@@ -137,10 +137,13 @@ export const ALBUM_PAGE= (userId) => `/album/${userId}`;
 
 
 
+export const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 //API
 export const SIGNUP_API="http://localhost:8080/user/register"
-export const LOGIN_API="http://localhost:8080/auth/login"
+// export const LOGIN_API="http://localhost:8080/auth/login"
+export const LOGIN_API = `${API_BASE_URL}/auth/login`;
+
 export const SETTINGS_API="http://localhost:8080/user/settings"
 //API FOR POSTS
 export const ADD_POST_API="http://localhost:8080/post/add"
