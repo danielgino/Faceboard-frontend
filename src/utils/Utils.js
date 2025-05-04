@@ -180,7 +180,7 @@ export const GET_FEED_POSTS_API=`${API_BASE_URL}/post/feed`
 export const DELETE_POST_API=(postId)=>`${API_BASE_URL}/post/delete/${postId}`
 export const EDIT_POST_API=(postId)=>`${API_BASE_URL}/post/edit/${postId}`
 export const DELETE_COMMENT_API=(commentId)=>`${API_BASE_URL}/comments/delete/${commentId}`
-export const GET_PAGINATED_POSTS_API = ({ userId = null, page = 0, size = 10, isFeed = true }) =>
+export const GET_PAGINATED_POSTS_API = ({ userId = null, page = 0, size = 5, isFeed = true }) =>
     isFeed
         ? `${API_BASE_URL}/post/feed?page=${page}&size=${size}`
         : `${API_BASE_URL}/post/posts?userId=${userId}&page=${page}&size=${size}`;

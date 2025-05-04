@@ -41,9 +41,17 @@ function Feed({ isFeed = false, userId = null }) {
         setLoading(true);
         try {
             const newPosts = await fetchPagePosts({ page: currentPage, isFeed, userId });
-            setLocalPosts(prev => [...prev, ...newPosts]);
+
+            // ⬇️ מניעת כפילויות לפי post.id
+            setLocalPosts(prev => {
+                const existingIds = new Set(prev.map(p => p.id));
+                const filtered = newPosts.filter(p => !existingIds.has(p.id));
+                return [...prev, ...filtered];
+            });
+
             loadedPages.current.add(currentPage);
             pageRef.current += 1;
+
             if (newPosts.length === 0) {
                 setHasMore(false);
             }
@@ -53,6 +61,28 @@ function Feed({ isFeed = false, userId = null }) {
             setLoading(false);
         }
     };
+
+    // const loadMorePosts = async () => {
+    //     console.log("📦 Loading posts for userId:", userId);
+    //
+    //     const currentPage = pageRef.current;
+    //     if (loading || loadedPages.current.has(currentPage)) return;
+    //
+    //     setLoading(true);
+    //     try {
+    //         const newPosts = await fetchPagePosts({ page: currentPage, isFeed, userId });
+    //         setLocalPosts(prev => [...prev, ...newPosts]);
+    //         loadedPages.current.add(currentPage);
+    //         pageRef.current += 1;
+    //         if (newPosts.length === 0) {
+    //             setHasMore(false);
+    //         }
+    //     } catch (err) {
+    //         console.error("Failed to load posts:", err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     useEffect(() => {
