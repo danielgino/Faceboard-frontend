@@ -162,7 +162,7 @@ export const SETTINGS_API     = `${API_BASE_URL}/user/settings`;
 export const GET_USER_DETAILS_BY_ID=(userId)=> `${API_BASE_URL}/user/by-id?id=${userId}`
 export const GET_USER_IMAGES_API = (userId) => `${API_BASE_URL}/post/${userId}/all-post-images`;
 export const GET_USER_FRIENDS_API=(userId)=> `${API_BASE_URL}/user/${userId}/friends`
-export const AUTH_ME_API=`http://localhost:8080/auth/me`
+export const AUTH_ME_API=`${API_BASE_URL}/auth/me`
 // Posts
 export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
 export const ADD_COMMENT_API  = `${API_BASE_URL}/comments/add-comment`;
