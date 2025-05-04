@@ -203,6 +203,11 @@ export const DECLINE_FRIEND_REQUEST_API=`${API_BASE_URL}/friendship/decline`
 export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
 export const ADD_COMMENT_API  = `${API_BASE_URL}/comments/add-comment`;
 export const ADD_LIKE_API     = `${API_BASE_URL}/likes/add-like`;
+
+//Messages
+
+export const GET_CONVERSATION_BETWEEN_USERS_API=(userId,otherUserId)=>`${API_BASE_URL}/messages/conversation/${userId}/${otherUserId}`
+
 export const WEBSITE_NAME="Faceboard"
     //BUTTONS
 

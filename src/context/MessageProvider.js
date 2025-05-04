@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 //import useWebSocket from "../service/WebSocketService";
 import { useUser } from "./UserProvider";
+import {GET_CONVERSATION_BETWEEN_USERS_API} from "../utils/Utils";
 
 const MessageContext = createContext();
 
@@ -31,7 +32,7 @@ export const MessageProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) throw new Error("Missing token");
 
-            const response = await fetch(`http://localhost:8080/messages/conversation/${userId}/${otherUserId}`, {
+            const response = await fetch(GET_CONVERSATION_BETWEEN_USERS_API(userId,otherUserId), {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
