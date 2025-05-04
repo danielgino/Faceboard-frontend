@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useUser } from "../context/UserProvider";
 import {usePosts} from "./PostProvider";
+import {DELETE_PROFILE_PIC_API, UPLOAD_PROFILE_PIC_API} from "../utils/Utils";
 
 const useProfilePictureUpload = () => {
     const { user,setUser, updateUserProfilePicture,fetchUserDetails } = useUser();
@@ -25,7 +26,7 @@ const useProfilePictureUpload = () => {
         formData.append("file", file);
 
         try {
-            const response = await fetch(`http://localhost:8080/user/${user.id}/profile-picture`, {
+            const response = await fetch(UPLOAD_PROFILE_PIC_API(user.id), {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -55,7 +56,7 @@ const useProfilePictureUpload = () => {
     };
     const handleRemoveProfilePicture = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/user/${user.id}/profile-picture`, {
+            const response = await fetch(DELETE_PROFILE_PIC_API(user.id), {
                 method: "DELETE",
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`

@@ -1,4 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
+import {
+    ACCEPT_FRIEND_REQUEST_API,
+    CHECK_FRIENDS_STATUS_API, DECLINE_FRIEND_REQUEST_API,
+    REMOVE_FRIEND_API,
+    SEND_FRIEND_REQUEST_API
+} from "../utils/Utils";
 
 const FriendshipContext = createContext();
 
@@ -9,7 +15,7 @@ export const FriendshipProvider = ({ children }) => {
     const checkFriendStatus = async (userId, friendId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-            const response = await fetch(`http://localhost:8080/friendship/status/${userId}/${friendId}`, {
+            const response = await fetch(CHECK_FRIENDS_STATUS_API(userId,friendId), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -39,7 +45,7 @@ export const FriendshipProvider = ({ children }) => {
     const sendFriendRequest = async (userId, otherUserId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-            await fetch(`http://localhost:8080/friendship/send/${userId}/${otherUserId}`, {
+            await fetch(SEND_FRIEND_REQUEST_API(userId,otherUserId), {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -52,7 +58,7 @@ export const FriendshipProvider = ({ children }) => {
     const acceptFriendRequest = async (userId, otherUserId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-            await fetch(`http://localhost:8080/friendship/accept/${userId}/${otherUserId}`, {
+            await fetch(ACCEPT_FRIEND_REQUEST_API(userId,otherUserId), {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -65,14 +71,12 @@ export const FriendshipProvider = ({ children }) => {
     const declineFriendRequest = async (userId, otherUserId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-
-            // המרה בטוחה ל-Number בתחילת הפונקציה
             const senderId = Number(otherUserId);
             const receiverId = Number(userId);
 
             console.log("🚀 Declining with:", { senderId, receiverId });
 
-            await fetch(`http://localhost:8080/friendship/decline`, {
+            await fetch(DECLINE_FRIEND_REQUEST_API, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -83,8 +87,6 @@ export const FriendshipProvider = ({ children }) => {
                     receiverId,
                 }),
             });
-
-            // גם פה תשתמש במספרים המומרים
             setFriendStatus({ senderId, receiverId, status: "DECLINED" });
 
         } catch (err) {
@@ -96,7 +98,7 @@ export const FriendshipProvider = ({ children }) => {
     const removeFriendship = async (userId, otherUserId) => {
         try {
             const token = localStorage.getItem("jwtToken");
-            await fetch(`http://localhost:8080/friendship/remove/${userId}/${otherUserId}`, {
+            await fetch(REMOVE_FRIEND_API(userId,otherUserId), {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

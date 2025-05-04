@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import {GET_NOTIFICATIONS_API, GET_UNREAD_NOTIFICATIONS_API, MARK_NOTIFICATIONS_AS_READ_API} from "../utils/Utils";
 
 const NotificationContext = createContext();
 
@@ -14,7 +15,7 @@ export const NotificationProvider = ({ children }) => {
                 throw new Error("User Not Authenticated!")
             }
 
-            const response = await fetch(`http://localhost:8080/notifications`, {
+            const response = await fetch(GET_NOTIFICATIONS_API, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -36,7 +37,7 @@ export const NotificationProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) return;
 
-            const res = await axios.get('http://localhost:8080/notifications/unread-count', {
+            const res = await axios.get(GET_UNREAD_NOTIFICATIONS_API, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -44,7 +45,7 @@ export const NotificationProvider = ({ children }) => {
 
             setUnreadCount(res.data);
         } catch (err) {
-            console.error('שגיאה בשליפת כמות התראות שלא נקראו:', err);
+            console.error('Error fetching unread notifications', err);
         }
     };
 
@@ -53,7 +54,7 @@ export const NotificationProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) return;
 
-            await axios.post('http://localhost:8080/notifications/mark-all-as-read', null, {
+            await axios.post(MARK_NOTIFICATIONS_AS_READ_API, null, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -64,7 +65,7 @@ export const NotificationProvider = ({ children }) => {
             );
             setUnreadCount(0);
         } catch (err) {
-            console.error('שגיאה בסימון התראות כנקראו:', err);
+            console.error('Error marking read Notifications', err);
         }
     };
     const addNotification = (notification) => {

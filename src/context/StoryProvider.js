@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import {useUser} from "./UserProvider";
+import {GET_FRIENDS_STORIES, GET_FRIENDS_STORIES_API, UPLOAD_STORY_API} from "../utils/Utils";
 
 const StoryContext = createContext();
 
@@ -14,18 +15,18 @@ export const StoryProvider = ({ children }) => {
         setLoading(true);
         const token = localStorage.getItem("jwtToken");
         try {
-            const response = await fetch("http://localhost:8080/api/stories/friends", {
+            const response = await fetch(GET_FRIENDS_STORIES_API, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (!response.ok) throw new Error("שגיאה בשליפת סטוריז");
+            if (!response.ok) throw new Error("Error Fetching Stories");
 
             const data = await response.json();
             setStories(data);
         } catch (error) {
-            console.error("שגיאה בשליפת סטוריז:", error.message);
+            console.error("Error Fetching Stories: ", error.message);
         } finally {
             setLoading(false);
         }
@@ -42,7 +43,7 @@ export const StoryProvider = ({ children }) => {
         if (caption) formData.append("caption", caption);
 
         try {
-            const response = await fetch("http://localhost:8080/api/stories/upload", {
+            const response = await fetch(UPLOAD_STORY_API, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -50,13 +51,13 @@ export const StoryProvider = ({ children }) => {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error("שגיאה בהעלאת סטורי");
+            if (!response.ok) throw new Error("Error upload a story..");
 
             const newStory = await response.json();
             setStories((prev) => [newStory, ...prev]);
             return newStory;
         } catch (error) {
-            console.error("שגיאה בהעלאת סטורי:", error.message);
+            console.error("Error upload a story: ", error.message);
             return null;
         }
     };

@@ -138,6 +138,9 @@ export const ALBUM_PAGE= (userId) => `/album/${userId}`;
 
 
 export const API_BASE_URL = process.env.REACT_APP_API_URL;
+// const url = isFeed
+//     ? `http://localhost:8080/post/feed?page=${page}&size=${size}`
+//     : `http://localhost:8080/post/posts?userId=${userId}&page=${page}&size=${size}`;
 
 //API
 // export const SIGNUP_API="http://localhost:8080/user/register"
@@ -158,11 +161,44 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL;
 export const SIGNUP_API       = `${API_BASE_URL}/user/register`;
 export const LOGIN_API        = `${API_BASE_URL}/auth/login`;
 export const SETTINGS_API     = `${API_BASE_URL}/user/settings`;
-
+//USER PROVIDERS
 export const GET_USER_DETAILS_BY_ID=(userId)=> `${API_BASE_URL}/user/by-id?id=${userId}`
 export const GET_USER_IMAGES_API = (userId) => `${API_BASE_URL}/post/${userId}/all-post-images`;
 export const GET_USER_FRIENDS_API=(userId)=> `${API_BASE_URL}/user/${userId}/friends`
 export const AUTH_ME_API=`${API_BASE_URL}/auth/me`
+//Profile Picture Provider
+export const UPLOAD_PROFILE_PIC_API=(userId)=>`${API_BASE_URL}/user/${userId}/profile-picture`
+export const DELETE_PROFILE_PIC_API=(userId)=>`${API_BASE_URL}/user/${userId}/profile-picture`
+//Update Settings
+export const UPDATE_SETTINGS_API=`${API_BASE_URL}/user/settings`
+//Stories Apis
+export const GET_FRIENDS_STORIES_API=`${API_BASE_URL}/api/stories/friends`
+export const UPLOAD_STORY_API=`${API_BASE_URL}/api/stories/upload`
+//Post Provider
+export const GET_USER_POSTS_API=(userId)=> `${API_BASE_URL}/post/posts?userId=${userId}`
+export const GET_FEED_POSTS_API=`${API_BASE_URL}/post/feed`
+export const DELETE_POST_API=(postId)=>`${API_BASE_URL}/post/delete/${postId}`
+export const EDIT_POST_API=(postId)=>`${API_BASE_URL}/post/edit/${postId}`
+export const DELETE_COMMENT_API=(commentId)=>`${API_BASE_URL}/comments/delete/${commentId}`
+export const GET_PAGINATED_POSTS_API = ({ userId = null, page = 0, size = 10, isFeed = true }) =>
+    isFeed
+        ? `${API_BASE_URL}/post/feed?page=${page}&size=${size}`
+        : `${API_BASE_URL}/post/posts?userId=${userId}&page=${page}&size=${size}`;
+
+//Search
+export const SEARCH_USERS_BY_NAME_API = (query) =>
+    `${API_BASE_URL}/user/name?name=${encodeURIComponent(query)}`;
+//Notifications
+export const GET_NOTIFICATIONS_API =`${API_BASE_URL}/notifications`
+export const GET_UNREAD_NOTIFICATIONS_API =`${API_BASE_URL}/notifications/unread-count`
+export const MARK_NOTIFICATIONS_AS_READ_API =`${API_BASE_URL}/notifications/mark-all-as-read`
+//Friendship Provider
+export const CHECK_FRIENDS_STATUS_API=(userId,friendId)=>`${API_BASE_URL}/friendship/status/${userId}/${friendId}`
+export const SEND_FRIEND_REQUEST_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/send/${userId}/${otherUserId}`
+export const ACCEPT_FRIEND_REQUEST_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/accept/${userId}/${otherUserId}`
+export const REMOVE_FRIEND_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/remove/${userId}/${otherUserId}`
+
+export const DECLINE_FRIEND_REQUEST_API=`${API_BASE_URL}/friendship/decline`
 // Posts
 export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
 export const ADD_COMMENT_API  = `${API_BASE_URL}/comments/add-comment`;

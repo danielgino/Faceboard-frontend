@@ -39,13 +39,9 @@ function AddPost() {
         if (postText!=='' || selectedImages.length>0){
         const token = localStorage.getItem('jwtToken');
         if (!token) {
-            setError('לא נמצא טוקן');
+            setError('Token Not Found');
             return;
         }
-
-        // const postData = {
-        //     postText: postText, // רק טקסט הפוסט
-        // };
             const formData = new FormData();
             formData.append("postText", postText);
             selectedImages.forEach((file, index) => {
@@ -61,17 +57,16 @@ function AddPost() {
             });
 
             if (!response.ok) {
-                const errorMessage = await response.json();  // קריאה לתוכן השגיאה
-              //  setPostStatus('שגיאה בהעלאת הפוסט: ' + errorMessage);
+                const errorMessage = await response.json();
                 return;
             }
             const newPost = await response.json();
             addPost(newPost)
-            setPostStatus('הפוסט הועלה בהצלחה!');
-            setPostText(''); // ניקוי השדה אחרי יצירת הפוסט
+            setPostStatus('Post Uploaded !');
+            setPostText('');
             setSelectedImages([]);
         } catch (err) {
-            setPostStatus('שגיאה בהעלאת הפוסט');
+            setPostStatus('Error creating post!');
             console.error('Error creating post:', err);
         }
     };

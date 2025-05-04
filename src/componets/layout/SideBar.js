@@ -69,11 +69,7 @@ export function SideBar() {
 
         <div className="mb-2 p-4">
             <img src={logoPNG} alt="Faceboard logo" />
-                {/*<Typography variant="h5" color="blue-gray">*/}
 
-                {/*    {WEBSITE_NAME}*/}
-                {/*</Typography>*/}
-            {/*<img src={FaceBoardLogo} alt="logo" style={{ width: '200px', height: '200px' }}/>*/}
         </div>
             <List>
                 <ListItem onClick={handleProfile} >

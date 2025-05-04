@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState } from "react";
 import PostLoader from "../assets/loaders/PostLoader";
+import {
+    DELETE_COMMENT_API,
+    DELETE_POST_API,
+    EDIT_POST_API,
+    GET_FEED_POSTS_API,
+    GET_PAGINATED_POSTS_API, GET_USER_POSTS_API
+} from "../utils/Utils";
 
 const PostContext = createContext();
 
@@ -17,7 +24,7 @@ export const PostProvider = ({ children }) => {
                 throw new Error("User Not Authenticated!")
             }
 
-            const response = await fetch(`http://localhost:8080/post/posts?userId=${userId}`, {
+            const response = await fetch(GET_USER_POSTS_API(userId), {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -42,7 +49,7 @@ export const PostProvider = ({ children }) => {
                 throw new Error("User Not Authenticated!")
             }
 
-            const response = await fetch(`http://localhost:8080/post/feed`, {
+            const response = await fetch(GET_FEED_POSTS_API, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -66,9 +73,7 @@ export const PostProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) throw new Error("User Not Authenticated!");
 
-            const url = isFeed
-                ? `http://localhost:8080/post/feed?page=${page}&size=${size}`
-                : `http://localhost:8080/post/posts?userId=${userId}&page=${page}&size=${size}`;
+            const url = GET_PAGINATED_POSTS_API({ userId, page, size, isFeed });
 
             const response = await fetch(url, {
                 headers: {
@@ -90,7 +95,7 @@ export const PostProvider = ({ children }) => {
         const token = localStorage.getItem("jwtToken");
 
         try {
-            const res = await fetch(`http://localhost:8080/post/delete/${postId}`, {
+            const res = await fetch(DELETE_POST_API(postId), {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -98,7 +103,6 @@ export const PostProvider = ({ children }) => {
             });
 
             if (res.ok) {
-                // מחק בהצלחה מה־state
                 setPosts((prev) => prev.filter((p) => p.postId !== postId));
             } else {
                 const err = await res.text();
@@ -117,7 +121,7 @@ export const PostProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/post/edit/${postId}`, {
+            const response = await fetch(EDIT_POST_API(postId), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -132,15 +136,11 @@ export const PostProvider = ({ children }) => {
             }
 
             const updatedPost = await response.json();
-
-            // מעדכן את הפוסט ב־posts
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
                     post.id === updatedPost.id ? { ...post, content: updatedPost.content, edited: updatedPost.edited } : post
                 )
             );
-
-            // אם אתה משתמש גם ב־feed, עדכן גם שם
             setFeed((prevFeed) =>
                 prevFeed.map((post) =>
                     post.id === updatedPost.id ? { ...post, content: updatedPost.content, edited: updatedPost.edited } : post
@@ -161,11 +161,11 @@ export const PostProvider = ({ children }) => {
     const setUpdatePosts = (newPosts) => {
         setPosts(newPosts);
     };
-    const deleteComment = async (commentId,postId) => {
+    const deleteComment = async (commentId) => {
         const token = localStorage.getItem("jwtToken");
 
         try {
-            const res = await fetch(`http://localhost:8080/comments/delete/${commentId}`, {
+            const res = await fetch(DELETE_COMMENT_API(commentId), {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

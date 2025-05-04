@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { fetchWithAuth } from "../utils/Utils";
+import {fetchWithAuth, SEARCH_USERS_BY_NAME_API} from "../utils/Utils";
 
 const SearchContext = createContext();
 
@@ -18,7 +18,7 @@ export const SearchProvider = ({ children }) => {
 
         setLoading(true);
         try {
-            const response = await fetchWithAuth(`http://localhost:8080/user/name?name=${query}`, { signal });
+            const response = await fetchWithAuth(SEARCH_USERS_BY_NAME_API(query), { signal });
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }

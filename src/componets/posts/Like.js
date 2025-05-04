@@ -15,7 +15,7 @@ function Like({post}){
 
     const handleLikes = async (likedNow) => {
 
-        const token = localStorage.getItem('jwtToken');  // שולפים את הטוקן מהמקומי (אם נשמר)
+        const token = localStorage.getItem('jwtToken');
         if (!token) {
             alert('User not authenticated');
             return;

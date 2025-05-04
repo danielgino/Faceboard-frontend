@@ -19,7 +19,7 @@ import {useUser} from "../../context/UserProvider";
 
 function Post({post,onImageClick,onDelete} ){
     const [showComments,setShowComment]=useState(false)
-    const [comments, setComments] = useState(post.comments);  // שמירה של התגובות במצב
+    const [comments, setComments] = useState(post.comments);
     const {user}=useUser()
     const { editPost, deletePost } = usePosts();
     const [isEditing, setIsEditing] = useState(false);
@@ -29,7 +29,7 @@ function Post({post,onImageClick,onDelete} ){
     }
 
     const handleCommentAdded = (newComment) => {
-        setComments(prevComments => [...prevComments, newComment]);  // הוספת תגובה חדשה לרשימה
+        setComments(prevComments => [...prevComments, newComment]);
         setShowComment(true);
     };
     const handleDeleteComment = (commentId) => {
@@ -170,7 +170,6 @@ function Post({post,onImageClick,onDelete} ){
             </div>
             {post.imageUrls.length > 0 ?
                 (
-                    // <div className="max-w-lg mx-auto">
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2">
                         {post.imageUrls.map((imageUrl, index) => (
                             <div key={index}>

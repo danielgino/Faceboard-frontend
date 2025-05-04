@@ -1,8 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import {useUser} from "./UserProvider";
-const {setUser}=useUser
-
+import {UPDATE_SETTINGS_API} from "../utils/Utils";
 export function useAutoSaveField(initialValue, fieldName,setUser) {
     const [value, setValue] = useState(initialValue || "");
     const [loading, setLoading] = useState(false);
@@ -10,7 +8,7 @@ export function useAutoSaveField(initialValue, fieldName,setUser) {
     const updateServer = async (newValue) => {
         setLoading(true);
         try {
-            await axios.put("http://localhost:8080/user/settings", {
+            await axios.put(UPDATE_SETTINGS_API, {
                 [fieldName]: newValue
             }, {
                 headers: {
