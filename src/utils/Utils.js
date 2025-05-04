@@ -140,17 +140,33 @@ export const ALBUM_PAGE= (userId) => `/album/${userId}`;
 export const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 //API
-export const SIGNUP_API="http://localhost:8080/user/register"
-// export const LOGIN_API="http://localhost:8080/auth/login"
-export const LOGIN_API = `${API_BASE_URL}/auth/login`;
+// export const SIGNUP_API="http://localhost:8080/user/register"
+// // export const LOGIN_API="http://localhost:8080/auth/login"
+// export const LOGIN_API = `${API_BASE_URL}/auth/login`;
+//
+// export const SETTINGS_API="http://localhost:8080/user/settings"
+// //API FOR POSTS
+// export const ADD_POST_API="http://localhost:8080/post/add"
+// export const ADD_COMMENT_API="http://localhost:8080/comments/add-comment"
+// export const ADD_LIKE_API="http://localhost:8080/likes/add-like"
+// export const PHOTOS_API= `http://localhost:8080/post/${userId}/all-post-images`
+// http://localhost:8080/user/${userId}/friends
+//http://localhost:8080/user/by-id?id=${userId}
+//http://localhost:8080/auth/me
 
-export const SETTINGS_API="http://localhost:8080/user/settings"
-//API FOR POSTS
-export const ADD_POST_API="http://localhost:8080/post/add"
-export const ADD_COMMENT_API="http://localhost:8080/comments/add-comment"
-export const ADD_LIKE_API="http://localhost:8080/likes/add-like"
 //API PROVIDERS
+export const SIGNUP_API       = `${API_BASE_URL}/user/register`;
+export const LOGIN_API        = `${API_BASE_URL}/auth/login`;
+export const SETTINGS_API     = `${API_BASE_URL}/user/settings`;
 
+export const GET_USER_DETAILS_BY_ID=(userId)=> `${API_BASE_URL}/user/by-id?id=${userId}`
+export const GET_USER_IMAGES_API = (userId) => `${API_BASE_URL}/post/${userId}/all-post-images`;
+export const GET_USER_FRIENDS_API=(userId)=> `${API_BASE_URL}/user/${userId}/friends`
+export const AUTH_ME_API=`http://localhost:8080/auth/me`
+// Posts
+export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
+export const ADD_COMMENT_API  = `${API_BASE_URL}/comments/add-comment`;
+export const ADD_LIKE_API     = `${API_BASE_URL}/likes/add-like`;
 export const WEBSITE_NAME="Faceboard"
     //BUTTONS
 

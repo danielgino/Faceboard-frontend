@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import {AUTH_ME_API, GET_USER_DETAILS_BY_ID, GET_USER_FRIENDS_API, GET_USER_IMAGES_API} from "../utils/Utils";
 
 const UserContext = createContext();
 
@@ -14,7 +15,7 @@ export const UserProvider = ({ children }) => {
 
         try {
 
-            const response = await fetch('http://localhost:8080/auth/me', {
+            const response = await fetch(AUTH_ME_API, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -43,7 +44,7 @@ export const UserProvider = ({ children }) => {
         try {
             const token = localStorage.getItem("jwtToken");
 
-            const response = await fetch(`http://localhost:8080/user/by-id?id=${userId}`, {
+            const response = await fetch(GET_USER_DETAILS_BY_ID(userId), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -82,7 +83,7 @@ export const UserProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) throw new Error("User Not Authenticated");
 
-            const response = await axios.get(`http://localhost:8080/post/${userId}/all-post-images`, {
+            const response = await axios.get(GET_USER_IMAGES_API(userId), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -99,7 +100,7 @@ export const UserProvider = ({ children }) => {
             const token = localStorage.getItem("jwtToken");
             if (!token) throw new Error("User Not Authenticated");
 
-            const response = await axios.get(`http://localhost:8080/user/${userId}/friends`, {
+            const response = await axios.get(GET_USER_FRIENDS_API(userId), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
