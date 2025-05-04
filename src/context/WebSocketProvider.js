@@ -15,7 +15,7 @@ export const WebSocketProvider = ({ children }) => {
         const token = localStorage.getItem("jwtToken");
 
         const client = new Client({
-            brokerURL:  process.env.REACT_APP_WS_URL,
+            brokerURL:  () => new SockJS(process.env.REACT_APP_WS_URL),
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
                 userId: user.id.toString(),
