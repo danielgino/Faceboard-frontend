@@ -96,7 +96,7 @@ export default function WebSocketHandler() {
             });
         };
 
-        connect(onConnect); // ➡️ קורא connect עם הסאבסקרייבים שלך
+        connect(onConnect);
 
     }, [user?.id]);
 
