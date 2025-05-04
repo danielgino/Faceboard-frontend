@@ -10,12 +10,13 @@ export const WebSocketProvider = ({ children }) => {
     const clientRef = useRef(null);
     const connect = (onConnectCallback) => {
         if (!user?.id || clientRef.current) return;
-
         console.log("🔌 Opening WebSocket...");
+        console.log("🧪 brokerURL:", process.env.REACT_APP_WS_URL);
+
         const token = localStorage.getItem("jwtToken");
 
         const client = new Client({
-            brokerURL:  () => new SockJS(process.env.REACT_APP_WS_URL),
+            brokerURL:  process.env.REACT_APP_WS_URL,
             connectHeaders: {
                 Authorization: `Bearer ${token}`,
                 userId: user.id.toString(),
