@@ -1,0 +1,8 @@
+{
+  "name": "untitled",
+  "importPath": "@/components/ui",
+  "aliases": {
+    "@/components": "./src/components",
+    "@/lib": "./src/lib"
+  }
+}
