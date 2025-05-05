@@ -15,7 +15,7 @@ import Swal from 'sweetalert2'
 import FriendshipStatus from "../../enums/FriendshipStatus";
 
  function UserDetails({otherUserId}) {
-    const { user, otherUser, fetchUserDetailsById ,fetchUserDetails,setUser,fetchUserPostImages,userImages} = useUser();
+    const { user, otherUser, fetchUserDetailsById,clearOtherUser,isOtherUserLoading ,fetchUserDetails,setUser,fetchUserPostImages,userImages} = useUser();
      const {  uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload(user, setUser);
      const { openLightbox } = useLightbox();
      const {friendStatus, checkFriendStatus, sendFriendRequest, acceptFriendRequest, declineFriendRequest,removeFriendship} = useFriendship();
@@ -32,6 +32,7 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
 
      useEffect(() => {
          if (otherUserId && user) {
+             clearOtherUser();
              fetchUserPostImages(otherUserId)
              fetchUserDetailsById(otherUserId);
          }
@@ -53,7 +54,8 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
          }
      }, [user, otherUser]);
 
-     const isLoading = !user || !currentUser;
+     // const isLoading = !user || !currentUser;
+     const isLoading = !user || !currentUser || (otherUserId && isOtherUserLoading);
 
      if (isLoading) {
          return (

@@ -15,11 +15,10 @@ import {
     Avatar,
 } from "@material-tailwind/react";
 import {ADD_POST_API} from "../../utils/Utils";
+import Swal from "sweetalert2";
 
 function AddPost() {
     const [postText, setPostText] = useState('');
-    const [postStatus, setPostStatus] = useState('');
-    const [error, setError] = useState(null);
     const [selectedImages, setSelectedImages] = useState([]);
     const fileInputRef = useRef();
     const {user}=useUser();
@@ -36,41 +35,54 @@ function AddPost() {
         );
     };
     const handlePostSubmit = async () => {
-        if (postText!=='' || selectedImages.length>0){
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-            setError('Token Not Found');
-            return;
-        }
-            const formData = new FormData();
-            formData.append("postText", postText);
-            selectedImages.forEach((file, index) => {
-                formData.append("files", file);
-            });
-        try {
-            const response = await fetch(ADD_POST_API, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
+        if (postText !== '' || selectedImages.length > 0) {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                Swal.fire("Error", "Unauthorized", "error");
                 return;
             }
-            const newPost = await response.json();
-            addPost(newPost)
-            setPostStatus('Post Uploaded !');
-            setPostText('');
-            setSelectedImages([]);
-        } catch (err) {
-            setPostStatus('Error creating post!');
-            console.error('Error creating post:', err);
+
+            const formData = new FormData();
+            formData.append("postText", postText);
+            selectedImages.forEach((file) => {
+                formData.append("files", file);
+            });
+
+            try {
+                const response = await fetch(ADD_POST_API, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage);
+                }
+
+                const newPost = await response.json();
+                addPost(newPost);
+
+                Swal.fire({
+                    title: "Post Uploaded!",
+                    text: "Post Successfully added",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'center',
+                });
+                setPostText('');
+                setSelectedImages([]);
+            } catch (err) {
+                Swal.fire("Error", "Post Upload Failed :( ", "error");
+                console.error('Error creating post:', err);
+            }
         }
     };
-    }
+
 
     return (
         <div className='add-post-container'>
@@ -151,9 +163,6 @@ function AddPost() {
 
             </div>
 
-
-            {postStatus && <p>{postStatus}</p>} {/* הצגת סטטוס הפוסט */}
-            {error && <p>{error}</p>} {/* הצגת שגיאה */}
         </div>
     );
 }

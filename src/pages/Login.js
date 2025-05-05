@@ -18,6 +18,7 @@ import Logo from "../animated/Logo";
 import LogoTemp from "../assets/logo/LogoTemp.png"
 import LogoTemp2 from "../assets/logo/LogoTemp2.png"
 import logoPNG from "../assets/logo/logoPNG.png"
+import Footer from "../componets/layout/Footer";
 
 function Login() {
     const [userName, setUserName] = useState(() => localStorage.getItem("savedEmail") || '');    const [password, setPassword] = useState('');
@@ -284,6 +285,7 @@ function Login() {
                     </div>
                 </div>
             </main>
+            <Footer/>
         </div>
     );
 }

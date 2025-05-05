@@ -5,7 +5,7 @@ import RandomIcons from "../../Icons/RandomIcons";
 import EmojiLibrary from "../interaction/EmojiLibrary";
 import {ADD_COMMENT_API} from "../../utils/Utils";
 
-function AddComment({post,onCommentAdded}){
+function AddComment({postId,onCommentAdded}){
     const user=useUser();
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +26,7 @@ function AddComment({post,onCommentAdded}){
         setCommentText("");
         setIsSubmitting(true);
 
-        const token = localStorage.getItem('jwtToken');  // שולפים את הטוקן מהמקומי (אם נשמר)
+        const token = localStorage.getItem('jwtToken');
         if (!token) {
             alert('User not authenticated');
             return;
@@ -34,7 +34,7 @@ function AddComment({post,onCommentAdded}){
         const commentData = {
             text: commentText,
             post: {
-                postId: post.id // שולח אובייקט שלם עם postId
+                postId: postId
             }
         };
         try {
@@ -42,7 +42,7 @@ function AddComment({post,onCommentAdded}){
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`  // הוספת הטוקן לכותרת Authorization
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(commentData),
             });

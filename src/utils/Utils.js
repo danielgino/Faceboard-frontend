@@ -143,19 +143,6 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL;
 //     : `http://localhost:8080/post/posts?userId=${userId}&page=${page}&size=${size}`;
 
 //API
-// export const SIGNUP_API="http://localhost:8080/user/register"
-// // export const LOGIN_API="http://localhost:8080/auth/login"
-// export const LOGIN_API = `${API_BASE_URL}/auth/login`;
-//
-// export const SETTINGS_API="http://localhost:8080/user/settings"
-// //API FOR POSTS
-// export const ADD_POST_API="http://localhost:8080/post/add"
-// export const ADD_COMMENT_API="http://localhost:8080/comments/add-comment"
-// export const ADD_LIKE_API="http://localhost:8080/likes/add-like"
-// export const PHOTOS_API= `http://localhost:8080/post/${userId}/all-post-images`
-// http://localhost:8080/user/${userId}/friends
-//http://localhost:8080/user/by-id?id=${userId}
-//http://localhost:8080/auth/me
 
 //API PROVIDERS
 export const SIGNUP_API       = `${API_BASE_URL}/user/register`;
@@ -203,7 +190,8 @@ export const DECLINE_FRIEND_REQUEST_API=`${API_BASE_URL}/friendship/decline`
 export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
 export const ADD_COMMENT_API  = `${API_BASE_URL}/comments/add-comment`;
 export const ADD_LIKE_API     = `${API_BASE_URL}/likes/add-like`;
-
+export const GET_LIKED_USERS_API=(postId) =>`${API_BASE_URL}/likes/post/${postId}`
+export const GET_COMMENTS_BY_POST=(postId)=>`${API_BASE_URL}/comments/post/${postId}`
 //Messages
 
 export const GET_CONVERSATION_BETWEEN_USERS_API=(userId,otherUserId)=>`${API_BASE_URL}/messages/conversation/${userId}/${otherUserId}`

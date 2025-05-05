@@ -154,10 +154,13 @@ export const PostProvider = ({ children }) => {
         }
     };
 
+    // const addPost = (newPost) => {
+    //     setPosts((prevPosts) => [...prevPosts, newPost]);
+    // };
     const addPost = (newPost) => {
-        setPosts((prevPosts) => [...prevPosts, newPost]);
+        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        setFeed((prevFeed) => [newPost, ...prevFeed]);
     };
-
     const setUpdatePosts = (newPosts) => {
         setPosts(newPosts);
     };

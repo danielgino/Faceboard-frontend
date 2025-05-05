@@ -10,9 +10,8 @@ export const UserProvider = ({ children }) => {
     const [otherUser, setOtherUser] = useState(null);
     const [token, setToken] = useState(null);
     const [userImages, setUserImages] = useState([]);
-
+    const [isOtherUserLoading, setIsOtherUserLoading] = useState(false);
     const fetchUserDetails = async (token) => {
-
         try {
 
             const response = await fetch(AUTH_ME_API, {
@@ -29,7 +28,6 @@ export const UserProvider = ({ children }) => {
             const userData = await response.json();
             setUser(userData);
 
-
         } catch (err) {
             console.error('Error fetching user details:', err);
             setError('Error fetching user details');
@@ -40,7 +38,29 @@ export const UserProvider = ({ children }) => {
         console.log("🔄 Updating user profile picture in context:", newProfilePictureUrl);
         setUser(prevUser => ({ ...prevUser, profilePictureUrl: newProfilePictureUrl }));
     };
+    // const fetchUserDetailsById = async (userId) => {
+    //     try {
+    //         const token = localStorage.getItem("jwtToken");
+    //
+    //         const response = await fetch(GET_USER_DETAILS_BY_ID(userId), {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch user details');
+    //         }
+    //
+    //         const userData = await response.json();
+    //         setOtherUser(userData);
+    //     } catch (err) {
+    //         console.error('Error fetching other user details:', err);
+    //         setError('Error fetching other user details');
+    //     }
+    // };
     const fetchUserDetailsById = async (userId) => {
+        setIsOtherUserLoading(true);
         try {
             const token = localStorage.getItem("jwtToken");
 
@@ -59,6 +79,8 @@ export const UserProvider = ({ children }) => {
         } catch (err) {
             console.error('Error fetching other user details:', err);
             setError('Error fetching other user details');
+        } finally {
+            setIsOtherUserLoading(false);
         }
     };
 
@@ -116,7 +138,7 @@ export const UserProvider = ({ children }) => {
         setOtherUser(null);
     };
     return (
-        <UserContext.Provider value={{ user, setUser, error,userImages
+        <UserContext.Provider value={{ user, setUser, error,userImages, isOtherUserLoading
             ,clearOtherUser,fetchUserPostImages , updateUserProfilePicture
             ,otherUser,fetchUserDetails, fetchUserDetailsById,fetchUserFriendsById }}>
             {children}

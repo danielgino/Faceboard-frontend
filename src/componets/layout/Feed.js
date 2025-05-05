@@ -126,8 +126,8 @@ function Feed({ isFeed = false, userId = null }) {
                         sortedPosts.map((post) => (
                             <Post key={post.id} post={post} onImageClick={openLightbox}
                                   onDelete={(postId) =>
-                                      setLocalPosts((prev) => prev.filter((p) => p.postId !== postId))
-                                  }/>
+                                      setLocalPosts((prev) => prev.filter((p) => p.id !== postId))
+                                    }/>
                         ))
                     )}
                 </InfiniteScroll>
