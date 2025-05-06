@@ -1,12 +1,10 @@
 import React, { useState,useRef } from 'react';
-import { Textarea, Button, IconButton } from "@material-tailwind/react";
+import { Textarea } from "@material-tailwind/react";
 import {usePosts} from "../../context/PostProvider";
 import {useUser} from "../../context/UserProvider";
-import EmojiPicker from "emoji-picker-react";
 import RandomIcons from "../../Icons/RandomIcons";
 import EmojiLibrary from "../interaction/EmojiLibrary";
 import ShareButton from "../../assets/buttons/ShareButtom";
-import {Subscript} from "lucide-react";
 import {
     Card,
     CardHeader,
@@ -22,6 +20,7 @@ function AddPost() {
     const [selectedImages, setSelectedImages] = useState([]);
     const fileInputRef = useRef();
     const {user}=useUser();
+    const [isPosting, setIsPosting] = useState(false);
 
     const {addPost}=usePosts()
 
@@ -35,10 +34,16 @@ function AddPost() {
         );
     };
     const handlePostSubmit = async () => {
-        if (postText !== '' || selectedImages.length > 0) {
+        if (isPosting) return;
+
+        const cleanedText = postText.trim();
+        if (cleanedText === '' && selectedImages.length === 0) {
+            await Swal.fire("Empty Post", "Share something to the world!", "warning");
+            return;
+        }
             const token = localStorage.getItem('jwtToken');
             if (!token) {
-                Swal.fire("Error", "Unauthorized", "error");
+                await Swal.fire("Error", "Unauthorized", "error");
                 return;
             }
 
@@ -49,6 +54,7 @@ function AddPost() {
             });
 
             try {
+                setIsPosting(true);
                 const response = await fetch(ADD_POST_API, {
                     method: 'POST',
                     headers: {
@@ -63,9 +69,9 @@ function AddPost() {
                 }
 
                 const newPost = await response.json();
-                addPost(newPost);
+                addPost(newPost,user.id);
 
-                Swal.fire({
+                await Swal.fire({
                     title: "Post Uploaded!",
                     text: "Post Successfully added",
                     icon: "success",
@@ -77,10 +83,12 @@ function AddPost() {
                 setPostText('');
                 setSelectedImages([]);
             } catch (err) {
-                Swal.fire("Error", "Post Upload Failed :( ", "error");
+                await Swal.fire("Error", "Post Upload Failed :( ", "error");
                 console.error('Error creating post:', err);
+            } finally {
+                setIsPosting(false);
             }
-        }
+
     };
 
 
@@ -157,7 +165,7 @@ function AddPost() {
                         <EmojiLibrary onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}/>
                     </div>
                     <div className="flex justify-end gap-2">
-                        <ShareButton onClick={handlePostSubmit} text={"Share"}/>
+                        <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting}/>
                     </div>
                 </Card>
 

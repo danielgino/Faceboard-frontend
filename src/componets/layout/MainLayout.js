@@ -9,7 +9,7 @@ import {useNotifications} from "../../context/NotificationProvider";
 import {useMessages} from "../../context/MessageProvider";
 import Search from "../interaction/Search";
 import Footer from "./Footer";
-
+import LogoLoading from "../../assets/logo/LogoLoading.png"
 function MainLayout() {
     const { user, fetchUserDetails } = useUser();
     const { fetchNotifications } = useNotifications();
@@ -33,8 +33,15 @@ function MainLayout() {
         return (
             <div className="w-full h-screen flex items-center justify-center bg-white">
                 <div className="text-center">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600 text-sm">טוען פרטי משתמש...</p>
+                    <img
+                        src={LogoLoading}
+                        alt="Faceboard Logo"
+                        className="w-[500px] h-[500px] mx-auto mb-6 animate-pulse"
+                    />
+                    {/*<h1 className="text-6xl font-extrabold tracking-widest text-purple-600 drop-shadow-lg animate-pulse">*/}
+                    {/*    LOADING...*/}
+                    {/*</h1>*/}
+                    {/*<p className="text-gray-600 text-xxl">Loading...</p>*/}
                 </div>
             </div>
         );
@@ -42,9 +49,9 @@ function MainLayout() {
 
     return (
         <div className="flex min-h-screen">
-            <Toast ref={toastRef} position="bottom-right" />
+            <Toast ref={toastRef} position="bottom-right"/>
 
-                <SideBar/>
+            <SideBar/>
             <div className="flex-1 flex flex-col">
                 <HeaderBar/>
 

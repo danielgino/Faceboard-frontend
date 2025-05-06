@@ -1,23 +1,32 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-const ShareButton = ({onClick,text}) => {
+const ShareButton = ({onClick,text,loading}) => {
     return (
         <StyledWrapper>
-            <button onClick={onClick}>
+            <button onClick={onClick} disabled={loading}>
                 <div className="svg-wrapper-1">
                     <div className="svg-wrapper">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={24} height={24}>
-                            <path fill="none" d="M0 0h24v24H0z" />
-                            <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" />
-                        </svg>
+                        {loading ? (
+                            <span className="spinner" />
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={24} height={24}>
+                                <path fill="none" d="M0 0h24v24H0z" />
+                                <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" />
+                            </svg>
+                        )}
                     </div>
                 </div>
-                <span>{text}</span>
+                <span>{loading ? "Posting..." : text}</span>
             </button>
         </StyledWrapper>
     );
 }
+
+const spin = keyframes`
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+`;
 
 const StyledWrapper = styled.div`
     button {
@@ -34,7 +43,12 @@ const StyledWrapper = styled.div`
         overflow: hidden;
         transition: all 0.2s;
         cursor: pointer;
-        height:40px;
+        height: 40px;
+        opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+    }
+
+    button:disabled {
+        cursor: not-allowed;
     }
 
     button span {
@@ -47,6 +61,17 @@ const StyledWrapper = styled.div`
         display: block;
         transform-origin: center center;
         transition: transform 0.3s ease-in-out;
+    }
+
+    .spinner {
+        display: block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        margin-left: 2px;       /* 🆕 מוסיף רווח מהטקסט */
+        animation: ${spin} 0.6s linear infinite;
     }
 
     button:hover .svg-wrapper {
@@ -73,6 +98,7 @@ const StyledWrapper = styled.div`
         to {
             transform: translateY(-0.1em);
         }
-    }`;
+    }
+`;
 
 export default ShareButton;

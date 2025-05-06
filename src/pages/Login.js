@@ -14,9 +14,7 @@ import {
 import {HOME_PAGE, LOGIN_API} from "../utils/Utils";
 import AnimatedBox from "../animated/TrailAnimation";
 import TrailAnimation from "../animated/TrailAnimation";
-import Logo from "../animated/Logo";
-import LogoTemp from "../assets/logo/LogoTemp.png"
-import LogoTemp2 from "../assets/logo/LogoTemp2.png"
+
 import logoPNG from "../assets/logo/logoPNG.png"
 import Footer from "../componets/layout/Footer";
 
@@ -57,13 +55,11 @@ function Login() {
             });
 
             const responseText = await response.text();
-            console.log('Response text:', responseText);
 
             if (response.ok) {
                 setToken(responseText);
                 localStorage.setItem('jwtToken', responseText);
-                console.log("Received token:", responseText);
-                console.log("TokenFROM",localStorage.getItem("jwtToken"))
+                // console.log("Received token:", responseText); //for checks
                 await fetchUserDetails(responseText);
                 navigate(HOME_PAGE);
             } else {
@@ -83,46 +79,13 @@ function Login() {
     return (
         <div>
 
-            <div>
-                {/*<Logo/>*/}
-                {/*<h1*/}
-                {/*    className="animate__animated animate__backInDown"*/}
-                {/*    style={{*/}
-                {/*        fontSize: '81px',*/}
-                {/*        marginBottom: '20px',*/}
-                {/*        padding: '10px 20px', // ריפוד פנימי*/}
-                {/*        background: 'linear-gradient(135deg, #e0e0e0, #cacaca)', // רקע עם גווני אפור*/}
-                {/*        borderRadius: '12px', // פינות מעוגלות*/}
-                {/*        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // צללים עדינים*/}
-                {/*        color: '#333',*/}
-                {/*        fontWeight: 'bold', // צבע טקסט כהה*/}
-                {/*    }}*/}
-                {/*>*/}
-                {/*    FaceBoard*/}
-                {/*</h1>*/}
-
-            </div>
 
             <main className="w-full flex">
                 <div className="relative flex-1 hidden items-center justify-center h-screen bg-indigo-50 lg:flex">
                     <div className="relative z-10 w-full max-w-md">
                         <img   className="w-[400px] h-auto object-contain"
                                src={logoPNG} alt="Faceboard logo" />
-                        {/*<h1*/}
-                        {/*    className="animate__animated animate__backInDown"*/}
-                        {/*    style={{*/}
-                        {/*        fontSize: '81px',*/}
-                        {/*        marginBottom: '20px',*/}
-                        {/*        padding: '10px 20px', // ריפוד פנימי*/}
-                        {/*        background: 'linear-gradient(135deg, #e0e0e0, #cacaca)', // רקע עם גווני אפור*/}
-                        {/*        borderRadius: '12px', // פינות מעוגלות*/}
-                        {/*        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // צללים עדינים*/}
-                        {/*        color: '#333',*/}
-                        {/*        fontWeight: 'bold', // צבע טקסט כהה*/}
-                        {/*    }}*/}
-                        {/*>*/}
-                        {/*    FaceBoard*/}
-                        {/*</h1>*/}
+
                         <div className=" mt-16 space-y-3">
                             <h3 className="text-indigo-400 text-3xl font-bold">Your friends are already waiting for you.</h3>
                             <p className="text-gray-900">

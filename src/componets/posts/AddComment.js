@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import RandomIcons from "../../Icons/RandomIcons";
 import EmojiLibrary from "../interaction/EmojiLibrary";
 import {ADD_COMMENT_API} from "../../utils/Utils";
+import Swal from 'sweetalert2';
 
 function AddComment({postId,onCommentAdded}){
     const user=useUser();
@@ -19,8 +20,12 @@ function AddComment({postId,onCommentAdded}){
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!commentText) {
-            alert("Please enter a comment.");
+        if (!commentText.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Empty Comment',
+                text: 'Please write something before submitting.',
+            });
             return;
         }
         setCommentText("");
@@ -28,7 +33,12 @@ function AddComment({postId,onCommentAdded}){
 
         const token = localStorage.getItem('jwtToken');
         if (!token) {
-            alert('User not authenticated');
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized',
+                text: 'User not authenticated',
+            });
+            setIsSubmitting(false);
             return;
         }
         const commentData = {
@@ -54,9 +64,15 @@ function AddComment({postId,onCommentAdded}){
             const result = await response.json();
             onCommentAdded(result)
             setCommentText('');
-
-            console.log('Comment added:', result);
-          // onCommentAdded(result);
+            Swal.fire({
+                icon: 'success',
+                title: 'Comment Added',
+                text: 'Your comment was successfully added!',
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'center',
+            });
 
         } catch (err) {
             setError(err.message);

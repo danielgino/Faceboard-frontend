@@ -10,8 +10,8 @@ export const StoryProvider = ({ children }) => {
     const { user } = useUser();
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(false);
-
     const fetchStories = async () => {
+        if (!user) return null;
         setLoading(true);
         const token = localStorage.getItem("jwtToken");
         try {

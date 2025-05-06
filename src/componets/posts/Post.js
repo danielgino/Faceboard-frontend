@@ -27,6 +27,7 @@ function Post({ post, onImageClick, onDelete }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(post.content);
     const [newestComment, setNewestComment] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
 
     const handleCommentsIcon = () => {
@@ -35,7 +36,8 @@ function Post({ post, onImageClick, onDelete }) {
 
     const handleSaveEdit = async () => {
         if (!editedContent.trim()) {
-            alert("Content cannot be empty!");
+            Swal.fire("Post can't  be empty!", "Please fill your post with something", "error");
+
             return;
         }
         const updated = await editPost(post.id, editedContent);
@@ -58,13 +60,14 @@ function Post({ post, onImageClick, onDelete }) {
         });
 
         if (!result.isConfirmed) return;
-
-        await deletePost(post.id);
-        Swal.fire("Deleted!", "Your post has been deleted.", "success");
-
-        if (onDelete) {
-            onDelete(post.id);
-        }
+        setIsDeleting(true);
+        setTimeout(async () => {
+            await deletePost(post.id);
+            if (onDelete) {
+                onDelete(post.id);
+            }
+             Swal.fire("Deleted!", "Your post has been deleted.", "success");
+        }, 500);
     };
 
     const randomLikedUsers = useMemo(() => {
@@ -73,8 +76,9 @@ function Post({ post, onImageClick, onDelete }) {
 
     return (
         <div className="w-full flex justify-center">
-            <Card className="mt-6 w-full max-w-4xl px-4 sm:px-6">
-                <CardBody>
+            <Card
+                className={`mt-6 w-full max-w-4xl px-4 sm:px-6 transition-all duration-500 ease-in-out overflow-hidden
+        ${isDeleting ? "opacity-0 max-h-0 p-0 m-0 scale-95" : "opacity-100 max-h-[1000px]"}`}>            <CardBody>
                     <CardHeader
                         color="transparent"
                         floated={false}

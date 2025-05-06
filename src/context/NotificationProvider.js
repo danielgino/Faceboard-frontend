@@ -1,14 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import {GET_NOTIFICATIONS_API, GET_UNREAD_NOTIFICATIONS_API, MARK_NOTIFICATIONS_AS_READ_API} from "../utils/Utils";
+import {useUser} from "./UserProvider";
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
-
+    const {user}=useUser;
     const fetchNotifications = async () => {
+        if (!user) return null;
         try {
             const token=localStorage.getItem("jwtToken");
             if (!token){

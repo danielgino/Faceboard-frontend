@@ -37,38 +37,7 @@ function Home() {
     if (loading) {
         return <p>Loading user details...</p>;
     }
-    const dummyStoriesData = [
-        {
-            profilePictureUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-            fullName: "Daniel Gino",
-            stories: [
-                { url: "https://picsum.photos/300/500?random=1" },
-                { url: "https://picsum.photos/300/500?random=2" },
-            ],
-        },
-        {
-            profilePictureUrl: "https://randomuser.me/api/portraits/women/2.jpg",
-            fullName: "Shilat Butz",
-            stories: [
-                { url: "https://picsum.photos/300/500?random=3" },
-                { url: "https://picsum.photos/300/500?random=4" },
-            ],
-        },
-        {
-            profilePictureUrl: "https://randomuser.me/api/portraits/men/3.jpg",
-            fullName: "Sagiv Sal",
-            stories: [
-                { url: "https://picsum.photos/300/500?random=5" },
-            ],
-        },
-        {
-            profilePictureUrl: "https://randomuser.me/api/portraits/men/4.jpg",
-            fullName: "Yosi Shitrit",
-            stories: [
-                { url: "https://picsum.photos/300/500?random=6" },
-            ],
-        },
-    ];
+
     return (
         <div>
 

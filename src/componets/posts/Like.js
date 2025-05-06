@@ -8,11 +8,16 @@ function Like({ postId, likeCount, likedByCurrentUser }) {
     const [likes, setLikes] = useState(likeCount ?? 0);
     const [liked, setLiked] = useState(likedByCurrentUser ?? false);
     const [showLikeList, setShowLikeList] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleLikes = async () => {
+        if (loading) return;
+        setLoading(true);
+
         const token = localStorage.getItem("jwtToken");
         if (!token) {
             alert("User not authenticated");
+            setLoading(false);
             return;
         }
 
@@ -43,15 +48,16 @@ function Like({ postId, likeCount, likedByCurrentUser }) {
 
         } catch (err) {
             console.error("Error toggling like:", err);
+        } finally {
+            setLoading(false);
         }
     };
-
     return (
         <div className="flex items-center gap-1">
             <div className="flex items-center h-6">
-                <HeartIcon liked={liked} handleLikes={handleLikes} />
+                    <HeartIcon liked={liked} handleLikes={handleLikes} loading={loading} />
             </div>
-            <Tooltip content={`${likes} לייקים`}>
+            <Tooltip content={`${likes} Likes`}>
                 <Typography
                     className="font-bold text-sm ml-1 text-gray-700 cursor-pointer hover:underline"
                     onClick={() => setShowLikeList(true)}

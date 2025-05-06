@@ -20,6 +20,7 @@ function Comment({ postId, postOwnerId,newComment  }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { deleteComment } = usePosts();
+    const [deletingCommentId, setDeletingCommentId] = useState(null);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -58,14 +59,19 @@ function Comment({ postId, postOwnerId,newComment  }) {
 
 
         if (!result.isConfirmed) return;
+        setDeletingCommentId(commentId);
+        setTimeout(async () => {
+            try {
+                await deleteComment(commentId, postId);
+                setComments(prev => prev.filter(c => c.commentId !== commentId));
+                 Swal.fire("Deleted!", "Your comment has been deleted.", "success");
+            } catch (err) {
+                 Swal.fire("Error!", "Failed to delete comment.", "error");
+            } finally {
+                setDeletingCommentId(null);
+            }
+        }, 600);
 
-        try {
-            await deleteComment(commentId, postId);
-            setComments(prev => prev.filter(c => c.commentId !== commentId));
-            Swal.fire("Deleted!", "Your comment has been deleted.", "success");
-        } catch (err) {
-            Swal.fire("Error!", "Failed to delete comment.", "error");
-        }
     };
 
     useEffect(() => {
@@ -77,7 +83,7 @@ function Comment({ postId, postOwnerId,newComment  }) {
         return (
             <>
                 <CommentLoader />
-                <CommentLoader />
+                {/*<CommentLoader />*/}
             </>
         );
     }
@@ -90,10 +96,19 @@ function Comment({ postId, postOwnerId,newComment  }) {
         <div>
             {loading && <div>טוען תגובות...</div>}
             {error && <div>שגיאה בטעינת תגובות: {error}</div>}
+            <div className="max-h-[600px] overflow-y-auto pr-2">
 
-            {comments.map((comment) => (
-                <Card key={comment.commentId} shadow={false} className="w-full max-w-[48rem] bg-gray-50 px-4 py-2 mb-4">
-                    <CardHeader
+                {comments.map((comment) => (
+
+                    <Card
+                        key={comment.commentId}
+                        shadow={false}
+                        className={`
+        w-full max-w-[48rem] bg-gray-50 px-4 py-2 mb-4
+        transition-all duration-500 ease-in-out overflow-hidden
+        ${deletingCommentId === comment.commentId ? "opacity-0 max-h-0 p-0 m-0 scale-95" : "opacity-100 max-h-[500px]"}
+    `}
+                    > <CardHeader
                         color="transparent"
                         floated={false}
                         shadow={false}
@@ -118,7 +133,7 @@ function Comment({ postId, postOwnerId,newComment  }) {
                                     {formatDate(comment.createdAt).toLocaleString()}
                                     {(user?.id === comment.userId || user?.id === postOwnerId) && (
                                         <button onClick={() => handleDeleteComment(comment.commentId)}>
-                                            <RandomIcons.TrashIcon className="w-4 h-4" />
+                                            <RandomIcons.TrashIcon className="w-4 h-4"/>
                                         </button>
                                     )}
                                 </div>
@@ -128,15 +143,16 @@ function Comment({ postId, postOwnerId,newComment  }) {
                             </a>
                         </div>
                     </CardHeader>
-                    <CardBody className="mb-6 p-0">
-                        <Typography>{comment.commentText}</Typography>
-                    </CardBody>
-                </Card>
-            ))}
+                        <CardBody className="mb-6 p-0">
+                            <Typography>{comment.commentText}</Typography>
+                        </CardBody>
+                    </Card>
+                ))}
+            </div>
 
 
-        </div>
-    );
-}
+            </div>
+            );
+            }
 
-export default Comment;
+            export default Comment;

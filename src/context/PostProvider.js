@@ -157,10 +157,17 @@ export const PostProvider = ({ children }) => {
     // const addPost = (newPost) => {
     //     setPosts((prevPosts) => [...prevPosts, newPost]);
     // };
-    const addPost = (newPost) => {
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
-        setFeed((prevFeed) => [newPost, ...prevFeed]);
+    // const addPost = (newPost) => {
+    //     setPosts((prevPosts) => [newPost, ...prevPosts]);
+    //     setFeed((prevFeed) => [newPost, ...prevFeed]);
+    // };
+    const addPost = (newPost, currentUserId) => {
+        setFeed((prev) => [newPost, ...prev]);
+        if (newPost.userId === currentUserId) {
+            setPosts((prev) => [newPost, ...prev]);
+        }
     };
+
     const setUpdatePosts = (newPosts) => {
         setPosts(newPosts);
     };
@@ -186,7 +193,7 @@ export const PostProvider = ({ children }) => {
         }
     };
     return (
-        <PostContext.Provider value={{ posts,feed,loading,editPost,
+        <PostContext.Provider value={{ posts,feed,setFeed,loading,editPost,
             fetchPagePosts,fetchFeedPosts,fetchUserPosts, addPost,
             setUpdatePosts,setPosts,deletePost,deleteComment }}>
             {children}
