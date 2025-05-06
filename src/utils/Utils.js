@@ -133,7 +133,7 @@ export const PROFILE_PAGE_LINK="/profile/:userId"
 export const FRIENDS_PAGE=(userId)=> `/friends/${userId}`
 export const PROFILE_PAGE = (userId) => `/profile/${userId}`;
 export const ALBUM_PAGE= (userId) => `/album/${userId}`;
-
+//l
 
 
 
