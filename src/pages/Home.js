@@ -15,10 +15,10 @@ import MainLayout from "../componets/layout/MainLayout";
 import StoryBar from "../componets/interaction/StoryBar";
 
 function Home() {
-    const { user, error } = useUser();
+    const { user } = useUser();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const {feed,fetchFeedPosts}=usePosts()
+    const {fetchFeedPosts}=usePosts()
 
     useEffect(() => {
         if (user) {

@@ -79,9 +79,16 @@ function StoryBar() {
     );
 
     return (
-        <div className="relative bg-white shadow-md rounded-xl my-5 max-w-screen-lg mx-auto">
-            <div className="overflow-x-auto overflow-y-hidden">
-                <div className="flex items-center gap-4 px-4 py-2 h-[140px]">
+        // <div className="relative bg-white shadow-md rounded-xl my-5 max-w-screen-lg mx-auto">
+        <div
+            className="relative bg-white shadow-md rounded-xl my-5 w-full max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto overflow-x-hidden">
+
+            {/*<div className="overflow-x-auto overflow-y-hidden">*/}
+            <div className="w-full overflow-x-auto overflow-y-hidden px-2 sm:px-4">
+
+                {/*<div className="flex items-center gap-4 px-4 py-2 h-[140px]">*/}
+                <div className="flex items-center gap-4 py-2 h-[140px] min-w-fit">
+
                     <div
                         className="flex flex-col items-center justify-center cursor-pointer"
                         onClick={() => openStoryUploadDialog(uploadStory, fetchStories)}
@@ -94,7 +101,8 @@ function StoryBar() {
                                 size="xl"
                                 className="border-2 border-gray-300 "
                             />
-                            <div className="absolute bottom-0 right-0 bg-blue-500 text-white text-sm rounded-full w-5 h-5 flex items-center justify-center">
+                            <div
+                                className="absolute bottom-0 right-0 bg-blue-500 text-white text-sm rounded-full w-5 h-5 flex items-center justify-center">
                                 +
                             </div>
                         </div>
@@ -130,8 +138,8 @@ function StoryBar() {
                         <Stories
                             stories={safeStories}
                             defaultInterval={3000}
-                            width={isMobile? "100vw": "30vw"}
-                            height={isMobile? "100vw": "45vw"}
+                            width={isMobile ? "100vw" : "30vw"}
+                            height={isMobile ? "100vw" : "45vw"}
                             onAllStoriesEnd={() => {
                                 setShowStories(false);
                                 setTimeout(() => {
@@ -152,7 +160,7 @@ function StoryBar() {
                         {/* כפתור הסגירה */}
                         <button
                             className="absolute top-4 right-4 z-[10000] bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center"
-                            style={{ pointerEvents: "auto" }}
+                            style={{pointerEvents: "auto"}}
                             onClick={() => {
                                 setShowStories(false);
                                 setCurrentGroupIndex(null);

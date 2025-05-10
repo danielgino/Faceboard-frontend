@@ -25,6 +25,7 @@ function Feed({ isFeed = false, userId = null }) {
     const [hasMore, setHasMore] = useState(true);
     const { user } = useUser();
     const location = useLocation();
+    const [readyToLoad, setReadyToLoad] = useState(false);
 
     const isProfileView = !isFeed && userId !== null;
     const activePosts = isProfileView ? posts : feed;
@@ -70,29 +71,50 @@ function Feed({ isFeed = false, userId = null }) {
         }
     };
 
+    // useEffect(() => {
+    //     resetPosts();
+    //     loadMorePosts();
+    // }, [isFeed, userId, location.pathname]);
+
     useEffect(() => {
+        setReadyToLoad(false); // תחסום טעינה ישנה
         resetPosts();
-        loadMorePosts();
-    }, [isFeed, userId, location.pathname]);
+        setTimeout(() => {
+            setReadyToLoad(true); // תאפשר טעינה חדשה אחרי שהסטייט התרוקן
+        }, 0); // אפשר גם 50ms אם אתה רוצה שיהיה ממש בטוח
+    }, [userId, isFeed, location.pathname]);
+
+    useEffect(() => {
+        if (readyToLoad) {
+            loadMorePosts();
+        }
+    }, [readyToLoad]);
 
     return (
-        <div className="flex flex-col items-center w-full">
-            <div className="w-full px-4 sm:px-6 lg:px-0 max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
-                {(isFeed || Number(userId) === user?.id) && <AddPost />}
+        <div className="flex flex-col items-center w-full overflow-x-hidden">
+
+            {/*// <div className="flex flex-col items-center w-full">*/}
+            {/*<div className="w-full px-4 sm:px-6 lg:px-0 max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">*/}
+            {/*<div className="w-full max-w-4xl mx-auto px-4 sm:px-6">*/}
+            {/*<div className="w-full max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 sm:px-4">*/}
+            <div
+                className="w-full max-w-[100vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 sm:px-4 overflow-x-hidden">
+
+                {(isFeed || Number(userId) === user?.id) && <AddPost/>}
 
                 <InfiniteScroll
                     dataLength={activePosts.length}
                     next={loadMorePosts}
                     hasMore={hasMore}
-                    loader={<div className="flex justify-center mt-4"><PostLoader /></div>}
+                    loader={<div className="flex justify-center mt-4"><PostLoader/></div>}
                     endMessage={
-                        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+                        <p style={{textAlign: 'center', marginTop: '1rem'}}>
                             <b>You have reached the end of the feed 🎉</b>
                         </p>
                     }
                 >
                     {activePosts.length === 0 && !loading ? (
-                        <div className="my-10"><NoPostsYet /></div>
+                        <div className="my-10"><NoPostsYet/></div>
                     ) : (
                         activePosts.map((post) => (
                             <Post

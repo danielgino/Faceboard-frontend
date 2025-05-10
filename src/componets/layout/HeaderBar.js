@@ -12,7 +12,7 @@ import Notification from "../interaction/Notification";
  function HeaderBar() {
     const [openNav, setOpenNav] = React.useState(false);
     const navigate = useNavigate();
-    const {user} = useUser();
+    const {user,logout} = useUser();
      const [open, setOpen] = useState(false);
      const [notificationOpen, setNotificationOpen] = useState(false);
 
@@ -28,8 +28,7 @@ import Notification from "../interaction/Notification";
 
     }
     const handleLogout = (e) => {
-        e.preventDefault();
-        localStorage.removeItem('jwtToken');
+         logout()
         navigate(LOGIN_PAGE); // חזרה לדף ההתחברות
     };
     React.useEffect(() => {

@@ -95,7 +95,8 @@ function AddPost() {
     return (
         <div className='add-post-container'>
 
-            <div className="w-full max-w-4xl mx-auto ">
+            {/*<div className="w-full max-w-4xl mx-auto ">*/}
+            <div className="w-full mb-6 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl  xl:max-w-4xl mx-auto px-2 sm:px-4">
                 <Card shadow={false} className="w-full px-4 py-2 shadow-md rounded-xl">
                     <CardHeader
                         color="transparent"
@@ -123,7 +124,7 @@ function AddPost() {
                     </CardHeader>
                     <CardBody className="mb-6 p-0">
                         {selectedImages.length > 0 && (
-                            <div className="mt-4 flex gap-2 overflow-x-auto">
+                            <div className="mt-4 flex gap-2 overflow-x-auto w-full max-w-full">
                                 {selectedImages.map((file, index) => (
                                     <div
                                         key={index}

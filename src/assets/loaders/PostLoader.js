@@ -1,113 +1,35 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
 
 const PostLoader = () => {
     return (
-        <StyledWrapper>
+        <div className="w-full flex justify-center mt-6">
+            <div className="w-full max-w-4xl px-4 sm:px-6 py-6 rounded-xl border border-gray-300 bg-gray-100 relative overflow-hidden ">
+                {/* shimmer effect */}
+                <div className="absolute top-0 left-0 w-full h-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent z-0" />
 
-            <div className="loader">
-                <div className="wrapper">
-                    <div className="circle" />
-                    <div className="line-1" />
-                    <div className="line-2" />
-                    <div className="line-3" />
-                    <div className="line-4" />
+                <div className="relative z-10 flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-300" />
+                    <div className="flex flex-col gap-2 flex-1">
+                        <div className="w-28 h-2.5 bg-gray-300 rounded" />
+                        <div className="w-20 h-2.5 bg-gray-300 rounded" />
+                    </div>
+                </div>
+
+                <div className="relative z-10 mb-4">
+                    <div className="w-full h-2.5 bg-gray-300 rounded mb-2" />
+                    <div className="w-[92%] h-2.5 bg-gray-300 rounded" />
+                </div>
+
+                <div className="relative z-10 w-full h-72 sm:h-80 bg-gray-300 rounded-md mb-6" />
+
+                <div className="relative z-10 flex gap-4">
+                    <div className="w-8 h-8 bg-gray-300 rounded-md" />
+                    <div className="w-8 h-8 bg-gray-300 rounded-md" />
+                    <div className="w-8 h-8 bg-gray-300 rounded-md" />
                 </div>
             </div>
-        </StyledWrapper>
+        </div>
     );
-}
-
-const StyledWrapper = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: center;
-
-    .loader {
-        position: relative;
-        width: 900px;
-        height: 400px;
-        margin-bottom: 5px;
-        border: 1px solid #d3d3d3;
-        border-radius: 12px;
-        padding: 15px;
-        background-color: #f8f8fa;
-        overflow: hidden;
-    }
-
-    .loader:after {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background: linear-gradient(110deg, rgba(227, 227, 227, 0) 0%, rgba(227, 227, 227, 0) 40%, rgb(228, 225, 225) 50%, rgba(227, 227, 227, 0) 60%, rgba(227, 227, 227, 0) 100%);
-        animation: gradient-animation_2 1.2s linear infinite;
-    }
-
-    .loader .wrapper {
-        width: 100%;
-        height: 100%;
-        position: relative;
-    }
-
-    .loader .wrapper > div {
-        background-color: #cacaca;
-    }
-
-    .loader .circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
-
-    .loader .button {
-        display: inline-block;
-        height: 32px;
-        width: 75px;
-    }
-
-    .loader .line-1 {
-        position: absolute;
-        top: 11px;
-        left: 58px;
-        height: 10px;
-        width: 100px;
-    }
-
-    .loader .line-2 {
-        position: absolute;
-        top: 34px;
-        left: 58px;
-        height: 10px;
-        width: 150px;
-    }
-
-    .loader .line-3 {
-        position: absolute;
-        top: 57px;
-        left: 0px;
-        height: 10px;
-        width: 100%;
-    }
-
-    .loader .line-4 {
-        position: absolute;
-        top: 80px;
-        left: 0px;
-        height: 10px;
-        width: 92%;
-    }
-
-    @keyframes gradient-animation_2 {
-        0% {
-            transform: translateX(-100%);
-        }
-
-        100% {
-            transform: translateX(100%);
-        }
-    }`;
+};
 
 export default PostLoader;

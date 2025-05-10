@@ -9,9 +9,24 @@
      "./node_modules/@material-tailwind/react/components/**/*.{js,ts,jsx,tsx}",
      "./node_modules/@material-tailwind/react/theme/components/**/*.{js,ts,jsx,tsx}",
    ],
-   theme: {
-     extend: {},
-   },
+     theme: {
+         extend: {
+             animation: {
+                 shimmer: 'shimmer 1.5s infinite linear',
+                 softPulse: 'softPulse 2.5s ease-in-out infinite',
+             },
+             keyframes: {
+                 shimmer: {
+                     '0%': { transform: 'translateX(-100%)' },
+                     '100%': { transform: 'translateX(100%)' },
+                 },
+                 softPulse: {
+                     '0%, 100%': { opacity: '1' },
+                     '50%': { opacity: '0.94' },
+                 },
+             },
+         },
+     },
    plugins: [],
  });
 

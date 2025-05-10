@@ -1,6 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import {AUTH_ME_API, GET_USER_DETAILS_BY_ID, GET_USER_FRIENDS_API, GET_USER_IMAGES_API} from "../utils/Utils";
+import {
+    AUTH_ME_API,
+    GET_USER_DETAILS_BY_ID,
+    GET_USER_FRIENDS_API,
+    GET_USER_IMAGES_API,
+    LOGIN_PAGE
+} from "../utils/Utils";
 
 const UserContext = createContext();
 
@@ -10,10 +16,12 @@ export const UserProvider = ({ children }) => {
     const [otherUser, setOtherUser] = useState(null);
     const [token, setToken] = useState(null);
     const [userImages, setUserImages] = useState([]);
+    const [isUserLoading, setIsUserLoading] = useState(true);
     const [isOtherUserLoading, setIsOtherUserLoading] = useState(false);
+
     const fetchUserDetails = async (token) => {
         try {
-
+            setIsUserLoading(true)
             const response = await fetch(AUTH_ME_API, {
                 method: 'GET',
                 headers: {
@@ -31,6 +39,9 @@ export const UserProvider = ({ children }) => {
         } catch (err) {
             console.error('Error fetching user details:', err);
             setError('Error fetching user details');
+        } finally {
+            setIsUserLoading(false);
+
         }
     };
 
@@ -38,29 +49,8 @@ export const UserProvider = ({ children }) => {
         console.log("🔄 Updating user profile picture in context:", newProfilePictureUrl);
         setUser(prevUser => ({ ...prevUser, profilePictureUrl: newProfilePictureUrl }));
     };
-    // const fetchUserDetailsById = async (userId) => {
-    //     try {
-    //         const token = localStorage.getItem("jwtToken");
-    //
-    //         const response = await fetch(GET_USER_DETAILS_BY_ID(userId), {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-    //
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch user details');
-    //         }
-    //
-    //         const userData = await response.json();
-    //         setOtherUser(userData);
-    //     } catch (err) {
-    //         console.error('Error fetching other user details:', err);
-    //         setError('Error fetching other user details');
-    //     }
-    // };
+
     const fetchUserDetailsById = async (userId) => {
-        setIsOtherUserLoading(true);
         try {
             const token = localStorage.getItem("jwtToken");
 
@@ -80,7 +70,6 @@ export const UserProvider = ({ children }) => {
             console.error('Error fetching other user details:', err);
             setError('Error fetching other user details');
         } finally {
-            setIsOtherUserLoading(false);
         }
     };
 
@@ -90,14 +79,13 @@ export const UserProvider = ({ children }) => {
             setToken(token);
         }
     }, []);
-
     useEffect(() => {
-        if (token && !user &&!otherUser) {
-            fetchUserDetails(token).catch((error) => {
-                console.error("Error fetching user details:", error);
-            });
+        if (token) {
+            fetchUserDetails(token);
         }
-    }, [token, user,otherUser]);
+    }, [token]);
+
+
 
 
     const fetchUserPostImages = async (userId) => {
@@ -137,8 +125,16 @@ export const UserProvider = ({ children }) => {
     const clearOtherUser = () => {
         setOtherUser(null);
     };
+
+    const logout = () => {
+        localStorage.removeItem("jwtToken");
+        setUser(null);
+        setOtherUser(null);
+        setUserImages([]);
+        setToken(null);
+    };
     return (
-        <UserContext.Provider value={{ user, setUser, error,userImages, isOtherUserLoading
+        <UserContext.Provider value={{ user,logout,isUserLoading, setUser, error,userImages, isOtherUserLoading
             ,clearOtherUser,fetchUserPostImages , updateUserProfilePicture
             ,otherUser,fetchUserDetails, fetchUserDetailsById,fetchUserFriendsById }}>
             {children}

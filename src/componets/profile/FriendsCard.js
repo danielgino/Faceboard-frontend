@@ -12,8 +12,10 @@ const hasMoreFriends=user.friendsList.length>6;
     }, [user]);
     return (
         <div>
-            <Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
-                <CardBody>
+            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
+            <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
+
+            <CardBody>
                     <Typography variant="h5" color="blue-gray" className="mb-2">
                             <Link to={FRIENDS_PAGE(user.id)}>
                             <button>{FRIENDS_BTN_TEXT}</button>

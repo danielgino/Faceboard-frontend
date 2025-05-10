@@ -1,6 +1,6 @@
 import {Card, CardHeader, CardBody, CardFooter, Typography, Tooltip,Avatar,Button} from "@material-tailwind/react";
 import {useUser} from "../../context/UserProvider";
-import { useEffect ,useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import { Link } from "react-router-dom";
 import CardSkeletonLoader from "../../assets/loaders/CardSkeletonLoader";
 import {ALBUM_PAGE, GenderEnum} from "../../utils/Utils";
@@ -13,12 +13,14 @@ import noPhotosYet from "../../assets/photos/noPhotosYet.png"
 import { useFriendship } from "../../context/FriendshipProvider";
 import Swal from 'sweetalert2'
 import FriendshipStatus from "../../enums/FriendshipStatus";
+import FriendshipActionButton from "./FriendshipActionButton";
 
  function UserDetails({otherUserId}) {
     const { user, otherUser, fetchUserDetailsById,clearOtherUser,isOtherUserLoading ,fetchUserDetails,setUser,fetchUserPostImages,userImages} = useUser();
      const {  uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload(user, setUser);
      const { openLightbox } = useLightbox();
      const {friendStatus, checkFriendStatus, sendFriendRequest, acceptFriendRequest, declineFriendRequest,removeFriendship} = useFriendship();
+     const [isFriendStatusLoading, setIsFriendStatusLoading] = useState(false);
 
      const handleImageClick = (index) => {
          openLightbox(userImages, index);
@@ -30,29 +32,78 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
          }
      }, [user, fetchUserDetails]);
 
-     useEffect(() => {
-         if (otherUserId && user) {
-             clearOtherUser();
-             fetchUserPostImages(otherUserId)
-             fetchUserDetailsById(otherUserId);
-         }
-     }, [otherUserId, user]);
 
+     useEffect(() => {
+         const fetchData = async () => {
+             if (otherUserId) {
+                 clearOtherUser(); // תאפס לפני שמושך מידע חדש
+                 await fetchUserDetailsById(otherUserId);
+                 await fetchUserPostImages(otherUserId);
+             }
+         };
+
+         fetchData();
+     }, [otherUserId]);
 
      const latestImages = useMemo(() => {
          if (!userImages) return [];
          return [...userImages].slice(-4).reverse();
      }, [userImages]);
+     const handleFriendButtonClick = async () => {
+         if (friendStatus?.status === FriendshipStatus.ACCEPTED) {
+             const result = await Swal.fire({
+                 title: "Unfriend?",
+                 text: `Are You Sure you want to cancel Friendship with ${currentUser.name}?`,
+                 icon: "warning",
+                 showCancelButton: true,
+                 confirmButtonText: "Yes,Remove",
+                 cancelButtonText: "Cancel",
+             });
+
+             if (result.isConfirmed) {
+                 await removeFriendship(user.id, otherUser.id);
+             }
+         } else if (!friendStatus || friendStatus.status !== FriendshipStatus.PENDING) {
+             await sendFriendRequest(user.id, otherUser.id);
+         }
+     };
+
+     const friendButtonText = isFriendStatusLoading
+         ? (
+             <div className="flex items-center gap-2">
+                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                 <span>Loading..</span>
+             </div>
+         )
+         : friendStatus?.status === FriendshipStatus.PENDING
+             ? friendStatus.senderId === user.id
+                 ? "Requested"
+                 : "Awaiting Response"
+             : friendStatus?.status === FriendshipStatus.ACCEPTED
+                 ? "Friends"
+                 : "Add Friend";
+
 
      const currentUser = otherUserId ? otherUser : user;
      const isOwnProfile = user && Number(user.id) === Number(otherUserId);
-
-
      useEffect(() => {
-         if (user && otherUser && user.id !== otherUser.id) {
-             checkFriendStatus(user.id, otherUser.id);
-         }
+         const fetchFriendStatus = async () => {
+             if (user && otherUser && user.id !== otherUser.id) {
+                 setIsFriendStatusLoading(true);
+                 await checkFriendStatus(user.id, otherUser.id);
+                 setIsFriendStatusLoading(false);
+             }
+         };
+
+         fetchFriendStatus();
      }, [user, otherUser]);
+
+
+     // useEffect(() => {
+     //     if (user && otherUser && user.id !== otherUser.id) {
+     //         checkFriendStatus(user.id, otherUser.id);
+     //     }
+     // }, [user, otherUser]);
 
      // const isLoading = !user || !currentUser;
      const isLoading = !user || !currentUser || (otherUserId && isOtherUserLoading);
@@ -69,7 +120,9 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
 
     return (
         <div className="w-full flex flex-col gap-6">
-            <Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
+            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
+            <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
+
             <CardHeader floated={false} className="overflow-hidden rounded-t-lg" >
                     <div className="relative w-full h-full">
                         <img src={currentUser.profilePictureUrl} alt={currentUser.name+ "Profile Picture"} className="w-full h-full object-cover"
@@ -106,90 +159,32 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
                     </Typography>
 
                     <Typography  color="indigo" className="font-medium font-bold" textGradient>
-                        {currentUser.id === 1 ? "CEO / Co-Founder" : ""}
+                        {currentUser.id === 1 ? "FaceBoard Founder" : ""}
                     </Typography>
 
-                    {/* הצג כפתורי חברות רק אם זה לא הפרופיל של המשתמש עצמו */}
                     {Number(otherUserId) !== Number(user.id) && (
                         <div className="flex flex-col items-center gap-2 mt-4">
-
-                            {friendStatus?.status === FriendshipStatus.PENDING && friendStatus.senderId !== user.id ? (
-                                <div>
-                                    <Typography variant="h6"> Sent you a Friend Request</Typography>
-                                <div className="flex gap-2">
-                                    <Button
-                                        onClick={() => acceptFriendRequest(user.id, otherUser.id)}
-                                        color="green"
-                                        variant="gradient"
-                                    >
-                                        Accept
-                                    </Button>
-                                    <Button
-                                        onClick={async () => {
-                                            const result = await Swal.fire({
-                                                title: "Reject Request?",
-                                                text: `Are you sure to reject request from ${currentUser.name}?`,
-                                                icon: "warning",
-                                                showCancelButton: true,
-                                                confirmButtonText: "Yes,Reject",
-                                                cancelButtonText: "Cancel",
-                                            });
-
-                                            if (result.isConfirmed) {
-                                                console.log("Declining friend request", { senderId: otherUserId, receiverId: user.id });
-                                                await declineFriendRequest(user.id, otherUser.id);
-                                            }
-                                        }}
-                                        color="red"
-                                        variant="gradient"
-                                    >
-                                        Reject
-                                    </Button>
-                                </div>
-                                </div>
-
-                            ) : (
-                                <Button
-                                    onClick={async () => {
-                                        if (friendStatus?.status === FriendshipStatus.ACCEPTED) {
-                                            const result = await Swal.fire({
-                                                title: "Unfriend?",
-                                                text: `Are You Sure you want to cancel Friendship with ${currentUser.name}?`,
-                                                icon: "warning",
-                                                showCancelButton: true,
-                                                confirmButtonText: "Yes,Remove",
-                                                cancelButtonText: "Cancel",
-                                            });
-
-                                            if (result.isConfirmed) {
-                                                await removeFriendship(user.id, otherUser.id);
-                                            }
-                                        } else if (
-                                            !friendStatus ||
-                                            friendStatus.status !== FriendshipStatus.PENDING
-                                        ) {
-                                            await sendFriendRequest(user.id, otherUser.id);
-                                        }
-                                    }}
-                                    color="blue"
-                                >
-                                    {friendStatus?.status === FriendshipStatus.PENDING
-                                        ? friendStatus.senderId === user.id
-                                            ? "Requested"
-                                            : "Awaiting Response"
-                                        : friendStatus?.status === FriendshipStatus.ACCEPTED
-                                            ? "Friends"
-                                            : "Add Friend"}
-                                </Button>
-                            )}
+                            <FriendshipActionButton
+                                user={user}
+                                otherUser={otherUser}
+                                friendStatus={friendStatus}
+                                isLoading={isFriendStatusLoading}
+                                onAccept={acceptFriendRequest}
+                                onDecline={declineFriendRequest}
+                                onSendRequest={sendFriendRequest}
+                                onRemove={removeFriendship}
+                            />
                         </div>
                     )}
+
                 </CardBody>
 
         </Card>
 
-            <Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
-                <CardBody>
+            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
+            <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
+
+            <CardBody>
                     <Typography variant="h5" color="blue-gray" className="mb-2">About {currentUser.name}</Typography>
 
                     <div
@@ -222,8 +217,10 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
                 </CardFooter>
             </Card>
 
-            <Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
-                <CardBody>
+            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
+            <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
+
+            <CardBody>
                     <Typography variant="h5" color="blue-gray" className="mb-2">
                         <Link to={ALBUM_PAGE(currentUser.id)}>
                             <button>Photos</button>
@@ -247,7 +244,6 @@ import FriendshipStatus from "../../enums/FriendshipStatus";
                                          onClick={()=>handleImageClick(realIndex)}
                                     >
                                         <img
-
                                             className="w-full h-40 object-contain transform group-hover:scale-105 transition duration-300"
                                             src={image}
                                             alt=""

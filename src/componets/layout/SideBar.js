@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {
     CHAT_PAGE,
     FRIENDS_BTN_TEXT, FRIENDS_PAGE,
-    INBOX_BTN_TEXT,
+    INBOX_BTN_TEXT, LOGIN_PAGE,
     LOGOUT_BTN_TEXT, NOTIFICATIONS_BTN_TEXT,
     PROFILE_BTN_TEXT,
     PROFILE_PAGE,
@@ -20,7 +20,7 @@ import {useMessages} from "../../context/MessageProvider";
 
 export function SideBar() {
     const navigate = useNavigate();
-    const{user}=useUser()
+    const{user,logout}=useUser()
     const [open, setOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const { messages } = useMessages(); // כאן מוסיפים
@@ -36,6 +36,7 @@ export function SideBar() {
         });
         return count;
     };
+
 
     const unreadTotal = getTotalUnread();
 
@@ -55,10 +56,9 @@ export function SideBar() {
         navigate(SETTINGS_PAGE)
     }
 
-  const handleLogout = (e) => {
-      e.preventDefault();
-      localStorage.removeItem('jwtToken');
-      navigate('/');
+  const handleLogout = () => {
+      logout()
+      navigate(LOGIN_PAGE);
   }
 
     return (
@@ -137,8 +137,9 @@ export function SideBar() {
                 <button onClick={handleChatPage} className="flex flex-col items-center text-xs relative">
                     <SideBarIcons.inbox className="h-5 w-5 mb-1"/>
                     {INBOX_BTN_TEXT}
-                    <span
-                        className="absolute -top-1 -right-2 bg-blue-600 text-white text-[10px] rounded-full px-1">14</span>
+                    {unreadTotal > 0 && (
+                        <Chip value={unreadTotal} size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
+                    )}
                 </button>
                 <button onClick={handleSettingsPage} className="flex flex-col items-center text-xs relative">
                     <SideBarIcons.settings className="h-5 w-5 mb-1"/>

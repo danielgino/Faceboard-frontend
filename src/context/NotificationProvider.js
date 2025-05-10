@@ -8,7 +8,7 @@ const NotificationContext = createContext();
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const {user}=useUser;
+    const {user}=useUser();
     const fetchNotifications = async () => {
         if (!user) return null;
         try {
