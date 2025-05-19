@@ -25,7 +25,8 @@ function FriendshipActionButton({user, otherUser, friendStatus, isLoading,
 
     if (isLoading) {
         return (
-            <Button disabled color="blue">
+            <Button disabled className="normal-case bg-gray-200 text-gray-800 border border-gray-300 font-medium px-6 py-2 rounded-xl shadow-sm flex items-center gap-2"
+            >
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Loading...</span>
@@ -81,8 +82,8 @@ function FriendshipActionButton({user, otherUser, friendStatus, isLoading,
     return (
         <Button
             onClick={handleClick}
-            color="blue"
-        >
+            className="normal-case  bg-gray-200 text-gray-800 border border-gray-300 hover:bg-gray-200 font-medium px-6 py-2 rounded-xl shadow-sm transition-all duration-200"
+            variant="text"        >
             {buttonText}
         </Button>
     );

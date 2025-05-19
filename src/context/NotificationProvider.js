@@ -74,10 +74,13 @@ export const NotificationProvider = ({ children }) => {
         setNotifications((prev) => [notification, ...prev]);
         setUnreadCount((prev) => prev + 1);
     };
+
     useEffect(() => {
-        fetchNotifications();
-        fetchUnreadCount();
-    }, []);
+        if (user) {
+            fetchNotifications();
+            fetchUnreadCount();
+        }
+    }, [user]);
 
     return (
         <NotificationContext.Provider

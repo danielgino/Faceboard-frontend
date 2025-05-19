@@ -9,10 +9,10 @@ import {UserProvider} from "./context/UserProvider";
 import { PostProvider } from './context/PostProvider';
 import MainLayout from "./componets/layout/MainLayout";
 import {
-   ALBUM_PAGE_LINK,
+    ALBUM_PAGE_LINK,
     CHAT_PAGE, FRIENDS_PAGE_LINK,
     HOME_PAGE,
-    LOGIN_PAGE,
+    LOGIN_PAGE, MOBILE_NOTIFICATIONS_PAGE,
     PROFILE_PAGE_LINK,
     SEARCH_PAGE, SETTINGS_PAGE,
     SIGNUP_PAGE
@@ -31,6 +31,7 @@ import {WebSocketProvider} from "./context/WebSocketProvider";
 import WebSocketHandler from "./service/WebSocketHandler";
 import {FriendshipProvider} from "./context/FriendshipProvider";
 import {StoryProvider} from "./context/StoryProvider";
+import MobileNotifications from "./pages/MobileNotifications";
 
 function App() {
 
@@ -56,6 +57,7 @@ function App() {
             <Route element={<MainLayout />}>
                 <Route path={HOME_PAGE} element={<Home />} />
                 <Route path={FRIENDS_PAGE_LINK} element={<Friends />} />
+                <Route path={MOBILE_NOTIFICATIONS_PAGE} element={<MobileNotifications/>} />
                 <Route path={CHAT_PAGE} element={<Chat />} />
                 <Route path={PROFILE_PAGE_LINK} element={<Profile />} />
                 <Route path={ALBUM_PAGE_LINK} element={<Album />} />

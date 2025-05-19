@@ -17,6 +17,7 @@ import logoPNG from "../../assets/logo/logoPNG.png"
 import Notification from "../interaction/Notification";
 import React, {useState} from "react";
 import {useMessages} from "../../context/MessageProvider";
+import HeaderBarIcons from "../../Icons/HeaderBarIcons";
 
 export function SideBar() {
     const navigate = useNavigate();
@@ -97,7 +98,6 @@ export function SideBar() {
                         {unreadTotal > 0 && (
                             <Chip value={unreadTotal} size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
                         )}
-                        {/*<Chip value="14" size="sm" variant="ghost" color="blue-gray" className="rounded-full"/>*/}
                     </ListItemSuffix>
 
 
@@ -127,9 +127,14 @@ export function SideBar() {
                 </button>
 
 
-                <button className="flex flex-col items-center text-xs">
-                        <Notification showLabel={false} />
-                </button>
+                <div className="flex flex-col items-center text-xs">
+                    <button
+                        onClick={() => navigate("/notifications")}
+                        className="flex flex-col items-center text-xs">
+                             <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
+                        {NOTIFICATIONS_BTN_TEXT}
+                    </button>
+                </div>
                 <button onClick={handleSearchPage} className="flex flex-col items-center text-xs">
                     <SideBarIcons.search className="h-5 w-5 mb-1"/>
                     {SEARCH_BTN_TEXT}

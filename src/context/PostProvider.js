@@ -13,7 +13,6 @@ const PostContext = createContext();
 export const PostProvider = ({ children }) => {
     const [posts, setPosts] = useState([]);
     const [feed,setFeed]=useState([])
-    const [feedPage, setFeedPage] = useState(0);
 
     const [loading, setLoading] = useState(true);
 
@@ -154,13 +153,6 @@ export const PostProvider = ({ children }) => {
         }
     };
 
-    // const addPost = (newPost) => {
-    //     setPosts((prevPosts) => [...prevPosts, newPost]);
-    // };
-    // const addPost = (newPost) => {
-    //     setPosts((prevPosts) => [newPost, ...prevPosts]);
-    //     setFeed((prevFeed) => [newPost, ...prevFeed]);
-    // };
     const addPost = (newPost, currentUserId) => {
         setFeed((prev) => [newPost, ...prev]);
         if (newPost.userId === currentUserId) {
