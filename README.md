@@ -1,10 +1,10 @@
 ![‏‏LogoTemp - עותק](https://github.com/user-attachments/assets/60afabf0-bd8b-471b-a37c-c71de01383be)
 
-**Link: https://faceboard-frontend.vercel.app**
+### Link: https://faceboard-frontend.vercel.app
 
-**The site is still under testing.**
+### The site is still under testing.*
 
-**Explanation and instructions coming soon!**
+### Explanation and instructions coming soon!
 
 # Getting Started with Create React App
 
