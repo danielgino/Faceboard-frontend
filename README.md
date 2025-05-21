@@ -1,5 +1,7 @@
-![‏‏LogoTemp - Small](https://github.com/user-attachments/assets/5e9c1e0e-88b0-4d69-8043-3750c184f588)
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f5783ee3-9716-4606-ac48-422ba553cd1a" alt="Facrboard React Project" width="600"/>
+</p>
 
 ### Link: https://faceboard-frontend.vercel.app
 
