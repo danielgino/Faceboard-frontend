@@ -7,7 +7,47 @@
 
 ### The site is still under testing.*
 
-### Explanation and instructions coming soon!
+### Full Explanation and instructions coming soon!
+
+# Faceboard - A Modern Social Network 🧑‍🤝‍🧑📱
+
+**Faceboard** is a full-featured social network platform that includes posts, a friends system, real-time chat, and live notifications — all wrapped in a responsive and intuitive user interface. The project is built with modern technologies on both frontend and backend.
+
+---
+
+## 🧩 Key Features
+
+- 📄 Create and edit posts with text and up to 4 images
+- 🖼️ Upload images via Cloudinary
+- ❤️ Like and comment on posts
+- 🧑‍🤝‍🧑 Friend system with requests, confirmations, and removals
+- 💬 Real-time chat using WebSockets with unread message counters
+- ✅ Message read indicators (green checkmark)
+- 🔔 Live notification system (real-time)
+- 📱 Fully responsive design for mobile
+
+---
+
+## 🌐 Frontend Technologies
+
+- **React** – Component-based UI library
+- **React Router** – Routing and navigation between pages
+- **Axios** – HTTP client for API requests
+- **Stomp.js + SockJS** – Real-time WebSocket communication
+- **Tailwind CSS** – Utility-first CSS framework for responsive styling
+- **shadcn/ui + Aceternity + Magic UI** – Modern UI component libraries
+- **SweetAlert2** – Beautiful alerts and confirmation dialogs
+- **Lottie** – JSON-based animated illustrations
+
+---
+
+## 🚀 Run the Frontend Locally
+
+```bash
+cd client
+npm install
+npm start
+
 
 # Getting Started with Create React App
 
@@ -60,22 +100,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
