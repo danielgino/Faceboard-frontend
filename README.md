@@ -1,4 +1,5 @@
-![‏‏LogoTemp - עותק](https://github.com/user-attachments/assets/60afabf0-bd8b-471b-a37c-c71de01383be)
+![‏‏LogoTemp - Small](https://github.com/user-attachments/assets/5e9c1e0e-88b0-4d69-8043-3750c184f588)
+
 
 ### Link: https://faceboard-frontend.vercel.app
 
