@@ -17,7 +17,6 @@ function Settings(){
     const [confirmPassword,setConfirmPassword]=useState("")
     const {user,setUser}=useUser();
     const { uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload(user, setUser);
-
     const [currentPassword, setCurrentPassword] = useState(null);
     const [errors,setErrors]=useState({})
     const { value: name, onSave: saveName } = useAutoSaveField(user.name, "name",setUser);
@@ -28,20 +27,50 @@ function Settings(){
     const { value: instagramUrl, onSave: saveInstagramUrl } = useAutoSaveField(user.instagramUrl , "instagramUrl",setUser);
 
 
+    // const handleSubmit = async () => {
+    //     console.log("📤 facebookUrl:", facebookUrl);
+    //     console.log("📤 instagramUrl:", instagramUrl);
+    //     const payload = {
+    //         name,
+    //         lastname,
+    //         bio: bio,
+    //         facebookUrl,
+    //         instagramUrl,
+    //         email,
+    //         currentPassword,
+    //         newPassword: password,
+    //     };
+    //
+    //     console.log("🔍 Payload being sent:", payload);
+    //
+    //     try {
+    //         await axios.put(SETTINGS_API, payload, {
+    //             headers: {
+    //                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+    //                 "Content-Type": "application/json"
+    //             },
+    //         });
+    //         alert("Profile updated!");
+    //     } catch (e) {
+    //         console.log("🔥 Full server error:", e.response);
+    //         console.log("🔥 Full data:", e.response?.data);
+    //         alert(e.response?.data?.message || "Something went wrong.");
+    //     }
+    // };
     const handleSubmit = async () => {
-        console.log("📤 facebookUrl:", facebookUrl);
-        console.log("📤 instagramUrl:", instagramUrl);
-        const payload = {
-            name,
-            lastname,
-            bio: bio,
-            facebookUrl,
-            instagramUrl,
-            email,
-            currentPassword,
-            newPassword: password,
-        };
+        const payload = {};
+
+        if (currentPassword?.trim() && password.trim()) {
+            payload.currentPassword = currentPassword;
+            payload.newPassword = password;
+        }
+
         console.log("🔍 Payload being sent:", payload);
+
+        if (!payload.currentPassword || !payload.newPassword) {
+            alert("Please fill both current and new password.");
+            return;
+        }
 
         try {
             await axios.put(SETTINGS_API, payload, {
@@ -50,10 +79,9 @@ function Settings(){
                     "Content-Type": "application/json"
                 },
             });
-            alert("Profile updated!");
+            alert("Password updated!");
         } catch (e) {
-            console.log("🔥 Full server error:", e.response);
-            console.log("🔥 Full data:", e.response?.data);
+            console.log("🔥 Server error:", e.response?.data);
             alert(e.response?.data?.message || "Something went wrong.");
         }
     };

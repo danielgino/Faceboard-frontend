@@ -17,6 +17,7 @@ import TrailAnimation from "../animated/TrailAnimation";
 
 import logoPNG from "../assets/logo/logoPNG.png"
 import Footer from "../componets/layout/Footer";
+import InputAlerts from "../assets/InputAlerts";
 
 function Login() {
     const [userName, setUserName] = useState(() => localStorage.getItem("savedEmail") || '');    const [password, setPassword] = useState('');
@@ -210,6 +211,10 @@ function Login() {
                             <p className="inline-block w-fit text-sm bg-white px-2 absolute -top-2 inset-x-0 mx-auto">Or
                                 continue with</p>
                         </div>
+                        <div>
+                            {message !== '' && (
+                                <InputAlerts text={message} onClose={() => setMessage('')} />
+                            )}                        </div>
                         <form
                             onSubmit={(e) => e.preventDefault()}
                             className="space-y-5"

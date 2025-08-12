@@ -139,9 +139,7 @@ export const ALBUM_PAGE= (userId) => `/album/${userId}`;
 
 
 export const API_BASE_URL = process.env.REACT_APP_API_URL;
-// const url = isFeed
-//     ? `http://localhost:8080/post/feed?page=${page}&size=${size}`
-//     : `http://localhost:8080/post/posts?userId=${userId}&page=${page}&size=${size}`;
+
 
 //API
 

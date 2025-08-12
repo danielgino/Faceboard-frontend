@@ -22,15 +22,38 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
         }
     };
 
+    // const handleSave = async () => {
+    //     const validationMessage = validate ? validate(inputValue) : "";
+    //     if (validationMessage) {
+    //         setError(validationMessage);
+    //         return;
+    //     }
+    //
+    //     await onSave(inputValue);
+    //     setEditing(false);
+    // };
     const handleSave = async () => {
-        const validationMessage = validate ? validate(inputValue) : "";
+        const trimmedValue = inputValue.trim();
+
+        if (trimmedValue === value) {
+            setEditing(false);
+            return;
+        }
+
+        const validationMessage = validate ? validate(trimmedValue) : "";
+
         if (validationMessage) {
             setError(validationMessage);
             return;
         }
 
-        await onSave(inputValue);
-        setEditing(false);
+        try {
+            await onSave(trimmedValue);
+            setEditing(false);
+        } catch (e) {
+            setError("Server rejected the value. Please check again.");
+            console.error("❌ Error from onSave:", e);
+        }
     };
 
     const handleCancel = () => {
