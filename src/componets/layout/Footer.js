@@ -1,4 +1,4 @@
-import logoPNG from "../../assets/logo/logoPNG.png"
+import logoPNG from "../../assets/photos/logo/logoPNG.png"
 import {
     DANIEL_FACEBOOK_ACCOUNT,
     DANIEL_GITHUB_ACCOUNT,
@@ -21,7 +21,8 @@ function Footer()  {
                 <img src={logoPNG} className="w-32 sm:mx-auto" alt=""/>
                 <p className="leading-relaxed mt-2 text-[15px]">
                     Dear user, please note that this site was built for learning and development purposes,
-                    therefore it is not accessible to those with disabilities.
+                    the site is still under construction and is not built for
+                    the general public but for use as a skills benchmark.
                 </p>
             </div>
 

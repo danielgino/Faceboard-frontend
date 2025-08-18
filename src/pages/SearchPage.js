@@ -1,19 +1,33 @@
-import { useNavigate } from "react-router-dom";
 import { useSearch } from "../context/SearchProvider";
 import { Avatar } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import { PROFILE_PAGE } from "../utils/Utils";
-import React from "react";
+import  {useEffect, useState} from "react";
+import Search from "../componets/interaction/Search";
 
 function SearchPage() {
-    const navigate = useNavigate();
     const { searchResults } = useSearch();
+    const [isMobile, setIsMobile] = useState(false);
 
+
+
+    useEffect(() => {
+        const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
     return (
         <div className="w-full px-6 py-8 bg-gray-100 min-h-screen">
-            <h1 className="text-center text-3xl font-bold text-gray-800 mb-8">
+            {isMobile?
+            <div className="flex justify-center mb-6">
+                <Search/>
+            </div>
+            :""}
+
+            <h2 className="text-center text-xl font-bold text-gray-800 mb-8">
                 Search Results
-            </h1>
+            </h2>
 
             {searchResults.length === 0 ? (
                 <p className="text-center text-gray-500">No users found.</p>

@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-//import useWebSocket from "../service/WebSocketService";
+import React, { createContext, useContext, useState} from "react";
 import { useUser } from "./UserProvider";
 import {GET_CONVERSATION_BETWEEN_USERS_API} from "../utils/Utils";
 
@@ -46,7 +45,7 @@ export const MessageProvider = ({ children }) => {
             }));
 
         } catch (err) {
-            console.error('❌ Error fetching conversation messages:', err);
+            console.error('Error fetching conversation messages:', err);
         }
     };
 

@@ -28,10 +28,8 @@ export const NotificationProvider = ({ children }) => {
 
             const notificationData = await response.json();
             setNotifications(notificationData);
-           // setLoading(false)
         } catch (err) {
             console.error('Error fetching user posts:', err);
-          //  setLoading(false)
         }
     };
     const fetchUnreadCount = async () => {

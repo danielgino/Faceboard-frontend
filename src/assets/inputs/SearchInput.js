@@ -5,7 +5,7 @@ const SearchInput = ({onChange,onSearch}) => {
     const [value, setValue] = useState('');
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            onSearch?.(value); // רק אם פונקציה הועברה
+            onSearch?.(value);
         }
     };
 
@@ -41,7 +41,7 @@ const StyledWrapper = styled.div`
         line-height: 28px;
         align-items: center;
         position: relative;
-        max-width: 190px;
+        max-width: 290px;
         height: 100%;
 
     }

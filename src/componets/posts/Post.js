@@ -75,10 +75,7 @@ function Post({ post, onImageClick, onDelete }) {
     }, [post.likedUsers]);
 
     return (
-        // <div className="w-full flex justify-center">
-        //     <Card
-        //         className={`mx-auto mt-6 w-full max-w-4xl px-4 sm:px-6 transition-all duration-500 ease-in-out overflow-hidden
-        // ${isDeleting ? "opacity-0 max-h-0 p-0 m-0 scale-95" : "opacity-100 "}`}>
+
         <Card
             className={`w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-2xl lg:max-w-3xl px-2 sm:px-4  mb-8 mx-auto transition-all duration-500 ease-in-out 
   ${isDeleting ? "opacity-0 max-h-0 p-0 m-0 scale-95 overflow-hidden" : "opacity-100"}`}>
@@ -149,17 +146,13 @@ function Post({ post, onImageClick, onDelete }) {
                     </div>
 
                     {post.imageUrls.length > 0 && (
-                        // <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2 mt-4">
-                        // <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 overflow-hidden">
 
                             {post.imageUrls.map((imageUrl, index) => (
                                 <img
                                     key={index}
                                     onClick={() => onImageClick(post.imageUrls, index)}
-                                    // className="w-full h-auto max-w-full max-h-[300px] object-contain object-center rounded-md"
                                     className="w-full max-w-full h-auto max-h-[300px] object-cover object-center rounded-md"
-
                                     src={imageUrl}
                                     alt={`Post image ${index + 1}`}
                                 />

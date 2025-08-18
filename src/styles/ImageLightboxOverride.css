@@ -1,11 +1,6 @@
 
 .yarl__container {
     background: rgba(0, 0, 0, 0.3) !important; /* שחור שקוף */
-    backdrop-filter: blur(10px) !important;   /* טשטוש מודרני */
+    backdrop-filter: blur(10px) !important;   /* טשטוש  */
 }
-/*.yarl__thumbnails_container {*/
-/*    background-color: rgba(0, 0, 0, 0.3) !important;*/
-/*    backdrop-filter: blur(12px) !important;*/
-/*    -webkit-backdrop-filter: blur(12px) !important;*/
-/*    border-top: 1px solid rgba(255, 255, 255, 0.08);*/
-/*}*/
+

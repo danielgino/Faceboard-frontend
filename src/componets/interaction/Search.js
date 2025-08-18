@@ -5,7 +5,7 @@ import { useSearch } from "../../context/SearchProvider";
 import { PROFILE_PAGE } from "../../utils/Utils";
 import SearchInput from "../../assets/inputs/SearchInput";
 
-// Debounce קטן
+
 function useDebouncedCallback(callback, delay) {
     const timer = useRef();
     const debouncedFunction = (...args) => {
@@ -79,7 +79,6 @@ function Search() {
 
     return (
         <div ref={containerRef} className="relative h-full">
-            {/* אינפוט חיפוש */}
             <SearchInput
                 onSearch={handleSearchClick}
                 onChange={handleSearchChange}
@@ -87,9 +86,9 @@ function Search() {
                 value={search}
             />
 
-            {/* תצוגת התוצאות בתוך ה-Header - לא פורטל! */}
             {showPreview && searchResults.length > 0 && (
-                <ul className="absolute top-full right-0 w-80 mt-1 bg-white shadow-lg rounded-lg max-h-60 overflow-y-auto z-[50] pointer-events-auto">
+                <ul className="absolute top-full left-0 w-full mt-1 bg-white shadow-lg rounded-lg max-h-60 overflow-y-auto z-[50] pointer-events-auto">
+
                     {searchResults.map((user) => (
                         <li
                             key={user.id}
@@ -99,7 +98,7 @@ function Search() {
                                 setShowPreview(false);
                             }}
                         >
-                            <Avatar src={user.profilePictureUrl} alt="Profile pic" />
+                            <Avatar src={user.profilePictureUrl} alt="Profile pic"/>
                             {user.fullName}
                         </li>
                     ))}

@@ -2,17 +2,11 @@ import React from 'react';
 import { useUser } from '../context/UserProvider';
 import { useNavigate} from 'react-router-dom';
 import {useState,useEffect} from "react";
-
 import Feed from "../componets/layout/Feed";
-import HeaderBar from "../componets/layout/HeaderBar";
-
-import { IconHome,  IconUserBolt, IconSettings } from "@tabler/icons-react";
-
-import {FRIENDS_PAGE, LOGIN_PAGE, PROFILE_PAGE_LINK} from "../utils/Utils";
+import {LOGIN_PAGE} from "../utils/Utils";
 import {usePosts} from "../context/PostProvider";
-
-import MainLayout from "../componets/layout/MainLayout";
 import StoryBar from "../componets/interaction/StoryBar";
+import PostLoader from "../assets/loaders/PostLoader";
 
 function Home() {
     const { user } = useUser();
@@ -35,7 +29,7 @@ function Home() {
     }, [user, navigate]);
 
     if (loading) {
-        return <p>Loading user details...</p>;
+        return <PostLoader/>
     }
 
     return (

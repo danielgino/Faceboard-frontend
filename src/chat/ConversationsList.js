@@ -19,10 +19,6 @@ function ConversationsList({friendsList, currentUser, onSelect }) {
 
         return userMessages.filter(msg => !msg.isRead && msg.senderId === friendId).length;
     };
-    // useEffect(() => {
-    //     // כל שינוי ב־messages יגרום לרינדור מחדש ע"י עדכון version
-    //     setVersion(v => v + 1);
-    // }, [messages]);
     useEffect(() => {
         const sorted = [...friendsList].sort((a, b) => {
             const lastA = messages[a.id]?.[messages[a.id].length - 1]?.sentTime || a.lastMessageTime;
@@ -37,10 +33,11 @@ function ConversationsList({friendsList, currentUser, onSelect }) {
         friend.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
     return (
-        <Sidebar position="left">
+        <Sidebar className="my-sidebar" position="left">
             <Search placeholder="Search..."
                     value={searchTerm}
                     onChange={(value) => setSearchTerm(value)}
+
             />
             <ConversationList key={version}>
                 {filteredFriends.map((friend) => {

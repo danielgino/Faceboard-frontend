@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState } from "react";
-import PostLoader from "../assets/loaders/PostLoader";
 import {
     DELETE_COMMENT_API,
     DELETE_POST_API,
@@ -13,7 +12,6 @@ const PostContext = createContext();
 export const PostProvider = ({ children }) => {
     const [posts, setPosts] = useState([]);
     const [feed,setFeed]=useState([])
-
     const [loading, setLoading] = useState(true);
 
     const fetchUserPosts = async (userId) => {

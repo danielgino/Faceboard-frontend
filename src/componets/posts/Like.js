@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useUser } from "../../context/UserProvider";
 import { Tooltip, Typography } from "@material-tailwind/react";
 import HeartIcon from "../../Icons/HeartIcon";
 import { ADD_LIKE_API } from "../../utils/Utils";

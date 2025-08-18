@@ -1,6 +1,5 @@
 
-import {Card, Typography, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,} from "@material-tailwind/react";
-import {PresentationChartBarIcon, ShoppingBagIcon, UserCircleIcon, Cog6ToothIcon, InboxIcon, PowerIcon,} from "@heroicons/react/24/solid";
+import {Card, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,} from "@material-tailwind/react";
 import {useNavigate} from "react-router-dom";
 import {
     CHAT_PAGE,
@@ -9,12 +8,11 @@ import {
     LOGOUT_BTN_TEXT, NOTIFICATIONS_BTN_TEXT,
     PROFILE_BTN_TEXT,
     PROFILE_PAGE,
-    PROFILE_PAGE_LINK, SEARCH_BTN_TEXT, SEARCH_PAGE, SETTINGS_BTN_TEXT, SETTINGS_PAGE, WEBSITE_NAME
+    SEARCH_BTN_TEXT, SEARCH_PAGE, SETTINGS_BTN_TEXT, SETTINGS_PAGE, WEBSITE_NAME
 } from "../../utils/Utils";
 import {useUser} from "../../context/UserProvider";
 import SideBarIcons from "../../Icons/SideBarIcons";
-import logoPNG from "../../assets/logo/logoPNG.png"
-import Notification from "../interaction/Notification";
+import logoPNG from "../../assets/photos/logo/logoPNG.png"
 import React, {useState} from "react";
 import {useMessages} from "../../context/MessageProvider";
 import HeaderBarIcons from "../../Icons/HeaderBarIcons";
@@ -22,9 +20,7 @@ import HeaderBarIcons from "../../Icons/HeaderBarIcons";
 export function SideBar() {
     const navigate = useNavigate();
     const{user,logout}=useUser()
-    const [open, setOpen] = useState(false);
-    const [notificationOpen, setNotificationOpen] = useState(false);
-    const { messages } = useMessages(); // כאן מוסיפים
+    const { messages } = useMessages();
 
     const getTotalUnread = () => {
         let count = 0;
@@ -57,10 +53,12 @@ export function SideBar() {
         navigate(SETTINGS_PAGE)
     }
 
-  const handleLogout = () => {
-      logout()
-      navigate(LOGIN_PAGE);
-  }
+    const handleLogout = () => {
+        navigate(LOGIN_PAGE, { replace: true, state: { forceLogin: true } });
+        setTimeout(() => {
+            logout();
+        }, 0);
+    };
 
     return (
         <>
@@ -69,7 +67,7 @@ export function SideBar() {
 
 
         <div className="mb-2 p-4">
-            <img src={logoPNG} alt="Faceboard logo" />
+            <img src={logoPNG}  alt="Faceboard logo" />
 
         </div>
             <List>
@@ -109,7 +107,7 @@ export function SideBar() {
                     </ListItemPrefix>
                     Settings
                 </ListItem>
-                <ListItem onClick={handleLogout}>
+                <ListItem onClick={(e) => { e.preventDefault(); handleLogout(); }}>
                     <ListItemPrefix>
                         <SideBarIcons.logout className="h-5 w-5"/>
                     </ListItemPrefix>

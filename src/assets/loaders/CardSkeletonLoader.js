@@ -1,4 +1,3 @@
-// src/assets/loaders/CardSkeletonLoader.jsx
 
 import React from "react";
 

@@ -1,5 +1,5 @@
 import {GlobalInput} from "../assets/inputs/GlobalInput";
-import React, {useState} from "react";
+import  {useState} from "react";
 import axios from "axios";
 import EditableField from "../assets/inputs/EditableField";
 import {useUser} from "../context/UserProvider";
@@ -27,36 +27,6 @@ function Settings(){
     const { value: instagramUrl, onSave: saveInstagramUrl } = useAutoSaveField(user.instagramUrl , "instagramUrl",setUser);
 
 
-    // const handleSubmit = async () => {
-    //     console.log("📤 facebookUrl:", facebookUrl);
-    //     console.log("📤 instagramUrl:", instagramUrl);
-    //     const payload = {
-    //         name,
-    //         lastname,
-    //         bio: bio,
-    //         facebookUrl,
-    //         instagramUrl,
-    //         email,
-    //         currentPassword,
-    //         newPassword: password,
-    //     };
-    //
-    //     console.log("🔍 Payload being sent:", payload);
-    //
-    //     try {
-    //         await axios.put(SETTINGS_API, payload, {
-    //             headers: {
-    //                 Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-    //                 "Content-Type": "application/json"
-    //             },
-    //         });
-    //         alert("Profile updated!");
-    //     } catch (e) {
-    //         console.log("🔥 Full server error:", e.response);
-    //         console.log("🔥 Full data:", e.response?.data);
-    //         alert(e.response?.data?.message || "Something went wrong.");
-    //     }
-    // };
     const handleSubmit = async () => {
         const payload = {};
 
@@ -135,7 +105,7 @@ function Settings(){
                         </button>
                     </div>
                     <Typography variant="h4" color="blue-gray" className="mt-4">
-                        {user.name}
+                        {user.fullName}
                     </Typography>
                     <Typography variant="small" color="gray" className="text-center">
                         Manage your account settings
@@ -146,7 +116,7 @@ function Settings(){
                     <EditableField label="Name" value={name} onSave={saveName} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
                     <EditableField label="Lastname" value={lastname} onSave={saveLastname} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
                     <EditableField label="Email" value={email} onSave={saveEmail} validate={(val) => !/\S+@\S+\.\S+/.test(val) ? "Invalid email" : ""} />
-                    <EditableField label="Biography" value={bio} onSave={saveBio} multiline rows={3} validate={(val) => val.length > 200 ? "Only 200 characters allowed" : ""} />
+                    <EditableField label="Biography" value={bio} onSave={saveBio} multiline rows={3} validate={(val) => val.length > 150 ? "Only 150 characters allowed" : ""} />
                     <EditableField label="Facebook URL" value={facebookUrl} onSave={saveFacebookUrl} validate={(val) => val && !/^https?:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(val) ? "Invalid Facebook URL" : ""} />
                     <EditableField label="Instagram URL" value={instagramUrl} onSave={saveInstagramUrl} validate={(val) => val && !/^https?:\/\/(www\.)?instagram\.com\/[^\s]+$/.test(val) ? "Invalid Instagram URL" : ""} />
                 </div>

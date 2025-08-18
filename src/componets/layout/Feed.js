@@ -71,17 +71,12 @@ function Feed({ isFeed = false, userId = null }) {
         }
     };
 
-    // useEffect(() => {
-    //     resetPosts();
-    //     loadMorePosts();
-    // }, [isFeed, userId, location.pathname]);
-
     useEffect(() => {
-        setReadyToLoad(false); // תחסום טעינה ישנה
+        setReadyToLoad(false);
         resetPosts();
         setTimeout(() => {
-            setReadyToLoad(true); // תאפשר טעינה חדשה אחרי שהסטייט התרוקן
-        }, 0); // אפשר גם 50ms אם אתה רוצה שיהיה ממש בטוח
+            setReadyToLoad(true);
+        }, 0);
     }, [userId, isFeed, location.pathname]);
 
     useEffect(() => {
@@ -92,11 +87,6 @@ function Feed({ isFeed = false, userId = null }) {
 
     return (
         <div className="flex flex-col items-center w-full overflow-x-hidden">
-
-            {/*// <div className="flex flex-col items-center w-full">*/}
-            {/*<div className="w-full px-4 sm:px-6 lg:px-0 max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">*/}
-            {/*<div className="w-full max-w-4xl mx-auto px-4 sm:px-6">*/}
-            {/*<div className="w-full max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 sm:px-4">*/}
             <div
                 className="w-full max-w-[100vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 sm:px-4 overflow-x-hidden">
 

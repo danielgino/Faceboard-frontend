@@ -16,7 +16,7 @@ function ImageLightbox({ images, isOpen, onClose, currentIndex }) {
             close={onClose}
             index={currentIndex}
             slides={slides}
-            plugins={[Thumbnails]} // 🔥 Thumbnails מופעלים!
+            plugins={[Thumbnails]}
             closeOnBackdropClick={true}
             closeOnClick={true}
             controller={{ closeOnBackdropClick: true, closeOnPullDown: true, closeOnClick: true }}

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const TryButt = ({text,fontSize}) => {
+const TransparentButton = ({text,fontSize}) => {
     return (
         <StyledWrapper fontSize={fontSize}>
             <button>
@@ -84,4 +84,4 @@ const StyledWrapper = styled.div`
         transition-delay: 0.2s;
     }`;
 
-export default TryButt;
+export default TransparentButton;

@@ -4,16 +4,11 @@ import { Avatar, Button, Typography, Input, Textarea } from "@material-tailwind/
 import { useStories } from "../../context/StoryProvider";
 import { useUser } from "../../context/UserProvider";
 import { WithHeader } from "react-insta-stories";
-import openStoryUploadDialog from "../StoryUploadDialog";
+import openStoryUploadDialog from "../profile/StoryUploadDialog";
 import {isMobile} from "../../utils/Utils";
 function StoryBar() {
     const [showStories, setShowStories] = useState(false);
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
-    const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
-    const [fileToUpload, setFileToUpload] = useState(null);
-    const [captionToUpload, setCaptionToUpload] = useState("");
-    const [uploading, setUploading] = useState(false);
-
     const { stories, uploadStory, fetchStories } = useStories();
     const { user } = useUser();
 
@@ -38,7 +33,7 @@ function StoryBar() {
                         <img
                             src={story.imageUrl}
                             alt=""
-                            // style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
                         {story.caption && (
                             <div
@@ -79,14 +74,9 @@ function StoryBar() {
     );
 
     return (
-        // <div className="relative bg-white shadow-md rounded-xl my-5 max-w-screen-lg mx-auto">
         <div
             className="relative bg-white shadow-md rounded-xl my-5 w-full max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto overflow-x-hidden">
-
-            {/*<div className="overflow-x-auto overflow-y-hidden">*/}
             <div className="w-full overflow-x-auto overflow-y-hidden px-2 sm:px-4">
-
-                {/*<div className="flex items-center gap-4 px-4 py-2 h-[140px]">*/}
                 <div className="flex items-center gap-4 py-2 h-[140px] min-w-fit">
 
                     <div
@@ -156,8 +146,6 @@ function StoryBar() {
                                 }, 200);
                             }}
                         />
-
-                        {/* כפתור הסגירה */}
                         <button
                             className="absolute top-4 right-4 z-[10000] bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center"
                             style={{pointerEvents: "auto"}}

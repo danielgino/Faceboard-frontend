@@ -1,4 +1,3 @@
-// components/GlobalImageLightbox.js
 
 import React from "react";
 import { useLightbox } from "../../context/LightBoxContext";

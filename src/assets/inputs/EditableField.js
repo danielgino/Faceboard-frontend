@@ -22,16 +22,6 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
         }
     };
 
-    // const handleSave = async () => {
-    //     const validationMessage = validate ? validate(inputValue) : "";
-    //     if (validationMessage) {
-    //         setError(validationMessage);
-    //         return;
-    //     }
-    //
-    //     await onSave(inputValue);
-    //     setEditing(false);
-    // };
     const handleSave = async () => {
         const trimmedValue = inputValue.trim();
 

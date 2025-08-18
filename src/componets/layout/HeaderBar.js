@@ -1,4 +1,4 @@
-import React, {useEffect,useState} from "react";
+import React, {useState} from "react";
 import {Navbar, Collapse , Typography, Button, IconButton, Input, Avatar,} from "@material-tailwind/react";
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../../context/UserProvider";
@@ -13,7 +13,6 @@ import Notification from "../interaction/Notification";
     const [openNav, setOpenNav] = React.useState(false);
     const navigate = useNavigate();
     const {user,logout} = useUser();
-     const [open, setOpen] = useState(false);
      const [notificationOpen, setNotificationOpen] = useState(false);
 
 
@@ -27,11 +26,14 @@ import Notification from "../interaction/Notification";
         navigate(HOME_PAGE);
 
     }
-    const handleLogout = (e) => {
-         logout()
-        navigate(LOGIN_PAGE); // חזרה לדף ההתחברות
-    };
-    React.useEffect(() => {
+     const handleLogout = () => {
+         navigate(LOGIN_PAGE, { replace: true, state: { forceLogin: true } });
+         setTimeout(() => {
+             logout();
+         }, 0);
+     };
+
+     React.useEffect(() => {
         window.addEventListener(
             "resize",
             () => window.innerWidth >= 960 && setOpenNav(false),
@@ -59,7 +61,7 @@ import Notification from "../interaction/Notification";
                 className="relative hidden lg:flex items-center gap-x-2 p-1 font-medium cursor-pointer"
                 onClick={() => setNotificationOpen(!notificationOpen)}
             >
-                <Notification open={notificationOpen} onClose={() => setNotificationOpen(false)} />
+                <Notification  />
             </Typography>
 
 
@@ -93,9 +95,7 @@ import Notification from "../interaction/Notification";
                 className="flex items-center gap-x-2 p-1 font-medium"
             >
                 <HeaderBarIcons.Logout/>
-                <a href="#" onClick={handleLogout} className="flex items-center">
-                    {LOGOUT_BTN_TEXT}
-                </a>
+                <button onClick={handleLogout}>{LOGOUT_BTN_TEXT}</button>
             </Typography>
         </ul>
     );
@@ -103,12 +103,9 @@ import Notification from "../interaction/Notification";
 
      return (
 
-         // <Navbar className="relative z-1000 mx-auto max-w-screen-xl px-4 py-2 lg:px-8 lg:py-4 h-22 bg-white shadow-md">
          <Navbar
              fullWidth={true}
-             className="fixed top-0 left-0 w-full z-[9999] bg-white shadow-md px-4 py-2 lg:px-8 lg:py-4"
-         >
-             {/*<div className="container mx-auto flex flex-wrap items-center justify-between text-blue-gray-900">*/}
+             className="fixed top-0 left-0 w-full z-[9999] bg-white shadow-md px-4 py-2 lg:px-8 lg:py-4">
              <div className="w-full px-4 flex flex-wrap items-center justify-between text-blue-gray-900">
 
                  <Typography

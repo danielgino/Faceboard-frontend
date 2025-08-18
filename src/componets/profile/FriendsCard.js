@@ -1,5 +1,5 @@
-import {Avatar, Card, CardBody, Typography} from "@material-tailwind/react";
-import {ALBUM_PAGE, FRIENDS_BTN_TEXT, FRIENDS_PAGE, getRandomUsers, PROFILE_PAGE} from "../../utils/Utils";
+import { Card, CardBody, Typography} from "@material-tailwind/react";
+import { FRIENDS_BTN_TEXT, FRIENDS_PAGE, getRandomUsers, PROFILE_PAGE} from "../../utils/Utils";
 import {Link} from "react-router-dom";
 import React, {useMemo} from "react";
 
@@ -12,9 +12,7 @@ const hasMoreFriends=user.friendsList.length>6;
     }, [user]);
     return (
         <div>
-            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
             <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
-
             <CardBody>
                     <Typography variant="h5" color="blue-gray" className="mb-2">
                             <Link to={FRIENDS_PAGE(user.id)}>

@@ -4,6 +4,7 @@ import SearchInput from "../assets/inputs/SearchInput";
 import { useEffect, useState } from "react";
 import { getRandomUsers } from "../utils/Utils";
 import { useNavigate, useParams } from "react-router-dom";
+import FriendsSkeleton from "../assets/loaders/FriendsSkeleton";
 
 function Friends() {
     const { userId } = useParams();
@@ -40,12 +41,12 @@ function Friends() {
     }, [search, friendsData]);
 
     if (!friendsData) {
-        return <div className="flex justify-center items-center h-screen">Loading...</div>;
+        return <div className="flex justify-center items-center h-screen"><FriendsSkeleton/></div>;
     }
 
     return (
         <div className="px-6 pt-6 bg-gray-100 w-full min-h-screen">
-            <Typography variant="h4" color="blue-gray" className="text-center mb-6">
+            <Typography variant="h5" color="blue-gray" className="text-center mb-6">
                 Friends of {friendsData.fullName}
             </Typography>
 
@@ -57,7 +58,7 @@ function Friends() {
                 <div className="flex flex-wrap justify-center gap-6">
                     {(results.length > 0 ? results : (!search ? getRandomUsers(friendsData.friendList, 20) : [])).map((friend, index) => (
                         <Card
-                            key={friend.id || index}
+                            key={friend.id }
                             className="w-40 shadow-md cursor-pointer"
                             onClick={() => navigate(`/profile/${friend.id}`)}
                         >

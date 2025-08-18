@@ -7,7 +7,6 @@ import {ADD_COMMENT_API} from "../../utils/Utils";
 import Swal from 'sweetalert2';
 
 function AddComment({postId,onCommentAdded}){
-    const user=useUser();
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);

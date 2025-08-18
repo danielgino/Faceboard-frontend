@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from "react-router-dom";
 import Swal from "sweetalert2";
 
 import {Avatar, Typography, Card,
@@ -10,7 +9,6 @@ import {formatDate, GET_COMMENTS_BY_POST, PROFILE_PAGE} from "../../utils/Utils"
 import {usePosts} from "../../context/PostProvider";
 import {useUser} from "../../context/UserProvider";
 import RandomIcons from "../../Icons/RandomIcons";
-import AddComment from "./AddComment";
 import CommentLoader from "../../assets/loaders/CommentLoader";
 
 
@@ -83,19 +81,18 @@ function Comment({ postId, postOwnerId,newComment  }) {
         return (
             <>
                 <CommentLoader />
-                {/*<CommentLoader />*/}
             </>
         );
     }
 
     if (error) {
-        return <div>שגיאה בטעינת תגובות: {error}</div>;
+        return <div> Error Loading Comments {error}</div>;
     }
 
     return (
         <div>
-            {loading && <div>טוען תגובות...</div>}
-            {error && <div>שגיאה בטעינת תגובות: {error}</div>}
+            {loading && <div>Loading Comments...</div>}
+            {error && <div>Error Loading Comments {error}</div>}
             <div className="max-h-[600px] overflow-y-auto pr-2">
 
                 {comments.map((comment) => (

@@ -1,32 +1,10 @@
-import {Route} from "react-router-dom";
-import Login from "../pages/Login";
-import Home from "../pages/Home";
-import Profile from "../pages/Profile";
-import SignUp from "../pages/SignUp";
 
-import { useNavigate } from "react-router-dom";
-import React, {useState} from "react";
-export const useNavigateToProfile = () => {
-    const navigate = useNavigate();
-
-    return (userId) => {
-        navigate(PROFILE_PAGE(userId));
-    };
-};
 
 export const getRandomUsers = (users, count) => {
     if (!users || users.length === 0) return [];
     const shuffled = [...users].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 };
-export const getRandomPictures = (images, count) => {
-    if (!images || images.length === 0) return [];
-    const shuffled = [...images].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-};
-
-
-
 
 export const getAge = (birthDateStr) => {
     const today = new Date();
@@ -100,15 +78,7 @@ export const fetchWithAuth = async (url, options = {}) => {
 
     return response;
 };
-// export const formatTime = (utcTime) => {
-//     const date = new Date(utcTime + "Z"); // הוספת Z מכריחה אותו לפרש כ־UTC
-//     return date.toLocaleTimeString("he-IL", {
-//         timeZone: "Asia/Jerusalem",
-//         hour: "2-digit",
-//         minute: "2-digit",
-//         hour12: false
-//     });
-// };
+
 export const formatTime = (utcTime) => {
     const date = new Date(utcTime.includes("Z") ? utcTime : utcTime + "Z");
     return date.toLocaleTimeString("he-IL", {
@@ -120,7 +90,7 @@ export const formatTime = (utcTime) => {
 };
 export const isMobile = window.innerWidth < 768;
 
-
+export const UNAUTHORIZED_PAGE="/Unauthorized"
 export const LOGIN_PAGE="/"
 export const SIGNUP_PAGE="/signup"
 export const HOME_PAGE="/home"
@@ -217,6 +187,7 @@ export const GenderEnum = {
     FEMALE: 'FEMALE',
 };
 
+export const ALT_RANDOM_USERS="Random User"
 ///My Personal Links
 
 export const DANIEL_FACEBOOK_ACCOUNT="https://www.facebook.com/Daniegino"

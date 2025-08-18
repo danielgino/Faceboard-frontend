@@ -1,4 +1,3 @@
-// WebSocketHandler.js
 import { useEffect } from "react";
 import { useWebSocketContext } from "../context/WebSocketProvider";
 import { useUser } from "../context/UserProvider";
@@ -21,7 +20,7 @@ export default function WebSocketHandler() {
                 console.log("✅ Sound played successfully");
             })
             .catch((error) => {
-                console.error("❌ Failed to play sound:", error.message);
+                console.error("Failed to play sound:", error.message);
             });
     };
     const playNotificationSound = () => {
@@ -33,7 +32,7 @@ export default function WebSocketHandler() {
                 console.log("✅ NOTIFICATION played successfully");
             })
             .catch((error) => {
-                console.error("❌ Failed to play sound:", error.message);
+                console.error(" Failed to play sound:", error.message);
             });
     };
 
@@ -49,13 +48,11 @@ export default function WebSocketHandler() {
             client.subscribe(`/topic/messages/${user.id}`, (msg) => {
                 const messages = Array.isArray(JSON.parse(msg.body)) ? JSON.parse(msg.body) : [JSON.parse(msg.body)];
                 messages.forEach((message) => {
-                    // ⬇️ נגן סאונד רק אם השולח הוא לא אני
                     if (message.senderId !== user.id) {
                         playMessageSound();
                     }
                     addMessage(message);
                 });
-                // messages.forEach(addMessage);
             });
 
             client.subscribe(`/topic/notifications/${user.id}`, (msg) => {
@@ -78,7 +75,7 @@ export default function WebSocketHandler() {
                                 <span>{notification.content}</span>
                             </div>
                         ),
-                        life: 4000,
+                        life: 5000,
                         className: 'bg-white/80 backdrop-blur-md shadow-lg rounded-lg'
                     });
                 }

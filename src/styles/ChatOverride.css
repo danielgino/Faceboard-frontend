@@ -1,0 +1,84 @@
+
+@media (max-width: 768px) {
+
+    .cs-main-container {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    .cs-main-container:has(.cs-chat-container .cs-conversation-header) .cs-sidebar {
+        display: none !important;
+    }
+    .cs-main-container:has(.cs-chat-container .cs-conversation-header) .cs-chat-container {
+        display: block !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-chat-container {
+        display: none !important;
+    }
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-sidebar {
+        display: block !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        inline-size: 100% !important;
+        --cs-sidebar-width: 100% !important;
+        --cs-sidebar-compact-width: 100% !important;
+        border-right: none !important;
+        box-shadow: none !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-sidebar.cs-sidebar--compact {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        inline-size: 100% !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-search {
+        display: flex !important;
+        width: 95% !important;
+        max-width: 420px !important;
+        margin: 8px auto 12px !important;
+    }
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-search input,
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-search .cs-search__input {
+        width: 100% !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation {
+        display: grid !important;
+        grid-template-columns: 48px 1fr !important;
+        align-items: center !important;
+        column-gap: 10px !important;
+        width: 100% !important;
+        padding: 12px 14px !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation .cs-avatar {
+        grid-column: 1 !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation__content {
+        grid-column: 2 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 2px !important;
+        width: 100% !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation__name,
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation__info {
+        display: block !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100% !important;
+    }
+
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation [class*="unread"],
+    .cs-main-container:not(:has(.cs-chat-container .cs-conversation-header)) .cs-conversation [class*="badge"] {
+        display: inline-flex !important;
+    }
+}

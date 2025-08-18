@@ -15,7 +15,7 @@ import {useNotifications} from "../../context/NotificationProvider";
 import {formatDate, NOTIFICATIONS_BTN_TEXT} from "../../utils/Utils";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-function Notification({ open, onClose,showLabel = true }){
+function Notification(){
     const { notifications,unreadCount, markAllAsRead } = useNotifications();
     const [visibleCount, setVisibleCount] = useState(5);
     const fetchMore = () => {

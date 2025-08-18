@@ -24,9 +24,9 @@ export function useAutoSaveField(initialValue, fieldName,setUser) {
                 }));
             }
         } catch (error) {
-            console.log("🔍 Sending update:", { fieldName, value });
+            console.log(" Sending update:", { fieldName, value });
 
-            console.error(`❌ Error updating ${fieldName}:`, error);
+            console.error(`Error updating ${fieldName}:`, error);
             alert(`Failed to update ${fieldName}`);
         } finally {
             setLoading(false);

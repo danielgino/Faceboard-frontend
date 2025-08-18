@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import {useUser} from "./UserProvider";
-import {GET_FRIENDS_STORIES, GET_FRIENDS_STORIES_API, UPLOAD_STORY_API} from "../utils/Utils";
+import {GET_FRIENDS_STORIES_API, UPLOAD_STORY_API} from "../utils/Utils";
 
 const StoryContext = createContext();
 

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, {createContext, useState, useContext, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import {
     AUTH_ME_API,
@@ -87,23 +87,20 @@ export const UserProvider = ({ children }) => {
 
 
 
+    const fetchUserPostImages = useCallback(async (userId) => {
+          try {
+                 const token = localStorage.getItem("jwtToken");
+                 if (!token) throw new Error("User Not Authenticated");
 
-    const fetchUserPostImages = async (userId) => {
-        try {
-            const token = localStorage.getItem("jwtToken");
-            if (!token) throw new Error("User Not Authenticated");
+                     const response = await axios.get(GET_USER_IMAGES_API(userId), {
+                        headers: { Authorization: `Bearer ${token}` },
+                  });
 
-            const response = await axios.get(GET_USER_IMAGES_API(userId), {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            setUserImages(response.data);
-        } catch (error) {
+                      setUserImages(response.data);
+          } catch (error) {
             console.error("Error fetching images with Axios:", error);
-        }
-    };
+                }
+         }, []);
 
     const fetchUserFriendsById = async (userId) => {
         try {
@@ -116,7 +113,7 @@ export const UserProvider = ({ children }) => {
                 },
             });
 
-            return response.data; // מחזיר את רשימת החברים
+            return response.data;
         } catch (error) {
             console.error("Error fetching user friends:", error);
             throw error;
@@ -133,6 +130,9 @@ export const UserProvider = ({ children }) => {
         setUserImages([]);
         setToken(null);
     };
+
+
+
     return (
         <UserContext.Provider value={{ user,logout,isUserLoading, setUser, error,userImages, isOtherUserLoading
             ,clearOtherUser,fetchUserPostImages , updateUserProfilePicture

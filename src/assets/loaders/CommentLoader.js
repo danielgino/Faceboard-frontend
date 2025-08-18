@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardBody, Avatar, Typography } from "@material-tailwind/react";
+import { Card, CardHeader, CardBody } from "@material-tailwind/react";
 
 function CommentLoader() {
     return (

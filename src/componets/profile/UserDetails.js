@@ -8,7 +8,7 @@ import FriendsCard from "./FriendsCard";
 import useProfilePictureUpload from "../../context/useProfilePictureUpload";
 import RandomIcons from "../../Icons/RandomIcons";
 import {useLightbox} from "../../context/LightBoxContext";
-import TryButt from "../../assets/buttons/TryButt";
+import TransparentButton from "../../assets/buttons/TransparentButton";
 import noPhotosYet from "../../assets/photos/noPhotosYet.png"
 import { useFriendship } from "../../context/FriendshipProvider";
 import Swal from 'sweetalert2'
@@ -36,7 +36,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
      useEffect(() => {
          const fetchData = async () => {
              if (otherUserId) {
-                 clearOtherUser(); // תאפס לפני שמושך מידע חדש
+                 clearOtherUser();
                  await fetchUserDetailsById(otherUserId);
                  await fetchUserPostImages(otherUserId);
              }
@@ -68,22 +68,6 @@ import FriendshipActionButton from "./FriendshipActionButton";
          }
      };
 
-     const friendButtonText = isFriendStatusLoading
-         ? (
-             <div className="flex items-center gap-2">
-                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                 <span>Loading..</span>
-             </div>
-         )
-         : friendStatus?.status === FriendshipStatus.PENDING
-             ? friendStatus.senderId === user.id
-                 ? "Requested"
-                 : "Awaiting Response"
-             : friendStatus?.status === FriendshipStatus.ACCEPTED
-                 ? "Friends"
-                 : "Add Friend";
-
-
      const currentUser = otherUserId ? otherUser : user;
      const isOwnProfile = user && Number(user.id) === Number(otherUserId);
      useEffect(() => {
@@ -99,13 +83,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
      }, [user, otherUser]);
 
 
-     // useEffect(() => {
-     //     if (user && otherUser && user.id !== otherUser.id) {
-     //         checkFriendStatus(user.id, otherUser.id);
-     //     }
-     // }, [user, otherUser]);
 
-     // const isLoading = !user || !currentUser;
      const isLoading = !user || !currentUser || (otherUserId && isOtherUserLoading);
 
      if (isLoading) {
@@ -120,9 +98,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
 
     return (
         <div className="w-full flex flex-col gap-6">
-            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
             <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
-
             <CardHeader floated={false} className="overflow-hidden rounded-t-lg" >
                     <div className="relative w-full h-full">
                         <img src={currentUser.profilePictureUrl} alt={currentUser.name+ "Profile Picture"} className="w-full h-full object-cover"
@@ -159,7 +135,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
                     </Typography>
 
                     <Typography  color="indigo" className="font-medium font-bold" textGradient>
-                        {currentUser.id === 1 ? "FaceBoard Founder" : ""}
+                        {currentUser.id === 1 ? "Faceboard Founder" : ""}
                     </Typography>
 
                     {Number(otherUserId) !== Number(user.id) && (
@@ -180,10 +156,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
                 </CardBody>
 
         </Card>
-
-            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
             <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
-
             <CardBody>
                     <Typography variant="h5" color="blue-gray" className="mb-2">About {currentUser.name}</Typography>
 
@@ -199,13 +172,13 @@ import FriendshipActionButton from "./FriendshipActionButton";
 
                 </CardBody>
                 <CardFooter className="flex justify-center gap-7 pt-2">
-                    <Tooltip content="Facebook Profile">
-                        <Typography as="a" href="#facebook" variant="lead" color="blue" textGradient>
+                    <Tooltip content={currentUser.facebookUrl? "Facebook Profile":"No Info Yet"}>
+                        <Typography as="a" href={currentUser.facebookUrl} variant="lead" color="blue" textGradient>
                             <i className="fab fa-facebook text-4xl" />
                         </Typography>
                     </Tooltip>
-                    <Tooltip content="Follow on Instagram">
-                        <Typography as="a" href="#instagram" variant="lead" color="purple" textGradient>
+                    <Tooltip content={currentUser.instagramUrl ? "Follow on Instagram":"No Info Yet"}>
+                        <Typography as="a" href={currentUser.instagramUrl} variant="lead" color="purple" textGradient>
                             <i className="fab fa-instagram text-4xl" />
                         </Typography>
                     </Tooltip>
@@ -216,8 +189,6 @@ import FriendshipActionButton from "./FriendshipActionButton";
                     </Tooltip>
                 </CardFooter>
             </Card>
-
-            {/*<Card className="mt-6 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">*/}
             <Card className="w-full max-w-[95vw] sm:max-w-[90vw] md:max-w-md mx-auto px-2 sm:px-4">
 
             <CardBody>
@@ -256,7 +227,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
                         {userImages.length>4 &&(
 
                             <Link to={ALBUM_PAGE(currentUser.id)}>
-                   <TryButt text="View all" fontSize="14px"/>
+                   <TransparentButton text="View all" fontSize="14px"/>
                             </Link>
                         )}
                         </Typography>
