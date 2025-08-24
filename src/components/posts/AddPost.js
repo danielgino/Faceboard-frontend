@@ -95,7 +95,7 @@ function AddPost() {
     return (
         <div className='add-post-container'>
 
-            <div className="w-full mb-6 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl  xl:max-w-4xl mx-auto px-2 sm:px-4">
+            <div className="w-full mb-6 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl  xl:max-w-5xl mx-auto px-2 sm:px-4">
                 <Card shadow={false} className="w-full px-4 py-2 shadow-md rounded-xl">
                     <CardHeader
                         color="transparent"

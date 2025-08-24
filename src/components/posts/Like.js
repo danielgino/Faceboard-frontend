@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Tooltip, Typography } from "@material-tailwind/react";
 import HeartIcon from "../../Icons/HeartIcon";
 import { ADD_LIKE_API } from "../../utils/Utils";
-import LikeList from "../../componets/interaction/LikeList"
+import LikeList from "../interaction/LikeList"
 function Like({ postId, likeCount, likedByCurrentUser }) {
     const [likes, setLikes] = useState(likeCount ?? 0);
     const [liked, setLiked] = useState(likedByCurrentUser ?? false);

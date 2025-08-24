@@ -42,7 +42,7 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
             setEditing(false);
         } catch (e) {
             setError("Server rejected the value. Please check again.");
-            console.error("❌ Error from onSave:", e);
+            console.error(" Error from onSave:", e);
         }
     };
 

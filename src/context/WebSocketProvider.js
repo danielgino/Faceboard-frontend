@@ -10,9 +10,8 @@ export const WebSocketProvider = ({ children }) => {
     const clientRef = useRef(null);
     const connect = (onConnectCallback) => {
         if (!user?.id || clientRef.current) return;
-        console.log("🔌 Opening WebSocket...");
-        console.log("🧪 brokerURL:", process.env.REACT_APP_WS_URL);
-
+        // console.log(" Opening WebSocket...");
+        // console.log(" brokerURL:", process.env.REACT_APP_WS_URL);
         const token = localStorage.getItem("jwtToken");
 
         const client = new Client({
@@ -26,7 +25,7 @@ export const WebSocketProvider = ({ children }) => {
             heartbeatOutgoing: 4000,
             debug: (str) => console.log("📡", str),
             onConnect: (frame) => {
-                console.log("✅ WebSocket connected");
+                // console.log(" WebSocket connected"); //checks
                 if (onConnectCallback) onConnectCallback();
             },
         });
@@ -52,7 +51,7 @@ export const WebSocketProvider = ({ children }) => {
 
     const send = (destination, body) => {
         if (!clientRef.current?.connected) {
-            console.warn("⚠️ WebSocket not connected");
+           console.warn("WebSocket not connected");
             return;
         }
 

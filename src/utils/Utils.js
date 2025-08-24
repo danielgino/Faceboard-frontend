@@ -98,14 +98,16 @@ export const SEARCH_PAGE="/search-page"
 export const CHAT_PAGE="/chat"
 export const MOBILE_NOTIFICATIONS_PAGE="/notifications"
 export const SETTINGS_PAGE="/settings"
+export const FORGOT_PASSWORD_PAGE="/forgot-password"
+export const RESET_PASSWORD_PAGE="/reset-password"
+
 export const ALBUM_PAGE_LINK="/album/:userId"
 export const FRIENDS_PAGE_LINK="/friends/:userId"
 export const PROFILE_PAGE_LINK="/profile/:userId"
 export const FRIENDS_PAGE=(userId)=> `/friends/${userId}`
 export const PROFILE_PAGE = (userId) => `/profile/${userId}`;
 export const ALBUM_PAGE= (userId) => `/album/${userId}`;
-//l
-
+export const POST_PAGE = (postId) => `/post/${postId}`;
 
 
 export const API_BASE_URL = process.env.REACT_APP_API_URL;
@@ -113,23 +115,34 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 //API
 
+
+//PASSWORD RESET
+
+export const RESET_PASSWORD_API=`${API_BASE_URL}/auth/reset-password`
+export const FORGOT_PASSWORD_API=`${API_BASE_URL}/auth/forgot-password`
+
 //API PROVIDERS
 export const SIGNUP_API       = `${API_BASE_URL}/user/register`;
 export const LOGIN_API        = `${API_BASE_URL}/auth/login`;
 export const SETTINGS_API     = `${API_BASE_URL}/user/settings`;
 //USER PROVIDERS
+
 export const GET_USER_DETAILS_BY_ID=(userId)=> `${API_BASE_URL}/user/by-id?id=${userId}`
 export const GET_USER_IMAGES_API = (userId) => `${API_BASE_URL}/post/${userId}/all-post-images`;
 export const GET_USER_FRIENDS_API=(userId)=> `${API_BASE_URL}/user/${userId}/friends`
 export const AUTH_ME_API=`${API_BASE_URL}/auth/me`
 //Profile Picture Provider
+
 export const UPLOAD_PROFILE_PIC_API=(userId)=>`${API_BASE_URL}/user/${userId}/profile-picture`
 export const DELETE_PROFILE_PIC_API=(userId)=>`${API_BASE_URL}/user/${userId}/profile-picture`
 //Update Settings
+
 export const UPDATE_SETTINGS_API=`${API_BASE_URL}/user/settings`
 //Stories Apis
+
 export const GET_FRIENDS_STORIES_API=`${API_BASE_URL}/api/stories/friends`
 export const UPLOAD_STORY_API=`${API_BASE_URL}/api/stories/upload`
+
 //Post Provider
 export const GET_USER_POSTS_API=(userId)=> `${API_BASE_URL}/post/posts?userId=${userId}`
 export const GET_FEED_POSTS_API=`${API_BASE_URL}/post/feed`
@@ -140,6 +153,7 @@ export const GET_PAGINATED_POSTS_API = ({ userId = null, page = 0, size = 5, isF
     isFeed
         ? `${API_BASE_URL}/post/feed?page=${page}&size=${size}`
         : `${API_BASE_URL}/post/posts?userId=${userId}&page=${page}&size=${size}`;
+export const GET_POST_BY_ID = (id) => `${API_BASE_URL}/post/${id}`;
 
 //Search
 export const SEARCH_USERS_BY_NAME_API = (query) =>
@@ -153,7 +167,6 @@ export const CHECK_FRIENDS_STATUS_API=(userId,friendId)=>`${API_BASE_URL}/friend
 export const SEND_FRIEND_REQUEST_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/send/${userId}/${otherUserId}`
 export const ACCEPT_FRIEND_REQUEST_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/accept/${userId}/${otherUserId}`
 export const REMOVE_FRIEND_API=(userId,otherUserId)=>`${API_BASE_URL}/friendship/remove/${userId}/${otherUserId}`
-
 export const DECLINE_FRIEND_REQUEST_API=`${API_BASE_URL}/friendship/decline`
 // Posts
 export const ADD_POST_API     = `${API_BASE_URL}/post/add`;
@@ -165,27 +178,26 @@ export const GET_COMMENTS_BY_POST=(postId)=>`${API_BASE_URL}/comments/post/${pos
 
 export const GET_CONVERSATION_BETWEEN_USERS_API=(userId,otherUserId)=>`${API_BASE_URL}/messages/conversation/${userId}/${otherUserId}`
 
-export const WEBSITE_NAME="Faceboard"
-    //BUTTONS
 
+//BUTTONS
 export const PROFILE_BTN_TEXT="Profile";
 export const FEED_BTN_TEXT="Feed";
 export const NOTIFICATIONS_BTN_TEXT="Notifications"
 export const FRIENDS_BTN_TEXT="Friends"
 export const SEARCH_BTN_TEXT="Search"
-
 export const SETTINGS_BTN_TEXT="Settings"
 export const LOGOUT_BTN_TEXT="Log Out";
 export const ABOUT_BTN_TEXT="About"
 ///SideBar
 export const INBOX_BTN_TEXT="Chat"
-
-//COLORS
 //ENUMS
 export const GenderEnum = {
     MALE: 'MALE',
     FEMALE: 'FEMALE',
 };
+
+
+export const WEBSITE_NAME="Faceboard"
 
 export const ALT_RANDOM_USERS="Random User"
 ///My Personal Links
@@ -194,3 +206,5 @@ export const DANIEL_FACEBOOK_ACCOUNT="https://www.facebook.com/Daniegino"
 export const DANIEL_LINKEDIN_ACCOUNT="https://www.linkedin.com/in/daniel-gino-2b6350345/"
 export const DANIEL_INSTAGRAM_ACCOUNT="https://www.instagram.com/daniel_gino"
 export const DANIEL_GITHUB_ACCOUNT="https://github.com/danielgino"
+
+

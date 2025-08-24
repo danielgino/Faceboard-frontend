@@ -185,11 +185,14 @@ function SignUp() {
 
                     </div>
                 </div>
-                <div className="flex-1 flex items-center justify-center h-screen">
-
-                    <div className="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0" >
+                <div className="flex-1 flex justify-center items-start min-h-[100svh] overflow-y-auto py-6
+                lg:items-center lg:h-screen lg:py-0">
+                    <div className="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
                         <div className="">
                             <div className="mt-5 space-y-2">
+                                <img src={logoPNG}  className="lg:hidden w-[200px] h-auto object-contain block mx-auto"
+                                     alt="Faceboard Logo"/>
+
                                 <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Sign up</h3>
                                 <p className="">Already have an account?
                                     <a onClick={handleBackToLogin}
@@ -289,7 +292,7 @@ function SignUp() {
                             </div>
                             <div>
                                 <label className="font-medium">
-                                    BirthDate
+                                    Birth Date
                                 </label>
                                 <input
                                     onChange={handleChange}

@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from "../context/UserProvider";
-import {ALT_RANDOM_USERS, HOME_PAGE, LOGIN_API} from "../utils/Utils";
+import {
+    ALT_RANDOM_USERS,
+    FORGOT_PASSWORD_PAGE,
+    HOME_PAGE,
+    LOGIN_API,
+    RESET_PASSWORD_PAGE,
+    SIGNUP_PAGE
+} from "../utils/Utils";
 import logoPNG from "../assets/photos/logo/logoPNG.png"
-import Footer from "../componets/layout/Footer";
+import Footer from "../components/layout/Footer";
 import InputAlerts from "../assets/inputs/InputAlerts";
+import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 
 function Login() {
     const [userName, setUserName] = useState(() => localStorage.getItem("savedEmail") || '');    const [password, setPassword] = useState('');
@@ -12,6 +20,8 @@ function Login() {
     const [message, setMessage] = useState('');
     const [token, setToken] = useState('');
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+
 
     const handleUserName = (event) => {
         const value = event.target.value;
@@ -24,7 +34,10 @@ function Login() {
     };
 
     const handleSignUpButton = () => {
-        navigate('/signup');
+        navigate(SIGNUP_PAGE);
+    };
+    const handleForgotPassButton = () => {
+        navigate(FORGOT_PASSWORD_PAGE);
     };
 
     const handleLoginButton = async () => {
@@ -91,9 +104,9 @@ function Login() {
                                      className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <img
                                     src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e"
-                                    className="w-10 h-10 rounded-full border-2 border-white" alt=""/>
+                                    className="w-10 h-10 rounded-full border-2 border-white" alt={ALT_RANDOM_USERS}/>
                                 <p className="text-sm text-gray-900 font-medium translate-x-5">
-                                    Join 5.000+ users
+                                    Join our users
                                 </p>
                             </div>
                         </div>
@@ -102,7 +115,6 @@ function Login() {
                         className="absolute inset-0 my-auto h-[500px]"
                         style={{
                             background: "oklch(0.924 0.003 17.217)",
-                                // "linear-gradient(152.92deg, rgba(102, 132, 252, 0.2) 4.54%, rgba(232, 121, 249, 0.26) 34.2%, rgba(192, 132, 252, 0.1) 77.55%)",
                             filter: "blur(118px)"
                         }}
                     >
@@ -146,22 +158,38 @@ function Login() {
                                     className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
                                 />
                             </div>
+
                             <div>
-                                <label className="font-medium">
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    required
-                                    onChange={handlePassword}
-                                    value={password}
-                                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                                />
+                                <label className="font-medium">Password</label>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        required
+                                        onChange={handlePassword}
+                                        value={password}
+                                        className="w-full mt-2 px-3 py-2 pr-10 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+                                        autoComplete="current-password"
+                                    />
+                                    <button
+                                        type="button"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        className="absolute inset-y-0 right-3 mt-2 flex items-center"
+                                    >
+                                        {showPassword ? <AiOutlineEye size={22}/> : <AiOutlineEyeInvisible size={22}/> }
+
+                                    </button>
+                                </div>
                             </div>
                             <button
                                 className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150"
                                 onClick={handleLoginButton}>
                                 Login
+                            </button>
+                            <button
+                                className="mt-2 mx-auto block w-fit text-indigo-600 hover:text-indigo-500 hover:underline"
+
+                                onClick={handleForgotPassButton}>Forgot your password?
                             </button>
                         </form>
                     </div>

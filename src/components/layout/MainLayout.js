@@ -10,6 +10,7 @@ import {useMessages} from "../../context/MessageProvider";
 import Search from "../interaction/Search";
 import Footer from "./Footer";
 import LogoLoading from "../../assets/photos/logo/LogoLoading.png"
+import {API_BASE_URL} from "../../utils/Utils";
 function MainLayout() {
     const { user, fetchUserDetails } = useUser();
     const { fetchNotifications } = useNotifications();
@@ -21,7 +22,6 @@ function MainLayout() {
             fetchNotifications();
         }
     }, [user]);
-
 
 
     useEffect(() => {

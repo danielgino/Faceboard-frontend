@@ -13,27 +13,25 @@ import {
 import {useUser} from "../../context/UserProvider";
 import SideBarIcons from "../../Icons/SideBarIcons";
 import logoPNG from "../../assets/photos/logo/logoPNG.png"
-import React, {useState} from "react";
 import {useMessages} from "../../context/MessageProvider";
 import HeaderBarIcons from "../../Icons/HeaderBarIcons";
 
 export function SideBar() {
     const navigate = useNavigate();
     const{user,logout}=useUser()
-    const { messages } = useMessages();
+    const { messages ,unreadByUser } = useMessages();
 
     const getTotalUnread = () => {
+        const keys = Object.keys(unreadByUser || {});
+        if (keys.length) {
+            return keys.reduce((sum, k) => sum + (unreadByUser[k] || 0), 0);
+        }
         let count = 0;
-        Object.values(messages).forEach(msgArray => {
-            msgArray.forEach(msg => {
-                if (!msg.isRead && msg.senderId !== user.id) {
-                    count++;
-                }
-            });
+        Object.values(messages).forEach(arr => {
+            arr.forEach(m => { if (!m.isRead && m.senderId !== user.id) count++; });
         });
         return count;
     };
-
 
     const unreadTotal = getTotalUnread();
 
@@ -62,13 +60,9 @@ export function SideBar() {
 
     return (
         <>
-       
         <Card className="hidden md:block sticky top-24 h-[calc(100vh-1rem)] w-64 ml-8 p-4 shadow-xl  shadow-blue-gray-900/5">
-
-
         <div className="mb-2 p-4">
             <img src={logoPNG}  alt="Faceboard logo" />
-
         </div>
             <List>
                 <ListItem onClick={handleProfile} >
@@ -129,7 +123,7 @@ export function SideBar() {
                     <button
                         onClick={() => navigate("/notifications")}
                         className="flex flex-col items-center text-xs">
-                             <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
+                        <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
                         {NOTIFICATIONS_BTN_TEXT}
                     </button>
                 </div>
@@ -137,12 +131,20 @@ export function SideBar() {
                     <SideBarIcons.search className="h-5 w-5 mb-1"/>
                     {SEARCH_BTN_TEXT}
                 </button>
-                <button onClick={handleChatPage} className="flex flex-col items-center text-xs relative">
-                    <SideBarIcons.inbox className="h-5 w-5 mb-1"/>
+
+                <button onClick={handleChatPage} className="flex flex-col items-center text-xs">
+                  <span className="relative">
+                 <SideBarIcons.inbox className="h-5 w-5 mb-1"/>
+                      {unreadTotal > 0 && (
+                        <span
+                         className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
+                           text-[10px] leading-none rounded-full bg-red-600 text-white
+                           flex items-center justify-center shadow ring-2 ring-white">
+                                 {unreadTotal > 99 ? "99+" : unreadTotal}
+                         </span>
+                              )}
+                            </span>
                     {INBOX_BTN_TEXT}
-                    {unreadTotal > 0 && (
-                        <Chip value={unreadTotal} size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
-                    )}
                 </button>
                 <button onClick={handleSettingsPage} className="flex flex-col items-center text-xs relative">
                     <SideBarIcons.settings className="h-5 w-5 mb-1"/>

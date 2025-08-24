@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useUser } from "../../context/UserProvider";
 import { useFriendship } from "../../context/FriendshipProvider";
 import LikeLoader from "../../assets/loaders/LikeLoader";
+import FriendshipStatus from "../../utils/enums/FriendshipStatus";
 
 function LikeList({ postId, onClose }) {
     const { user } = useUser();
@@ -97,9 +98,9 @@ function LikeList({ postId, onClose }) {
                                         </div>
                                     </Link>
                                     {!isCurrentUser && (
-                                        userFriendStatus?.status === "ACCEPTED" ? (
+                                        userFriendStatus?.status ===  FriendshipStatus.ACCEPTED ? (
                                             <Button size="sm" variant="filled" color="blue-gray" disabled>Friend</Button>
-                                        ) : userFriendStatus?.status === "PENDING" || sentRequests.includes(userId) ? (
+                                        ) : userFriendStatus?.status === FriendshipStatus.PENDING || sentRequests.includes(userId) ? (
                                             <Button size="sm" variant="outlined" disabled>Requested</Button>
                                         ) : (
                                             <Button size="sm" variant="outlined" onClick={() => handleSendFriendRequest(userId)}>Add Friend</Button>

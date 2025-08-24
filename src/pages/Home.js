@@ -2,10 +2,10 @@ import React from 'react';
 import { useUser } from '../context/UserProvider';
 import { useNavigate} from 'react-router-dom';
 import {useState,useEffect} from "react";
-import Feed from "../componets/layout/Feed";
+import Feed from "../components/layout/Feed";
 import {LOGIN_PAGE} from "../utils/Utils";
 import {usePosts} from "../context/PostProvider";
-import StoryBar from "../componets/interaction/StoryBar";
+import StoryBar from "../components/interaction/StoryBar";
 import PostLoader from "../assets/loaders/PostLoader";
 
 function Home() {

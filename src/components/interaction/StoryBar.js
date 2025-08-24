@@ -75,7 +75,10 @@ function StoryBar() {
 
     return (
         <div
-            className="relative bg-white shadow-md rounded-xl my-5 w-full max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto overflow-x-hidden">
+            className="relative bg-white shadow-md rounded-xl my-5
+  w-full mx-auto
+  max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl
+  overflow-x-hidden">
             <div className="w-full overflow-x-auto overflow-y-hidden px-2 sm:px-4">
                 <div className="flex items-center gap-4 py-2 h-[140px] min-w-fit">
 

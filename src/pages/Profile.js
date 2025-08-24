@@ -1,5 +1,5 @@
-import Feed from "../componets/layout/Feed";
-import UserDetails from "../componets/profile/UserDetails";
+import Feed from "../components/layout/Feed";
+import UserDetails from "../components/profile/UserDetails";
 import { useParams } from "react-router-dom";
 
 

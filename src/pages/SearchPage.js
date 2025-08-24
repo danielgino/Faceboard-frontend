@@ -3,7 +3,7 @@ import { Avatar } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import { PROFILE_PAGE } from "../utils/Utils";
 import  {useEffect, useState} from "react";
-import Search from "../componets/interaction/Search";
+import Search from "../components/interaction/Search";
 
 function SearchPage() {
     const { searchResults } = useSearch();

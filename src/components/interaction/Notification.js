@@ -12,8 +12,9 @@ import {
 import HeaderBarIcons from "../../Icons/HeaderBarIcons";
 import React, {useEffect, useState} from "react";
 import {useNotifications} from "../../context/NotificationProvider";
-import {formatDate, NOTIFICATIONS_BTN_TEXT} from "../../utils/Utils";
+import {formatDate, NOTIFICATIONS_BTN_TEXT, POST_PAGE, PROFILE_PAGE} from "../../utils/Utils";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {useNavigate} from "react-router-dom";
 
 function Notification(){
     const { notifications,unreadCount, markAllAsRead } = useNotifications();
@@ -26,8 +27,34 @@ function Notification(){
     const hasMore = visibleNotifications.length < notifications.length;
     const [showMobile, setShowMobile] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
 
+    const handleItemClick = (n) => {
+        switch (n.type) {
+            case "FRIEND_REQUEST":
+            case "FRIEND_ACCEPTED":
+                if (n.senderId) {
+                    navigate(PROFILE_PAGE(n.senderId));
+                    setOpen(false);
+                    if (isMobile) setShowMobile(false);
+                }
+                break;
 
+            case "LIKE":
+            case "COMMENT":
+                if (n.postId) {
+                    navigate(POST_PAGE(n.postId));
+                    setOpen(false);
+                    if (isMobile) setShowMobile(false);
+                }
+                break;
+
+            default:
+                setOpen(false);
+                break;
+        }
+    };
 
     useEffect(() => {
         const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
@@ -63,7 +90,7 @@ function Notification(){
                                 <h2 className="text-lg font-bold">Notifications</h2>
                                 <button
                                     onClick={() => setShowMobile(false)}
-                                    aria-label="סגור התראות"
+                                    aria-label="Close Notifications"
                                     className="text-gray-500 text-xl font-bold focus:outline-none"
                                 >
                                     ✕
@@ -79,11 +106,15 @@ function Notification(){
                             >
                                 {visibleNotifications.length === 0 ? (
                                     <Typography variant="small" color="gray" className="text-center py-2">
-                                        אין התראות חדשות 🙌
+                                        No new notifications 🙌
                                     </Typography>
                                 ) : (
                                     visibleNotifications.map((notification) => (
-                                        <ListItem key={notification.id} className="hover:bg-blue-gray-50">
+                                        <ListItem
+                                            key={notification.id}
+                                            className="hover:bg-blue-gray-50 cursor-pointer"
+                                            onClick={() => handleItemClick(notification)}
+                                        >
                                             <ListItemPrefix>
                                                 <Avatar src={notification.senderProfilePicture} alt="avatar" />
                                             </ListItemPrefix>
@@ -105,7 +136,7 @@ function Notification(){
             ) : (
 
 
-            <Popover  placement="bottom-end">
+            <Popover open={open} handler={setOpen}  placement="bottom-end">
                 <PopoverHandler onClick={() => {
                     markAllAsRead();
                 }}>
@@ -156,11 +187,15 @@ function Notification(){
                     >
                         {visibleNotifications.length === 0 ? (
                             <Typography variant="small" color="gray" className="text-center py-2">
-                                אין התראות חדשות 🙌
+                                No new Notifications 🙌
                             </Typography>
                         ) : (
                             visibleNotifications.map((notification) => (
-                                <ListItem key={notification.id} className="hover:bg-blue-gray-50">
+                                <ListItem
+                                    key={notification.id}
+                                    className="hover:bg-blue-gray-50 cursor-pointer"
+                                    onClick={() => handleItemClick(notification)}
+                                >
                                     <ListItemPrefix>
                                         <Avatar src={notification.senderProfilePicture} alt="avatar" />
                                     </ListItemPrefix>

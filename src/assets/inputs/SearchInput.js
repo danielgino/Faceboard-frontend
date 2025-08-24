@@ -9,11 +9,6 @@ const SearchInput = ({onChange,onSearch}) => {
         }
     };
 
-    // const handleChange = (e) => {
-    //     const val = e.target.value;
-    //     setValue(val);
-    //     onChange?.(val);
-    // };
 
     const handleChange = (e) => {
         const val = e.target.value;

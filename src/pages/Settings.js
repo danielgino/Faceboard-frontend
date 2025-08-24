@@ -9,6 +9,8 @@ import {Avatar, Button, Card, CardBody, Typography} from "@material-tailwind/rea
 import RandomIcons from "../Icons/RandomIcons";
 import useProfilePictureUpload from "../context/useProfilePictureUpload";
 import {SETTINGS_API} from "../utils/Utils";
+import Swal from "sweetalert2";
+import {PasswordInput} from "../assets/inputs/PasswordInput";
 
 
 
@@ -35,8 +37,6 @@ function Settings(){
             payload.newPassword = password;
         }
 
-        console.log("🔍 Payload being sent:", payload);
-
         if (!payload.currentPassword || !payload.newPassword) {
             alert("Please fill both current and new password.");
             return;
@@ -49,10 +49,19 @@ function Settings(){
                     "Content-Type": "application/json"
                 },
             });
-            alert("Password updated!");
+            await Swal.fire({
+                title: "Success!",
+                text: `Password updated successfully`,
+                icon: "success"
+            });
         } catch (e) {
             console.log("🔥 Server error:", e.response?.data);
-            alert(e.response?.data?.message || "Something went wrong.");
+            await Swal.fire({
+                title: "Error!",
+                text: `Please Check Password Fields`,
+                icon: "error"
+            });
+
         }
     };
 
@@ -127,9 +136,10 @@ function Settings(){
                             Change Password
                         </Typography>
 
-                        <GlobalInput label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword} />
-                        <GlobalInput label="New Password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); validate("password", e.target.value); }} error={errors.password} />
-                        <GlobalInput label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); validate("confirmPassword", e.target.value); }} error={errors.confirmPassword} />
+                        <PasswordInput label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword} />
+                        <PasswordInput label="New Password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); validate("password", e.target.value); }} error={errors.password} />
+                        <PasswordInput label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); validate("confirmPassword", e.target.value); }} error={errors.confirmPassword} />
+                        {/*<PasswordInput label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword}/>*/}
 
                         <div className="flex justify-center mt-6">
                             <Button onClick={handleSubmit} color="blue" size="lg">

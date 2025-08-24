@@ -104,7 +104,7 @@ function Feed({ isFeed = false, userId = null }) {
                     }
                 >
                     {activePosts.length === 0 && !loading ? (
-                        <div className="my-10"><NoPostsYet/></div>
+                        <div className="my-10"><NoPostsYet title="No posts yet" text="Posts will appear here"/></div>
                     ) : (
                         activePosts.map((post) => (
                             <Post

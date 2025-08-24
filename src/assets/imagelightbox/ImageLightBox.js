@@ -3,7 +3,7 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import {Thumbnails} from "yet-another-react-lightbox/plugins";
-import "../../styles/ImageLightboxOverride.css";
+import "../styles/ImageLightboxOverride.css";
 
 function ImageLightbox({ images, isOpen, onClose, currentIndex }) {
     if (!images || images.length === 0) return null;

@@ -6,19 +6,21 @@ import {
     Conversation,
     Avatar,
 } from "@chatscope/chat-ui-kit-react";
-import {useMessages} from "../context/MessageProvider";
+import {useMessages} from "../../context/MessageProvider";
 
 function ConversationsList({friendsList, currentUser, onSelect }) {
-    const { messages } = useMessages();
+    const { messages,unreadByUser  } = useMessages();
     const [version, setVersion] = useState(0);
     const [sortedFriends, setSortedFriends] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const getUnreadCount = (friendId) => {
-        if (currentUser?.id === friendId) return 0;
-        const userMessages = messages[friendId] || [];
 
-        return userMessages.filter(msg => !msg.isRead && msg.senderId === friendId).length;
+    const getUnreadCount = (friendId) => {
+        const mapVal = unreadByUser[String(friendId)];
+        if (mapVal != null) return mapVal;
+        const userMessages = messages[friendId] || [];
+        return userMessages.filter(m => !m.isRead && m.senderId === friendId).length;
     };
+
     useEffect(() => {
         const sorted = [...friendsList].sort((a, b) => {
             const lastA = messages[a.id]?.[messages[a.id].length - 1]?.sentTime || a.lastMessageTime;

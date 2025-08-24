@@ -1,4 +1,3 @@
-// src/assets/loaders/FriendsSkeleton.jsx
 export default function FriendsSkeleton({ count = 12 }) {
     return (
         <div className="px-6 pt-6 bg-gray-100 w-full min-h-screen">

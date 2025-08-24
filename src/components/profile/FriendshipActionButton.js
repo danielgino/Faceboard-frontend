@@ -1,6 +1,6 @@
 import { Button } from "@material-tailwind/react";
 import Swal from "sweetalert2";
-import FriendshipStatus from "../../enums/FriendshipStatus";
+import FriendshipStatus from "../../utils/enums/FriendshipStatus";
 
 function FriendshipActionButton({user, otherUser, friendStatus, isLoading,
                                     onAccept, onDecline, onSendRequest, onRemove,}) {

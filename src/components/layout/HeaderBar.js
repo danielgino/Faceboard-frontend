@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Navbar, Collapse , Typography, Button, IconButton, Input, Avatar,} from "@material-tailwind/react";
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../../context/UserProvider";
@@ -17,7 +17,6 @@ import Notification from "../interaction/Notification";
 
 
      const handleProfileButton=(e)=>{
-       // e.preventDefault();
         navigate(PROFILE_PAGE(user.id));
     }
 
@@ -33,7 +32,7 @@ import Notification from "../interaction/Notification";
          }, 0);
      };
 
-     React.useEffect(() => {
+     useEffect(() => {
         window.addEventListener(
             "resize",
             () => window.innerWidth >= 960 && setOpenNav(false),

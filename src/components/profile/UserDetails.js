@@ -11,8 +11,6 @@ import {useLightbox} from "../../context/LightBoxContext";
 import TransparentButton from "../../assets/buttons/TransparentButton";
 import noPhotosYet from "../../assets/photos/noPhotosYet.png"
 import { useFriendship } from "../../context/FriendshipProvider";
-import Swal from 'sweetalert2'
-import FriendshipStatus from "../../enums/FriendshipStatus";
 import FriendshipActionButton from "./FriendshipActionButton";
 
  function UserDetails({otherUserId}) {
@@ -49,24 +47,7 @@ import FriendshipActionButton from "./FriendshipActionButton";
          if (!userImages) return [];
          return [...userImages].slice(-4).reverse();
      }, [userImages]);
-     const handleFriendButtonClick = async () => {
-         if (friendStatus?.status === FriendshipStatus.ACCEPTED) {
-             const result = await Swal.fire({
-                 title: "Unfriend?",
-                 text: `Are You Sure you want to cancel Friendship with ${currentUser.name}?`,
-                 icon: "warning",
-                 showCancelButton: true,
-                 confirmButtonText: "Yes,Remove",
-                 cancelButtonText: "Cancel",
-             });
 
-             if (result.isConfirmed) {
-                 await removeFriendship(user.id, otherUser.id);
-             }
-         } else if (!friendStatus || friendStatus.status !== FriendshipStatus.PENDING) {
-             await sendFriendRequest(user.id, otherUser.id);
-         }
-     };
 
      const currentUser = otherUserId ? otherUser : user;
      const isOwnProfile = user && Number(user.id) === Number(otherUserId);

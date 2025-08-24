@@ -2,35 +2,30 @@ import React, { useEffect, useState } from "react";
 import {
     MainContainer,
     ChatContainer,
-    MessageInput, Avatar, ConversationHeader, MessageList, Message
+    MessageInput, Avatar, ConversationHeader, MessageList, Message,TypingIndicator
 } from "@chatscope/chat-ui-kit-react";
-import "../styles/ChatOverride.css"
+import "../../assets/styles/ChatOverride.css"
 import ConversationsList from "./ConversationsList";
-import { useUser } from "../context/UserProvider";
-import { useMessages } from "../context/MessageProvider";
-import {formatDate, formatTime} from "../utils/Utils";
+import { useUser } from "../../context/UserProvider";
+import { useMessages } from "../../context/MessageProvider";
+import {formatDate, formatTime} from "../../utils/Utils";
 import {useLocation} from "react-router-dom";
-import {useWebSocketContext} from "../context/WebSocketProvider";
+import {useWebSocketContext} from "../../context/WebSocketProvider";
 
 function Chat() {
     const { user } = useUser();
     const [currentUser, setCurrentUser] = useState(null);
-   // const { fetchUserMessages, messages,sendMessage,setMessages  } = useMessages();
     const location = useLocation();
-    //const { sendMarkAsRead, sendActiveChatStatus } = useWebSocketContext();
-    const { fetchConversationMessages, messages, setMessages } = useMessages();
+    const { fetchConversationMessages, messages, setMessages ,markThreadRead } = useMessages();
     const { sendMessage, sendMarkAsRead, sendActiveChatStatus } = useWebSocketContext();
+    const [sendingGhosts, setSendingGhosts] = useState([]);
      const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
       useEffect(() => {
            const onResize = () => setIsMobile(window.innerWidth < 768);
            window.addEventListener("resize", onResize);
            return () => window.removeEventListener("resize", onResize);
          }, []);
 
-    useEffect(() => {
-        console.log("Messages updated for currentUser:", messages[currentUser?.id]);
-    }, [messages, currentUser]);
 
 
     useEffect(() => {
@@ -57,7 +52,6 @@ function Chat() {
     useEffect(() => {
         return () => {
             sendActiveChatStatus(user.id, null);
-            console.log("📤 User left Chat page – activeChat cleared");
         };
     }, [location.pathname]);
 
@@ -70,6 +64,7 @@ function Chat() {
         if (!messages[selectedUser.id]) {
             await fetchConversationMessages(user.id, selectedUser.id);
         }
+        markThreadRead(selectedUser.id);
         sendMarkAsRead(selectedUser.id, user.id);
 
         setMessages(prev => {
@@ -89,6 +84,13 @@ function Chat() {
 
     const handleSend = (message) => {
         if (currentUser) {
+
+            const ghostId = `${currentUser.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                setSendingGhosts(g => [...g, ghostId]);
+               setTimeout(() => {
+                   setSendingGhosts(g => g.filter(id => id !== ghostId));
+                    }, 1200);
+
             sendMessage({
                 senderId: user.id,
                 receiverId: currentUser.id,
@@ -98,11 +100,10 @@ function Chat() {
         }
     };
     const handleBack = () => {
+        setSendingGhosts([])
         setCurrentUser(null);
     };
-
     const userMessages = currentUser ? messages[currentUser.id] : [];
-    console.log("📥 Displaying messages for current user:", currentUser?.id, userMessages);
 
     return (
         <div className="min-h-[calc(100dvh-6rem)]">
@@ -129,6 +130,7 @@ function Chat() {
                         </ConversationHeader>
                     ) : null}
                     <MessageList>
+
                         {userMessages && userMessages.length > 0 ? (
                             userMessages.map((msg, index) => (
                                 <Message
@@ -153,16 +155,40 @@ function Chat() {
                                                     marginLeft: "8px",
                                                     fontSize: "14px",
                                                     color: msg.isRead ? "green" : "gray"
-                                                }}
-                                            >
-                                                            ✓✓
-                                                    </span>
-                                        )}
+                                                }}>✓✓</span> )}
 
                                     </Message.Footer>
                                 </Message>
                             ))
                         ) : null}
+
+
+                        {currentUser && sendingGhosts.map(id => (
+                            <Message
+                                key={`ghost-${id}`}
+                                model={{
+                                    type: "custom",
+                                    sender: "You",
+                                    direction: "outgoing",
+                                    position: "single",
+                                    sentTime: new Date().toISOString()
+                                }}>
+                                <Avatar
+                                    src={user?.profilePictureUrl}
+                                    name={user?.fullName}
+                                />
+                                <Message.CustomContent>
+                                    <div className="pending-bubble">
+                                        <span className="dot" />
+                                        <span className="dot" style={{ animationDelay: ".15s" }} />
+                                        <span className="dot" style={{ animationDelay: ".3s" }} />
+                                    </div>
+                                </Message.CustomContent>
+
+                                <Message.Footer>Sending…</Message.Footer>
+                            </Message>
+                        ))}
+
                     </MessageList>
                     <MessageInput placeholder="Type message here..." onSend={handleSend} />
                 </ChatContainer>

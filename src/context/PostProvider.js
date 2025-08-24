@@ -57,8 +57,6 @@ export const PostProvider = ({ children }) => {
 
             const feedData = await response.json();
             setFeed(feedData);
-            console.log("Feed data:", feedData);
-
             setLoading(false)
         } catch (err) {
             console.error('Error fetching  posts:', err);

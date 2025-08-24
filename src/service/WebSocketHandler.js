@@ -11,40 +11,19 @@ export default function WebSocketHandler() {
     const { addNotification } = useNotifications();
     const { clientRef, connect } = useWebSocketContext();
 
-    const playMessageSound = () => {
-        console.log("🔔 playMessageSound called");
-        const audio = new Audio("/sounds/messageSound.mp3");
-
-        audio.play()
-            .then(() => {
-                console.log("✅ Sound played successfully");
-            })
-            .catch((error) => {
-                console.error("Failed to play sound:", error.message);
-            });
-    };
-    const playNotificationSound = () => {
-        console.log("🔔 playMessageSound called");
-        const audio = new Audio("/sounds/notificationSound.mp3");
-
-        audio.play()
-            .then(() => {
-                console.log("✅ NOTIFICATION played successfully");
-            })
-            .catch((error) => {
-                console.error(" Failed to play sound:", error.message);
-            });
+    const playSound = (src) => {
+        const audio = new Audio(src);
+        void audio.play().catch(() => {});
     };
 
+    const playMessageSound = () => playSound("/sounds/messageSound.mp3");
+    const playNotificationSound = () => playSound("/sounds/notificationSound.mp3");
     useEffect(() => {
         if (!user?.id) return;
 
         const onConnect = () => {
             const client = clientRef.current;
             if (!client) return;
-
-            console.log("📞 Subscribing to WebSocket topics");
-
             client.subscribe(`/topic/messages/${user.id}`, (msg) => {
                 const messages = Array.isArray(JSON.parse(msg.body)) ? JSON.parse(msg.body) : [JSON.parse(msg.body)];
                 messages.forEach((message) => {

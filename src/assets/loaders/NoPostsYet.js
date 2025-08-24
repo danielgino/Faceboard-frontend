@@ -2,7 +2,7 @@ import { Card, CardBody, Typography } from "@material-tailwind/react";
 import { Ghost } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function NoPostsYet() {
+export default function NoPostsYet({title,text}) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -13,10 +13,10 @@ export default function NoPostsYet() {
                 <CardBody className="flex flex-col items-center justify-center space-y-4">
                     <Ghost className="w-16 h-16 text-gray-400" />
                     <Typography variant="h5" color="gray">
-                        No posts yet
+                        {title}
                     </Typography>
                     <Typography color="gray" className="text-sm">
-                        Posts will appear here.
+                        {text}
                     </Typography>
                 </CardBody>
             </Card>

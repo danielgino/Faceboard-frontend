@@ -4,11 +4,13 @@ import {IconButton} from "@material-tailwind/react";
 
 const RandomIcons = {
         Edit: ({className = "size-6", stroke = "BLACK"}) => (
+            <button aria-label="EditIcon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  strokeWidth={1.5} stroke={stroke} className={className}>
                 <path strokeLinecap="round" strokeLinejoin="round"
                       d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
             </svg>
+            </button>
         ),
         Delete: ({className = "size-6", stroke = "currentColor"}) => (
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -17,26 +19,43 @@ const RandomIcons = {
                       d="M6 18L18 6M6 6l12 12"/>
             </svg>
         ),
-    Share: ()=> (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="icon icon-tabler icons-tabler-outline icon-tabler-share-3"
-        >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path d="M13 4v4c-6.575 1.028 -9.02 6.788 -10 12c-.037 .206 5.384 -5.962 10 -6v4l8 -7l-8 -7z"/>
-        </svg>
-    ),
-    Comment: ({onClick})=> (
+
+        Share: () => (
+            <button aria-label="Share (coming soon)">
+
+            <div className="group relative inline-block">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-share-3 cursor-pointer
+                 hover:stroke-blue-500 transition duration-200"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M13 4v4c-6.575 1.028 -9.02 6.788 -10 12c-.037 .206 5.384 -5.962 10 -6v4l8 -7l-8 -7z"/>
+                </svg>
+                <span
+                    className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap
+                 scale-0 group-hover:scale-100
+                 px-3 py-1 rounded-lg border border-gray-300 bg-white
+                 text-sm font-bold text-gray-800 shadow-md
+                 transition-all duration-300 ease-in-out"
+                >
+      Coming Soon
+    </span>
+            </div>
+            </button>
+        ),
+
+        Comment: ({onClick})=> (
         <div className="group relative">
-            <button onClick={onClick}>
+            <button onClick={onClick}  aria-label="Comments">
                 <svg strokeLinejoin="round" strokeLinecap="round" stroke="currentColor" strokeWidth={2}
                      viewBox="0 0 24 24" height={25} width={25} xmlns="http://www.w3.org/2000/svg"
                      className="w-8 hover:scale-125 duration-200 hover:stroke-blue-500" fill="none">
@@ -52,7 +71,7 @@ const RandomIcons = {
     ),
 
     PhotoIcon : ({onClick})=>(
-        <IconButton onClick={onClick} variant="text" className="rounded-full">
+        <IconButton onClick={onClick} variant="text" className="rounded-full"  aria-label="PhotoIcon">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -71,7 +90,7 @@ const RandomIcons = {
     ),
 
     EmojiIcon: ({onClick})=>(
-        <IconButton onClick={onClick} variant="text" className="rounded-full">
+        <IconButton onClick={onClick} variant="text" className="rounded-full"  aria-label="EmojiIcon">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -89,7 +108,7 @@ const RandomIcons = {
         </IconButton>
     ),
     PostComment: ({handleSubmit})=>(
-        <IconButton onClick={handleSubmit} variant="text" className="rounded-full">
+        <IconButton onClick={handleSubmit} variant="text" className="rounded-full"  aria-label="Post Comment">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
