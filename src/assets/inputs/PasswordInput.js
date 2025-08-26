@@ -1,14 +1,15 @@
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 import {useState} from "react";
 
- export const PasswordInput = ({ name, label, value, onChange, error }) => {
+ export const PasswordInput = ({ id,name, label, value, onChange, error }) => {
      const [showPassword, setShowPassword] = useState({});
 
      return (
         <div>
-            <label className="font-medium">{label}</label>
+            <label htmlFor={id} className="font-medium">{label}</label>
             <div className="relative mt-2">
                 <input
+                    id={id}
                     name={name}
                     value={value}
                     onChange={onChange}

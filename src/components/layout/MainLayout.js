@@ -1,16 +1,10 @@
 import React, {useEffect, useRef} from "react";
 import HeaderBar from "./HeaderBar";
 import SideBar from "./SideBar";
-import GlobalImageLightbox from "../../assets/imagelightbox/GlobalImageLightbox";
 import { Toast } from 'primereact/toast';
 import {useUser} from "../../context/UserProvider";
 import { Outlet } from "react-router-dom";
 import {useNotifications} from "../../context/NotificationProvider";
-import {useMessages} from "../../context/MessageProvider";
-import Search from "../interaction/Search";
-import Footer from "./Footer";
-import LogoLoading from "../../assets/photos/logo/LogoLoading.png"
-import {API_BASE_URL} from "../../utils/Utils";
 function MainLayout() {
     const { user, fetchUserDetails } = useUser();
     const { fetchNotifications } = useNotifications();

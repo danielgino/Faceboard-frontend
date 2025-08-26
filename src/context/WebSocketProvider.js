@@ -23,7 +23,7 @@ export const WebSocketProvider = ({ children }) => {
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
-            debug: (str) => console.log("📡", str),
+            // debug: (str) => console.log("📡", str),
             onConnect: (frame) => {
                 // console.log(" WebSocket connected"); //checks
                 if (onConnectCallback) onConnectCallback();

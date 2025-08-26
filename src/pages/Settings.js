@@ -122,12 +122,12 @@ function Settings(){
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <EditableField label="Name" value={name} onSave={saveName} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
-                    <EditableField label="Lastname" value={lastname} onSave={saveLastname} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
-                    <EditableField label="Email" value={email} onSave={saveEmail} validate={(val) => !/\S+@\S+\.\S+/.test(val) ? "Invalid email" : ""} />
-                    <EditableField label="Biography" value={bio} onSave={saveBio} multiline rows={3} validate={(val) => val.length > 150 ? "Only 150 characters allowed" : ""} />
-                    <EditableField label="Facebook URL" value={facebookUrl} onSave={saveFacebookUrl} validate={(val) => val && !/^https?:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(val) ? "Invalid Facebook URL" : ""} />
-                    <EditableField label="Instagram URL" value={instagramUrl} onSave={saveInstagramUrl} validate={(val) => val && !/^https?:\/\/(www\.)?instagram\.com\/[^\s]+$/.test(val) ? "Invalid Instagram URL" : ""} />
+                    <EditableField id="name" label="Name" value={name} onSave={saveName} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
+                    <EditableField id="lastname" label="Lastname" value={lastname} onSave={saveLastname} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
+                    <EditableField id="email" label="Email" value={email} onSave={saveEmail} validate={(val) => !/\S+@\S+\.\S+/.test(val) ? "Invalid email" : ""} />
+                    <EditableField id="bio" label="Biography" value={bio} onSave={saveBio} multiline rows={3} validate={(val) => val.length > 150 ? "Only 150 characters allowed" : ""} />
+                    <EditableField id="facebookurl" label="Facebook URL" value={facebookUrl} onSave={saveFacebookUrl} validate={(val) => val && !/^https?:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(val) ? "Invalid Facebook URL" : ""} />
+                    <EditableField id="instagramurl"  label="Instagram URL" value={instagramUrl} onSave={saveInstagramUrl} validate={(val) => val && !/^https?:\/\/(www\.)?instagram\.com\/[^\s]+$/.test(val) ? "Invalid Instagram URL" : ""} />
                 </div>
 
                 <Card className="bg-gray-50 shadow-md rounded-xl">
@@ -136,10 +136,9 @@ function Settings(){
                             Change Password
                         </Typography>
 
-                        <PasswordInput label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword} />
-                        <PasswordInput label="New Password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); validate("password", e.target.value); }} error={errors.password} />
-                        <PasswordInput label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); validate("confirmPassword", e.target.value); }} error={errors.confirmPassword} />
-                        {/*<PasswordInput label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword}/>*/}
+                        <PasswordInput id="currentPassword" label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword} />
+                        <PasswordInput  id="NewPassword" label="New Password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); validate("password", e.target.value); }} error={errors.password} />
+                        <PasswordInput  id="ConfirmPassword" label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); validate("confirmPassword", e.target.value); }} error={errors.confirmPassword} />
 
                         <div className="flex justify-center mt-6">
                             <Button onClick={handleSubmit} color="blue" size="lg">

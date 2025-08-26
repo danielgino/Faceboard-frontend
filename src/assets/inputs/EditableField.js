@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect, useId} from "react";
 import { Pencil, X, Check } from "lucide-react";
 import {useUser} from "../../context/UserProvider";
 
-function EditableField({ label, value, onSave, validate, multiline = false, rows = 3 }) {
+function EditableField({ label, value, onSave, validate, id: idProp,  multiline = false, rows = 3 }) {
     const [editing, setEditing] = useState(false);
     const [inputValue, setInputValue] = useState(value || "");
     const [error, setError] = useState("");
+    const autoId = useId();
+    const id = idProp || `editable-${autoId}`;
     useEffect(() => {
         setInputValue(value || "");
     }, [value]);
@@ -54,7 +56,12 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
 
     return (
         <div className="mb-4">
-            <label className="block font-medium mb-1">{label}</label>
+                     {editing ? (
+                      <label htmlFor={id} className="block font-medium mb-1">{label}</label>
+                      ) : (
+                        <div className="block font-medium mb-1">{label}</div>
+                      )}
+
             {!editing ? (
                 <div className="flex items-center gap-2">
                    <span className="whitespace-pre-line break-words w-full max-w-xs bg-gray-50 ">
@@ -66,6 +73,7 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
                 <div className="flex flex-col gap-2">
                 {multiline ? (
                         <textarea
+                            id={id}
                             value={inputValue}
                             maxLength={200}
                             onChange={handleChange}
@@ -74,6 +82,7 @@ function EditableField({ label, value, onSave, validate, multiline = false, rows
                         />
                     ) : (
                         <input
+                            id={id}
                             value={inputValue}
                             onChange={handleChange}
                             className={`border px-2 py-1 rounded max-w-xs w-full ${error ? 'border-red-500' : 'border-gray-300'}`}

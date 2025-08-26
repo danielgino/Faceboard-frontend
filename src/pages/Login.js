@@ -14,6 +14,7 @@ import Footer from "../components/layout/Footer";
 import InputAlerts from "../assets/inputs/InputAlerts";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 
+
 function Login() {
     const [userName, setUserName] = useState(() => localStorage.getItem("savedEmail") || '');    const [password, setPassword] = useState('');
     const {fetchUserDetails } = useUser();
@@ -21,6 +22,7 @@ function Login() {
     const [token, setToken] = useState('');
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
 
 
     const handleUserName = (event) => {
@@ -78,19 +80,22 @@ function Login() {
     }, [token, navigate]);
 
     return (
-        <div>
+        // <div>
 
-
-            <main className="w-full flex">
-                <div className="relative flex-1 hidden items-center justify-center h-screen bg-indigo-50 lg:flex">
+        <div className="min-h-dvh flex flex-col">
+            <main className="w-full flex flex-1 min-h-0">
+                <div
+                    className="relative flex-1 hidden items-center justify-center bg-indigo-50 lg:flex overflow-hidden">
                     <div className="relative z-10 w-full max-w-md">
-                        <img   className="w-[400px] h-auto object-contain"
-                               src={logoPNG} alt="Faceboard logo" />
+                        <img className="w-[400px] h-auto object-contain"
+                             src={logoPNG} alt="Faceboard logo"/>
 
                         <div className=" mt-16 space-y-3">
-                            <h3 className="text-indigo-400 text-3xl font-bold">Your friends are already waiting for you.</h3>
+                            <h3 className="text-indigo-400 text-3xl font-bold">Your friends are already waiting for
+                                you.</h3>
                             <p className="text-gray-900">
-                                Login now and start connecting with like-minded people, sharing your moments, and building meaningful relationships – all in one vibrant community.
+                                Login now and start connecting with like-minded people, sharing your moments, and
+                                building meaningful relationships – all in one vibrant community.
                             </p>
                             <div className="flex items-center -space-x-2 overflow-hidden">
                                 <img src="https://randomuser.me/api/portraits/women/79.jpg"
@@ -98,8 +103,8 @@ function Login() {
                                 <img src="https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg"
                                      className="w-10 h-10 rounded-full border-2 border-white" alt={ALT_RANDOM_USERS}/>
                                 <img alt={ALT_RANDOM_USERS}
-                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f"
-                                    className="w-10 h-10 rounded-full border-2 border-white"/>
+                                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f"
+                                     className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <img alt={ALT_RANDOM_USERS} src="https://randomuser.me/api/portraits/men/86.jpg"
                                      className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <img
@@ -121,15 +126,18 @@ function Login() {
 
                     </div>
                 </div>
-                <div className="flex-1 flex items-center justify-center h-screen">
+                <div className="flex-1 flex items-center justify-center">
+
                     <div className="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
                         <div className="">
-                        <img src={logoPNG} width={150} className="lg:hidden w-[400px] h-auto object-contain " alt="Faceboard Logo"/>
+                            <img src={logoPNG} width={150} className="lg:hidden w-[400px] h-auto object-contain "
+                                 alt="Faceboard Logo"/>
                             <div className="mt-5 space-y-2">
                                 <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Login</h3>
                                 <p className="">Don't have an account?
-                                    <a onClick={handleSignUpButton} className="font-medium text-indigo-600 hover:text-indigo-500">
-                                    Sign Up</a></p>
+                                    <a onClick={handleSignUpButton}
+                                       className="font-medium text-indigo-600 hover:text-indigo-500">
+                                        Sign Up</a></p>
                             </div>
                         </div>
                         <div className="relative">
@@ -139,7 +147,7 @@ function Login() {
                         </div>
                         <div>
                             {message !== '' && (
-                                <InputAlerts text={message} onClose={() => setMessage('')} />
+                                <InputAlerts text={message} onClose={() => setMessage('')}/>
                             )}                        </div>
                         <form
                             onSubmit={(e) => e.preventDefault()}
@@ -176,7 +184,7 @@ function Login() {
                                         onClick={() => setShowPassword((prev) => !prev)}
                                         className="absolute inset-y-0 right-3 mt-2 flex items-center"
                                     >
-                                        {showPassword ? <AiOutlineEye size={22}/> : <AiOutlineEyeInvisible size={22}/> }
+                                        {showPassword ? <AiOutlineEye size={22}/> : <AiOutlineEyeInvisible size={22}/>}
 
                                     </button>
                                 </div>
@@ -195,7 +203,11 @@ function Login() {
                     </div>
                 </div>
             </main>
-            <Footer/>
+            <footer className="mt-auto w-full">
+                <Footer/>
+            </footer>
+            {/*<Footer/>*/}
+
         </div>
     );
 }

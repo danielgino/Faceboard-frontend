@@ -163,9 +163,9 @@ import FriendshipActionButton from "./FriendshipActionButton";
                             <i className="fab fa-instagram text-4xl" />
                         </Typography>
                     </Tooltip>
-                    <Tooltip content="Follow">
-                        <Typography as="a" href="#twitter" variant="lead" color="light-blue" textGradient>
-                            <i className="fab fa-twitter text-4xl" />
+                    <Tooltip content="Cooming soon">
+                        <Typography as="a" href="#github" variant="lead" color="light-blue" textGradient>
+                            <i className="fab fa-github  text-4xl" />
                         </Typography>
                     </Tooltip>
                 </CardFooter>

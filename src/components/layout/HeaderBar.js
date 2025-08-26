@@ -1,8 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {Navbar, Collapse , Typography, Button, IconButton, Input, Avatar,} from "@material-tailwind/react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useUser} from "../../context/UserProvider";
-import {ABOUT_BTN_TEXT, FEED_BTN_TEXT, HOME_PAGE, LOGIN_PAGE, LOGOUT_BTN_TEXT, PROFILE_BTN_TEXT, PROFILE_PAGE
+import {
+    GALLERY_BTN_TEXT,
+    ALBUM_PAGE,
+    FEED_BTN_TEXT,
+    HOME_PAGE,
+    LOGIN_PAGE,
+    LOGOUT_BTN_TEXT,
+    PROFILE_BTN_TEXT,
+    PROFILE_PAGE
 } from "../../utils/Utils";
 import Search from "../interaction/Search";
 import HeaderBarIcons from "../../Icons/HeaderBarIcons.js"
@@ -20,6 +28,11 @@ import Notification from "../interaction/Notification";
         navigate(PROFILE_PAGE(user.id));
     }
 
+
+     const handleGalleryButton=(e)=>{
+         navigate(ALBUM_PAGE(user.id));
+
+     }
     const handleFeedButton=(e)=>{
         e.preventDefault();
         navigate(HOME_PAGE);
@@ -82,9 +95,9 @@ import Notification from "../interaction/Notification";
                 color="blue-gray"
                 className="flex items-center gap-x-2 p-1 font-medium"
             >
-                <HeaderBarIcons.About/>
-                <a href="#" className="flex items-center">
-                    {ABOUT_BTN_TEXT}
+                <HeaderBarIcons.Gallery/>
+                <a href="#" onClick={handleGalleryButton} className="flex items-center">
+                    {GALLERY_BTN_TEXT}
                 </a>
             </Typography>
             <Typography

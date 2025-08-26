@@ -3,18 +3,19 @@ import styled from 'styled-components';
 
 const SearchInput = ({onChange,onSearch}) => {
     const [value, setValue] = useState('');
+
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             onSearch?.(value);
         }
     };
 
-
     const handleChange = (e) => {
         const val = e.target.value;
         setValue(val);
         if (onChange) onChange(e);
     };
+
     return (
         <StyledWrapper>
             <div className="group">
@@ -23,14 +24,24 @@ const SearchInput = ({onChange,onSearch}) => {
                         <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
                     </g>
                 </svg>
-                <input onChange={handleChange}   onKeyDown={handleKeyDown} id="query" className="input" type="search" placeholder="Search..." name="searchbar "  autoComplete="off"/>
+                <input
+                    id="query"
+                    className="input"
+                    type="search"
+                    placeholder="Search..."
+                    name="searchbar"
+                    autoComplete="off"
+                    aria-label="Search"
+                    value={value}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                />
             </div>
         </StyledWrapper>
     );
 }
 
 const StyledWrapper = styled.div`
-
     .group {
         display: flex;
         line-height: 28px;
@@ -38,9 +49,7 @@ const StyledWrapper = styled.div`
         position: relative;
         max-width: 290px;
         height: 100%;
-
     }
-
     .input {
         font-family: "Montserrat", sans-serif;
         width: 100%;
@@ -56,23 +65,10 @@ const StyledWrapper = styled.div`
         cursor: text;
         z-index: 0;
     }
-
-    .input::placeholder {
-        color: #909095;
-    }
-
-    .input:hover {
-        box-shadow: 0 0 0 2.5px #2f303d, 0px 0px 25px -15px #000;
-    }
-
-    .input:active {
-        transform: scale(0.95);
-    }
-
-    .input:focus {
-        box-shadow: 0 0 0 2.5px #2f303d;
-    }
-
+    .input::placeholder { color: #909095; }
+    .input:hover { box-shadow: 0 0 0 2.5px #2f303d, 0px 0px 25px -15px #000; }
+    .input:active { transform: scale(0.95); }
+    .input:focus { box-shadow: 0 0 0 2.5px #2f303d; }
     .search-icon {
         position: absolute;
         left: 1rem;
@@ -81,6 +77,7 @@ const StyledWrapper = styled.div`
         height: 1rem;
         pointer-events: none;
         z-index: 1;
-    }`;
+    }
+`;
 
 export default SearchInput;

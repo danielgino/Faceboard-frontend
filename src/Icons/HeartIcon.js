@@ -1,7 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useId } from 'react';
 
-const HeartIcon = ({handleLikes,liked,loading}) => {
+const HeartIcon = ({ handleLikes, liked, loading, id: idProp, name }) => {
+    const rid = useId();
+    const inputId = idProp || `like-${rid.replace(/:/g, '')}`;
+    const inputName = name || 'like';
+
     return (
         <StyledWrapper>
             <div className="heart-container" title="Like">
@@ -11,7 +16,9 @@ const HeartIcon = ({handleLikes,liked,loading}) => {
                     disabled={loading}
                     type="checkbox"
                     className="checkbox"
-                    id="Give-It-An-Id"
+                    id={inputId}
+                    name={inputName}
+                    aria-label={liked ? 'Unlike' : 'Like'}
                 />
                 <div className={`svg-container ${loading ? 'animate-spin' : ''}`}>
                     <svg viewBox="0 0 24 24" className="svg-outline" xmlns="http://www.w3.org/2000/svg">
@@ -32,100 +39,63 @@ const HeartIcon = ({handleLikes,liked,loading}) => {
             </div>
         </StyledWrapper>
     );
-}
+};
 
 const StyledWrapper = styled.div`
-    .heart-container {
-        --heart-color: rgb(255, 91, 137);
-        position: relative;
-        width: 30px;
-        height: 30px;
-        transition: .3s;
-       
-    }
+  .heart-container {
+    --heart-color: rgb(255, 91, 137);
+    position: relative;
+    width: 30px;
+    height: 30px;
+    transition: .3s;
+  }
+  .heart-container .checkbox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 20;
+    cursor: pointer;
+  }
+  .heart-container .svg-container {
+    width: 80%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .heart-container .svg-outline{
+    fill: black;
+    position: absolute;
+  }
+  .heart-container .svg-filled {
+    fill: #fa5858;
+    position: absolute;
+    animation: keyframes-svg-filled 1s;
+    display: none;
+  }
+  .heart-container .svg-celebrate {
+    position: absolute;
+    animation: keyframes-svg-celebrate .5s;
+    animation-fill-mode: forwards;
+    display: none;
+    stroke: black;
+    fill: #fa5858;
+    stroke-width: 2px;
+  }
+  .heart-container .checkbox:checked ~ .svg-container .svg-filled { display: block }
+  .heart-container .checkbox:checked ~ .svg-container .svg-celebrate { display: block }
 
-    .heart-container .checkbox {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        z-index: 20;
-        cursor: pointer;
-    }
-
-    .heart-container .svg-container {
-        width: 80%;
-        height: 80%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .heart-container .svg-outline{
-        fill: black;
-        
-      // stroke: black;
-        //stroke-width: 0.3px;
-        position: absolute;
-    }
-    .heart-container .svg-filled {
-        fill: #fa5858;
-        position: absolute;
-    }
-
-    .heart-container .svg-filled {
-        animation: keyframes-svg-filled 1s;
-        display: none;
-    }
-
-    .heart-container .svg-celebrate {
-        position: absolute;
-        animation: keyframes-svg-celebrate .5s;
-        animation-fill-mode: forwards;
-        display: none;
-        stroke: black;
-        fill: #fa5858;
-        stroke-width: 2px;
-    }
-
-    .heart-container .checkbox:checked ~ .svg-container .svg-filled {
-        display: block
-    }
-
-    .heart-container .checkbox:checked ~ .svg-container .svg-celebrate {
-        display: block
-    }
-
-    @keyframes keyframes-svg-filled {
-        0% {
-            transform: scale(0);
-        }
-
-        25% {
-            transform: scale(1.2);
-        }
-
-        50% {
-            transform: scale(1);
-            filter: brightness(1.5);
-        }
-    }
-
-    @keyframes keyframes-svg-celebrate {
-        0% {
-            transform: scale(0);
-        }
-
-        50% {
-            opacity: 1;
-            filter: brightness(1.5);
-        }
-
-        100% {
-            transform: scale(1.4);
-            opacity: 0;
-            display: none;
-        }
-    }`;
+  @keyframes keyframes-svg-filled {
+    0% { transform: scale(0); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); filter: brightness(1.5); }
+  }
+  @keyframes keyframes-svg-celebrate {
+    0% { transform: scale(0); }
+    50% { opacity: 1; filter: brightness(1.5); }
+    100% { transform: scale(1.4); opacity: 0; display: none; }
+  }
+`;
 
 export default HeartIcon;

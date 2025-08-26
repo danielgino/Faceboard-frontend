@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, {useState, useRef, useId} from 'react';
 import { Textarea } from "@material-tailwind/react";
 import {usePosts} from "../../context/PostProvider";
 import {useUser} from "../../context/UserProvider";
@@ -21,8 +21,11 @@ function AddPost() {
     const fileInputRef = useRef();
     const {user}=useUser();
     const [isPosting, setIsPosting] = useState(false);
-
     const {addPost}=usePosts()
+    const uid = useId();
+    const safeUid = uid.replace(/:/g, "");
+    const postContentId = `post-content-${safeUid}`;
+    const imageInputId  = `imageupload-${safeUid}`;
 
 
     const handlePostChange = (e) => {
@@ -145,34 +148,68 @@ function AddPost() {
                             </div>
                         )}
                         <div>
-                            <Textarea value={postText} onChange={handlePostChange} variant="static"
+                            <label htmlFor={postContentId} className="sr-only">Post content</label>
+                            <Textarea value={postText}
+                                      id={postContentId}
+                                      name="postText"
+                                      onChange={handlePostChange}
+                                      variant="static"
+                                      aria-describedby={`${postContentId}-help`}
+                                      label=" "
+                                      labelProps={{ htmlFor: postContentId, className: "sr-only", "aria-hidden": true }}
+                                      containerProps={{ className: "grid h-full rounded-md" }}
                                       placeholder={`What's going on in your mind, ${user.name}?`} rows={6}/>
                         </div>
                     </CardBody>
-                    <div className="flex w-full ">
-                        <RandomIcons.PhotoIcon onClick={() => fileInputRef.current?.click()}/>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            ref={fileInputRef}
-                            onChange={(e) => {
-                                const files = Array.from(e.target.files);
-                                setSelectedImages(prev => [...prev, ...files]);
-                            }}
-                            style={{display: 'none'}}
-                        />
-                        <EmojiLibrary onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}/>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                        <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting}/>
-                    </div>
+                        <div className="flex w-full items-center gap-1">
+                            <label
+                                htmlFor={imageInputId}
+                                className="
+                                 p-2 rounded-full
+                                 hover:bg-gray-100
+                                    focus:outline-none focus:ring-2 focus:ring-gray-400
+                                cursor-pointer
+                                 transition"
+                                aria-label="Upload images"
+                                title="Upload images"
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => fileInputRef.current?.click()}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        fileInputRef.current?.click();
+                                    }
+                                }}
+                            >
+                                <RandomIcons.PhotoIcon/>
+                                <span className="sr-only">Upload images</span>
+                            </label>
+
+                            <input
+                                name="images[]"
+                                type="file"
+                                id={imageInputId}
+                                accept="image/*"
+                                multiple
+                                ref={fileInputRef}
+                                onChange={(e) => {
+                                    const files = Array.from(e.target.files);
+                                    setSelectedImages(prev => [...prev, ...files]);
+                                }}
+                                style={{display: 'none'}}
+                            />
+                            <EmojiLibrary onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}/>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting}/>
+                        </div>
                 </Card>
 
             </div>
 
         </div>
-    );
+);
 }
 
 export default AddPost;

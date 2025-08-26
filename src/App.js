@@ -9,6 +9,7 @@ import {UserProvider} from "./context/UserProvider";
 import { PostProvider } from './context/PostProvider';
 import MainLayout from "./components/layout/MainLayout";
 import {
+    ABOUT_PAGE,
     ALBUM_PAGE_LINK,
     CHAT_PAGE, FORGOT_PASSWORD_PAGE,
     FRIENDS_PAGE_LINK,
@@ -18,7 +19,7 @@ import {
     PROFILE_PAGE_LINK, RESET_PASSWORD_PAGE,
     SEARCH_PAGE,
     SETTINGS_PAGE,
-    SIGNUP_PAGE,
+    SIGNUP_PAGE, SINGLE_POST_PAGE_LINK,
     UNAUTHORIZED_PAGE
 } from "./utils/Utils";
 import {SearchProvider} from "./context/SearchProvider";
@@ -42,6 +43,7 @@ import Page404 from "./pages/Page404";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import SinglePostPage from "./pages/SinglePostPage";
+import About from "./pages/About";
 
 function App() {
     return (
@@ -56,6 +58,7 @@ function App() {
                                 <Route path={LOGIN_PAGE} element={<Login />} />
                                 <Route path={FORGOT_PASSWORD_PAGE} element={<ForgotPassword/>} />
                                 <Route path={RESET_PASSWORD_PAGE} element={<ResetPassword/>} />
+                                <Route path={ABOUT_PAGE} element={<About/>}/>
                             </Route>
                             <Route element={<RouteGuard auth="protected" redirectTo={UNAUTHORIZED_PAGE}/>}>
                                 <Route element={
@@ -82,11 +85,10 @@ function App() {
                                     <Route path={ALBUM_PAGE_LINK} element={<Album />} />
                                     <Route path={SEARCH_PAGE} element={<SearchPage />} />
                                     <Route path={SETTINGS_PAGE} element={<Settings />} />
-                                    <Route path="/post/:postId" element={<SinglePostPage />} />
+                                    <Route path={SINGLE_POST_PAGE_LINK} element={<SinglePostPage />} />
 
                                 </Route>
                             </Route>
-
                             <Route path={UNAUTHORIZED_PAGE} element={<Unauthorized />} />
                             <Route path="*" element={<Page404 />} />
                         </Routes>

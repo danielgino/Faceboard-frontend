@@ -6,6 +6,7 @@ import Swal from 'sweetalert2'
 import {PasswordInput} from "../assets/inputs/PasswordInput";
 import {GlobalInput} from "../assets/inputs/GlobalInput";
 import logoPNG from "../assets/photos/logo/logoPNG.png";
+import Footer from "../components/layout/Footer";
 function SignUp() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -145,9 +146,10 @@ function SignUp() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen px-4">
-            <main className="w-full flex">
-                <div className="relative flex-1 hidden items-center justify-center h-screen bg-indigo-50 lg:flex">
+        <div className="min-h-svh flex flex-col">
+            <main className="w-full flex flex-1 min-h-0 overflow-x-hidden">
+                <div
+                    className="relative flex-1 min-h-0 hidden items-center justify-center bg-indigo-50 lg:flex overflow-hidden">
                     <div className="relative z-10 w-full max-w-md">
                         <img className="w-[400px] h-auto object-contain"
                              src={logoPNG} alt="Faceboard logo"/>
@@ -162,13 +164,13 @@ function SignUp() {
                                 <img src="https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg"
                                      className="w-10 h-10 rounded-full border-2 border-white" alt={ALT_RANDOM_USERS}/>
                                 <img alt={ALT_RANDOM_USERS}
-                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f"
-                                    className="w-10 h-10 rounded-full border-2 border-white"/>
+                                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f"
+                                     className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <img alt={ALT_RANDOM_USERS} src="https://randomuser.me/api/portraits/men/86.jpg"
                                      className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <img alt={ALT_RANDOM_USERS}
-                                    src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e"
-                                    className="w-10 h-10 rounded-full border-2 border-white"/>
+                                     src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e"
+                                     className="w-10 h-10 rounded-full border-2 border-white"/>
                                 <p className="text-sm text-gray-900 font-medium translate-x-5">
                                     Join all our users
                                 </p>
@@ -176,23 +178,19 @@ function SignUp() {
                         </div>
                     </div>
                     <div
-                        className="absolute inset-0 my-auto h-[500px]"
+                        className="absolute inset-0 my-auto h-[500px] pointer-events-none"
                         style={{
                             background: "oklch(0.924 0.003 17.217)",
-                            filter: "blur(118px)"
-                        }}
-                    >
+                            filter: "blur(118px)"}}>
 
                     </div>
                 </div>
-                <div className="flex-1 flex justify-center items-start min-h-[100svh] overflow-y-auto py-6
-                lg:items-center lg:h-screen lg:py-0">
+                <div className="flex-1 min-h-0 flex justify-center items-start overflow-y-auto py-6
+                lg:items-center lg:py-0">
                     <div className="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
                         <div className="">
                             <div className="mt-5 space-y-2">
-                                <img src={logoPNG}  className="lg:hidden w-[200px] h-auto object-contain block mx-auto"
-                                     alt="Faceboard Logo"/>
-
+                                <img src={logoPNG} className="lg:hidden w-[200px] h-auto object-contain block mx-auto" alt="Faceboard Logo"/>
                                 <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Sign up</h3>
                                 <p className="">Already have an account?
                                     <a onClick={handleBackToLogin}
@@ -200,7 +198,7 @@ function SignUp() {
                                         in</a></p>
                             </div>
                         </div>
-                        <div className="relative">
+                        <div  className="relative overflow-hidden">
                             <span className="block w-full h-px bg-gray-300"></span>
                             <p className="inline-block w-fit text-sm bg-white px-2 absolute -top-2 inset-x-0 mx-auto">Or
                                 continue with</p>
@@ -316,6 +314,10 @@ function SignUp() {
                     </div>
                 </div>
             </main>
+            <footer className="mt-auto w-full">
+                <Footer/>
+
+            </footer>
         </div>
     );
 }

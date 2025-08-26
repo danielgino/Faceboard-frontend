@@ -89,10 +89,10 @@ export const formatTime = (utcTime) => {
     });
 };
 export const isMobile = window.innerWidth < 768;
-
 export const UNAUTHORIZED_PAGE="/Unauthorized"
 export const LOGIN_PAGE="/"
 export const SIGNUP_PAGE="/signup"
+export const ABOUT_PAGE="/about"
 export const HOME_PAGE="/home"
 export const SEARCH_PAGE="/search-page"
 export const CHAT_PAGE="/chat"
@@ -100,10 +100,11 @@ export const MOBILE_NOTIFICATIONS_PAGE="/notifications"
 export const SETTINGS_PAGE="/settings"
 export const FORGOT_PASSWORD_PAGE="/forgot-password"
 export const RESET_PASSWORD_PAGE="/reset-password"
-
+    //
 export const ALBUM_PAGE_LINK="/album/:userId"
 export const FRIENDS_PAGE_LINK="/friends/:userId"
 export const PROFILE_PAGE_LINK="/profile/:userId"
+export const SINGLE_POST_PAGE_LINK="/post/:postId"
 export const FRIENDS_PAGE=(userId)=> `/friends/${userId}`
 export const PROFILE_PAGE = (userId) => `/profile/${userId}`;
 export const ALBUM_PAGE= (userId) => `/album/${userId}`;
@@ -187,7 +188,7 @@ export const FRIENDS_BTN_TEXT="Friends"
 export const SEARCH_BTN_TEXT="Search"
 export const SETTINGS_BTN_TEXT="Settings"
 export const LOGOUT_BTN_TEXT="Log Out";
-export const ABOUT_BTN_TEXT="About"
+export const GALLERY_BTN_TEXT="Gallery"
 ///SideBar
 export const INBOX_BTN_TEXT="Chat"
 //ENUMS
@@ -198,7 +199,6 @@ export const GenderEnum = {
 
 
 export const WEBSITE_NAME="Faceboard"
-
 export const ALT_RANDOM_USERS="Random User"
 ///My Personal Links
 
@@ -206,5 +206,5 @@ export const DANIEL_FACEBOOK_ACCOUNT="https://www.facebook.com/Daniegino"
 export const DANIEL_LINKEDIN_ACCOUNT="https://www.linkedin.com/in/daniel-gino-2b6350345/"
 export const DANIEL_INSTAGRAM_ACCOUNT="https://www.instagram.com/daniel_gino"
 export const DANIEL_GITHUB_ACCOUNT="https://github.com/danielgino"
-
+export const DANIEL_EMAIL="Danielgino3@gmail.com"
 

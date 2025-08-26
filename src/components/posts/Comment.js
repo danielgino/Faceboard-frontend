@@ -1,10 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Swal from "sweetalert2";
 
-import {Avatar, Typography, Card,
-    CardHeader,
-    CardBody,
-    } from "@material-tailwind/react";
+import {Avatar, Typography, Card, CardHeader, CardBody,} from "@material-tailwind/react";
 import {formatDate, GET_COMMENTS_BY_POST, PROFILE_PAGE} from "../../utils/Utils";
 import {usePosts} from "../../context/PostProvider";
 import {useUser} from "../../context/UserProvider";
@@ -93,12 +90,13 @@ function Comment({ postId, postOwnerId,newComment  }) {
         <div>
             {loading && <div>Loading Comments...</div>}
             {error && <div>Error Loading Comments {error}</div>}
-            <div className="max-h-[600px] overflow-y-auto pr-2">
+            <div className="max-h-[600px] overflow-y-auto pr-2" role="list">
 
                 {comments.map((comment) => (
 
                     <Card
                         key={comment.commentId}
+                        id={`comment-text-${comment.commentId}`}
                         shadow={false}
                         className={`
         w-full max-w-[48rem] bg-gray-50 px-4 py-2 mb-4
@@ -127,7 +125,12 @@ function Comment({ postId, postOwnerId,newComment  }) {
                                     </Typography>
                                 </a>
                                 <div className="flex items-center gap-x-2">
-                                    {formatDate(comment.createdAt).toLocaleString()}
+                                    <time
+                                        dateTime={new Date(comment.createdAt).toISOString()}
+                                        className="text-sm text-gray-600"
+                                        aria-label={`Posted on ${formatDate(comment.createdAt).toLocaleString()}`}>
+                                        {formatDate(comment.createdAt).toLocaleString()}
+                                    </time>
                                     {(user?.id === comment.userId || user?.id === postOwnerId) && (
                                         <button onClick={() => handleDeleteComment(comment.commentId)}>
                                             <RandomIcons.TrashIcon className="w-4 h-4"/>

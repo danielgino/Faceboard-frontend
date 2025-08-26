@@ -27,7 +27,7 @@ function Album() {
     }
     return (
         <div className="flex-1 px-4 pt-8 min-h-screen">
-            <h1 className="text-2xl font-bold text-center text-indigo-400 mb-8 drop-shadow-md">
+            <h1 className="text-2xl font-bold text-center text-indigo-800 mb-8 drop-shadow-md">
                 {currentUser ? `${currentUser.fullName}  Album` : "Album"}
             </h1>
 
