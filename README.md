@@ -23,8 +23,8 @@ Faceboard is a full‑featured social network built with a modern web stack. It 
 * **Posts**: create, edit, and delete posts; attach up to **4 images** (via Cloudinary)
 * **Images**: file picker upload, optimized cloud delivery
 * **Reactions**: like & comment on posts
-* **Comments**: add, **delete**.
-* **Friends System**: request, accept/decline, remove.
+* **Comments**: add and delete.
+* **Friends System**: request, accept/decline.
 * **Chat (Real-time)**: WebSockets (STOMP + SockJS), **unread counters**, **read receipts** (green ✓)
 * **Notifications**: full real-time system with **incoming sound support**
 * **Authentication & Security**: JWT secured APIs, role handling, **password reset via email**
