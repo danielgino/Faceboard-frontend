@@ -10,7 +10,6 @@
 ### Full Explanation and instructions coming soon!
 
 # Faceboard - A Modern Social Network 🧑‍🤝‍🧑📱
-# Faceboard — A Modern Social Network 🧑‍🤝‍🧑📱
 
 **Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
 *The site is under active testing.*
