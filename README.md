@@ -10,94 +10,278 @@
 ### Full Explanation and instructions coming soon!
 
 # Faceboard - A Modern Social Network 🧑‍🤝‍🧑📱
+# Faceboard — A Modern Social Network 🧑‍🤝‍🧑📱
 
-**Faceboard** is a full-featured social network platform that includes posts, a friends system, real-time chat, and live notifications — all wrapped in a responsive and intuitive user interface. The project is built with modern technologies on both frontend and backend.
+**Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
+*The site is under active testing.*
 
----
-
-## 🧩 Key Features
-
-- 📄 Create and edit posts with text and up to 4 images
-- 🖼️ Upload images via Cloudinary
-- ❤️ Like and comment on posts
-- 🧑‍🤝‍🧑 Friend system with requests, confirmations, and removals
-- 💬 Real-time chat using WebSockets with unread message counters
-- ✅ Message read indicators (green checkmark)
-- 🔔 Live notification system (real-time)
-- 📱 Fully responsive design for mobile
+Faceboard is a full‑featured social network built with a modern web stack. It offers posts (with up to 4 images), likes, comments, a complete friends system, real‑time chat, live notifications (with optional sounds), password resets via email, and a responsive UI that feels great on desktop and mobile.
 
 ---
 
-## 🌐 Frontend Technologies
+## ✨ Features
 
-- **React** – Component-based UI library
-- **React Router** – Routing and navigation between pages
-- **Axios** – HTTP client for API requests
-- **Stomp.js + SockJS** – Real-time WebSocket communication
-- **Tailwind CSS** – Utility-first CSS framework for responsive styling
-- **shadcn/ui + Aceternity + Magic UI** – Modern UI component libraries
-- **SweetAlert2** – Beautiful alerts and confirmation dialogs
-- **Lottie** – JSON-based animated illustrations
+* **Posts**: create, edit, and delete posts; attach up to **4 images** (via Cloudinary)
+* **Images**: file picker upload, optimized cloud delivery
+* **Reactions**: like & comment on posts
+* **Comments**: add, **delete**.
+* **Friends System**: request, accept/decline, remove.
+* **Chat (Real-time)**: WebSockets (STOMP + SockJS), **unread counters**, **read receipts** (green ✓)
+* **Notifications**: full real-time system with **incoming sound support**
+* **Authentication & Security**: JWT secured APIs, role handling, **password reset via email**
+* **Profile Management**: edit personal details & profile picture
+* **Responsive**: fully responsive (desktop ↔ mobile)
+* **Error Handling**: friendly **404** and **403 (no permission)** pages
 
 ---
 
-## 🚀 Run the Frontend Locally
+## 🧰 Tech Stack
+
+### Frontend
+
+* **React (CRA)** + **React Router**
+* **Tailwind CSS** (utility-first styling)
+* **shadcn/ui**, **Aceternity**, **Magic UI** (UI components)
+* **Axios** (REST)
+* **STOMP.js + SockJS** (WebSockets)
+* **SweetAlert2**, **Lottie**, **Framer Motion**
+
+### Backend
+
+* **Spring Boot** (REST API + WebSockets)
+* **JWT** auth (HS256)
+* **MySQL** (relational DB)
+* **Cloudinary** SDK (image storage)
+* **Java Mail** (password resets)
+
+---
+
+## ⚙️ MySQL Configuration
+
+### Backend (Spring Boot)
+
+`application.yml` example:
+
+```yaml
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/faceboard?useSSL=false&serverTimezone=UTC
+    username: root
+    password: your_mysql_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+spring:
+  mail:
+    host: smtp.yourprovider.com
+    port: 587
+    username: your_smtp_user
+    password: your_smtp_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  frontendBaseUrl: http://localhost:3000
+  jwtSecret: ${JWT_SECRET:localDevSecretKeyThatIsLongEnoughForHMAC256_123456789}
+  cloudinary:
+    cloudName: your_cloud_name
+    apiKey: your_api_key
+    apiSecret: your_api_secret
+  cors:
+    allowedOrigins: "http://localhost:3000,https://faceboard-frontend.vercel.app"
+```
+
+### Maven Dependency
+
+```xml
+<dependency>
+  <groupId>mysql</groupId>
+  <artifactId>mysql-connector-j</artifactId>
+  <scope>runtime</scope>
+</dependency>
+```
+
+---
+
+## 🚀 Getting Started (Local)
+
+### Backend
+
+```bash
+cd server
+./mvnw spring-boot:run
+```
+
+API will be available at `http://localhost:8080`.
+
+### Frontend
 
 ```bash
 cd client
 npm install
 npm start
+```
+
+Runs on `http://localhost:3000`.
+
+---
+
+## 📂 Project Structure
+
+```
+assets/
+│
+├─ buttons/
+│ ├─ ShareButtom.js
+│ ├─ StyleButton.js
+│ └─ TransparentButton.js
+│
+├─ imagelightbox/
+│ ├─ GlobalImageLightbox.js
+│ └─ ImageLightBox.js
+│
+├─ inputs/
+│ ├─ EditableField.js
+│ ├─ GlobalInput.js
+│ ├─ InputAlerts.js
+│ ├─ PasswordInput.js
+│ └─ SearchInput.js
+│
+├─ loaders/
+│ ├─ AlbumPageLoader.js
+│ ├─ CardSkeletonLoader.js
+│ ├─ CommentLoader.js
+│ ├─ FriendsSkeleton.js
+│ ├─ GeneralLoadingLogo.js
+│ ├─ LikeLoader.js
+│ ├─ NoAlbumYet.js
+│ ├─ NoPostsYet.js
+│ └─ PostLoader.js
+│
+├─ photos/
+│ ├─ github.png
+│ ├─ linkedin.png
+│ ├─ mail.png
+│ ├─ noPhotosYet.png
+│ └─ logo/
+│ ├─ FaceboardLogo.png
+│ ├─ FaceboardLogoV2.png
+│ ├─ LogoLoading.png
+│ ├─ logoPNG.png
+│ ├─ LogoTemp2.png
+│ └─ LogoTemp22.png
+│
+└─ styles/
+├─ ChatOverride.css
+└─ ImageLightboxOverride.css
+
+components/
+│
+├─ about/
+│ ├─ AboutCard.js
+│ ├─ AnimatedMenu.js
+│ └─ GalaxyBackground.js
+│
+├─ interaction/
+│ ├─ EmojiLibrary.js
+│ ├─ LikeList.js
+│ ├─ Notification.js
+│ ├─ Search.js
+│ └─ StoryBar.js
+│
+├─ layout/
+│ ├─ Feed.js
+│ ├─ Footer.js
+│ ├─ HeaderBar.js
+│ ├─ MainLayout.js
+│ └─ SideBar.js
+│
+├─ posts/
+│ ├─ AddComment.js
+│ ├─ AddPost.js
+│ ├─ Comment.js
+│ ├─ Like.js
+│ ├─ Post.js
+│ └─ PostImages.js
+│
+└─ profile/
+├─ FriendsCard.js
+├─ FriendshipActionButton.js
+├─ StoryUploadDialog.js
+└─ UserDetails.js
+
+context/
+├─ FriendshipProvider.js
+├─ LightBoxContext.js
+├─ MessageProvider.js
+├─ NotificationProvider.js
+├─ PostProvider.js
+├─ SearchProvider.js
+├─ StoryProvider.js
+├─ useAutoSaveField.js
+├─ useProfilePictureUpload.js
+├─ UserProvider.js
+└─ WebSocketProvider.js
+
+Icons/
+├─ HeaderBarIcons.js
+├─ HeartIcon.js
+├─ RandomIcons.js
+└─ SideBarIcons.js
+
+pages/
+├─ About.js
+├─ Album.js
+├─ ForgotPassword.js
+├─ Friends.js
+├─ Home.js
+├─ Login.js
+├─ MobileNotifications.js
+├─ Page404.js
+├─ Profile.js
+├─ ResetPassword.js
+├─ SearchPage.js
+├─ Settings.js
+├─ SignUp.js
+├─ SinglePostPage.js
+├─ Unauthorized.js
+└─ chat/
+├─ Chat.js
+└─ ConversationsList.js
+
+service/
+└─ WebSocketHandler.js
+
+utils/
+├─ RouteGuard.js
+├─ Utils.js
+└─ enums/
+└─ FriendshipStatus.js
+```
+
+---
+
+## 📫 Contact
+
+* **Author:** Daniel Gino
+* **Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
+
+---
 
 
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
 
