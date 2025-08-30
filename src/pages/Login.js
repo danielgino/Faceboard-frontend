@@ -6,7 +6,6 @@ import {
     FORGOT_PASSWORD_PAGE,
     HOME_PAGE,
     LOGIN_API,
-    RESET_PASSWORD_PAGE,
     SIGNUP_PAGE
 } from "../utils/Utils";
 import logoPNG from "../assets/photos/logo/logoPNG.png"
@@ -16,7 +15,8 @@ import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 
 
 function Login() {
-    const [userName, setUserName] = useState(() => localStorage.getItem("savedEmail") || '');    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState(() => localStorage.getItem("savedEmail") || '');
+    const [password, setPassword] = useState('');
     const {fetchUserDetails } = useUser();
     const [message, setMessage] = useState('');
     const [token, setToken] = useState('');
@@ -25,9 +25,9 @@ function Login() {
 
 
 
-    const handleUserName = (event) => {
+    const handleEmail = (event) => {
         const value = event.target.value;
-        setUserName(value);
+        setEmail(value);
         localStorage.setItem("savedEmail", value);
     };
 
@@ -44,7 +44,7 @@ function Login() {
 
     const handleLoginButton = async () => {
         const loginRequest = {
-            userName: userName,
+            email: email,
             password: password,
         };
 
@@ -66,7 +66,7 @@ function Login() {
                 await fetchUserDetails(responseText);
                 navigate(HOME_PAGE);
             } else {
-                setMessage("Login failed, please check password or username");
+                setMessage("Login failed, please check password or Email");
             }
         } catch (error) {
             console.error("Error during login:", error);
@@ -160,8 +160,8 @@ function Login() {
                                 </label>
                                 <input
                                     type="email"
-                                    value={userName}
-                                    onChange={handleUserName}
+                                    value={email}
+                                    onChange={handleEmail}
                                     required
                                     className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
                                 />
@@ -206,8 +206,6 @@ function Login() {
             <footer className="mt-auto w-full">
                 <Footer/>
             </footer>
-            {/*<Footer/>*/}
-
         </div>
     );
 }
