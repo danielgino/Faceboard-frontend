@@ -5,7 +5,7 @@ import {
     CHAT_PAGE,
     FRIENDS_BTN_TEXT, FRIENDS_PAGE,
     INBOX_BTN_TEXT, LOGIN_PAGE,
-    LOGOUT_BTN_TEXT, NOTIFICATIONS_BTN_TEXT,
+    LOGOUT_BTN_TEXT, MOBILE_NOTIFICATIONS_PAGE, NOTIFICATIONS_BTN_TEXT,
     PROFILE_BTN_TEXT,
     PROFILE_PAGE,
     SEARCH_BTN_TEXT, SEARCH_PAGE, SETTINGS_BTN_TEXT, SETTINGS_PAGE, WEBSITE_NAME
@@ -15,11 +15,18 @@ import SideBarIcons from "../../Icons/SideBarIcons";
 import logoPNG from "../../assets/photos/logo/logoPNG.png"
 import {useMessages} from "../../context/MessageProvider";
 import HeaderBarIcons from "../../Icons/HeaderBarIcons";
+import {useNotifications} from "../../context/NotificationProvider";
 
 export function SideBar() {
     const navigate = useNavigate();
     const{user,logout}=useUser()
     const { messages ,unreadByUser } = useMessages();
+    const { notifications, unreadCount: notifUnreadCount, markAllAsRead } = useNotifications();
+
+    const unreadNotifications =
+        typeof notifUnreadCount === "number"
+            ? notifUnreadCount
+            : (notifications?.filter(n => !n.isRead).length || 0);
 
     const getTotalUnread = () => {
         const keys = Object.keys(unreadByUser || {});
@@ -50,7 +57,10 @@ export function SideBar() {
     const handleSettingsPage=()=> {
         navigate(SETTINGS_PAGE)
     }
-
+    const handleOpenNotifications = async () => {
+        try { markAllAsRead?.(); } catch (_) {}
+        navigate(MOBILE_NOTIFICATIONS_PAGE);
+    };
     const handleLogout = () => {
         navigate(LOGIN_PAGE, { replace: true, state: { forceLogin: true } });
         setTimeout(() => {
@@ -119,14 +129,24 @@ export function SideBar() {
                 </button>
 
 
-                <div className="flex flex-col items-center text-xs">
-                    <button
-                        onClick={() => navigate("/notifications")}
-                        className="flex flex-col items-center text-xs">
-                        <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
-                        {NOTIFICATIONS_BTN_TEXT}
-                    </button>
-                </div>
+
+                <button
+                    onClick={handleOpenNotifications}
+                    className="relative flex flex-col items-center text-xs">
+                      <span className="relative">
+                    <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
+                     {unreadNotifications > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
+                       text-[10px] leading-none rounded-full bg-red-600 text-white
+                       flex items-center justify-center ring-2 ring-white shadow">
+                          {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                         </span>
+                             )}
+                            </span>
+                    {NOTIFICATIONS_BTN_TEXT}
+                </button>
+
+
                 <button onClick={handleSearchPage} className="flex flex-col items-center text-xs">
                     <SideBarIcons.search className="h-5 w-5 mb-1"/>
                     {SEARCH_BTN_TEXT}
@@ -136,13 +156,13 @@ export function SideBar() {
                   <span className="relative">
                  <SideBarIcons.inbox className="h-5 w-5 mb-1"/>
                       {unreadTotal > 0 && (
-                        <span
-                         className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
+                          <span
+                              className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
                            text-[10px] leading-none rounded-full bg-red-600 text-white
                            flex items-center justify-center shadow ring-2 ring-white">
                                  {unreadTotal > 99 ? "99+" : unreadTotal}
                          </span>
-                              )}
+                      )}
                             </span>
                     {INBOX_BTN_TEXT}
                 </button>

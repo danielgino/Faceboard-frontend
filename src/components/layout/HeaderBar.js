@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Navbar, Collapse , Typography, Button, IconButton, Input, Avatar,} from "@material-tailwind/react";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useUser} from "../../context/UserProvider";
 import {
     GALLERY_BTN_TEXT,
