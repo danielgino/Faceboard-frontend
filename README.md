@@ -55,6 +55,24 @@ Faceboard is a full‑featured social network built with a modern web stack. It 
 
 ---
 
+## 📸 Application Screenshots
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b5b7972c-0a9f-4371-aee2-892669bf27b7" alt="Facrboard React Project" width="600"/>
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7e2727ff-916f-490a-897a-a180429d1793" alt="Facrboard React Project" width="600"/>
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2afa2d48-f3ba-49ff-b362-bc8ff109c778" alt="Facrboard React Project" width="300"/>
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/15243044-49dd-4d1c-98b1-7b60514ca96a" alt="Facrboard React Project" width="300"/>
+</p>
+
+---
+
 ## ⚙️ MySQL Configuration
 
 ### Backend (Spring Boot)
