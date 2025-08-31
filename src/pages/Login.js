@@ -136,7 +136,7 @@ function Login() {
                                 <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Login</h3>
                                 <p className="">Don't have an account?
                                     <a onClick={handleSignUpButton}
-                                       className="font-medium text-indigo-600 hover:text-indigo-500">
+                                       className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">
                                         Sign Up</a></p>
                             </div>
                         </div>

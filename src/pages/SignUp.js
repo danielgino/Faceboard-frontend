@@ -194,7 +194,7 @@ function SignUp() {
                                 <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Sign up</h3>
                                 <p className="">Already have an account?
                                     <a onClick={handleBackToLogin}
-                                       className="font-medium text-indigo-600 hover:text-indigo-500">Log
+                                       className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">Log
                                         in</a></p>
                             </div>
                         </div>
