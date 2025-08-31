@@ -13,13 +13,13 @@ import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 const root = ReactDOM.createRoot(document.getElementById('root'));
 Modal.setAppElement('#root');
 root.render(
-     // <React.StrictMode>
+     <React.StrictMode>
       <ThemeProvider>
           <UserProvider>
           <App />
           </UserProvider>
       </ThemeProvider>
- /*</React.StrictMode>  ///@@@@@@@@BACK IN PRODUCTION@@@@@@@@@@@@@@@@@@@//*/
+  </React.StrictMode>  ///@@@@@@@@BACK IN PRODUCTION@@@@@@@@@@@@@@@@@@@//*/
 );
 
 // If you want to start measuring performance in your app, pass a function
