@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f5783ee3-9716-4606-ac48-422ba553cd1a" alt="Facrboard React Project" width="600"/>
+  <img src="https://github.com/user-attachments/assets/f5783ee3-9716-4606-ac48-422ba553cd1a" alt="Facrboard React Project" width="550"/>
 </p>
 
 ### Link: https://faceboard-frontend.vercel.app
@@ -68,7 +68,7 @@ Faceboard is a full‑featured social network built with a modern web stack. It 
   <img src="https://github.com/user-attachments/assets/2afa2d48-f3ba-49ff-b362-bc8ff109c778" alt="Facrboard React Project" width="300"/>
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/15243044-49dd-4d1c-98b1-7b60514ca96a" alt="Facrboard React Project" width="300"/>
+  <img src="https://github.com/user-attachments/assets/aef5f098-199d-4662-a181-caf5dec3005c" alt="Facrboard React Project" width="300"/>
 </p>
 
 ---
@@ -294,6 +294,7 @@ utils/
 ## 📫 Contact
 
 * **Author:** Daniel Gino
+* **Email:** :Danielgino3@gmail.com
 * **Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
 
 ---
