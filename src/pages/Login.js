@@ -12,6 +12,7 @@ import logoPNG from "../assets/photos/logo/logoPNG.png"
 import Footer from "../components/layout/Footer";
 import InputAlerts from "../assets/inputs/InputAlerts";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
+import Swal from "sweetalert2";
 
 
 function Login() {
@@ -22,6 +23,7 @@ function Login() {
     const [token, setToken] = useState('');
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
 
@@ -43,35 +45,60 @@ function Login() {
     };
 
     const handleLoginButton = async () => {
-        const loginRequest = {
-            email: email,
-            password: password,
-        };
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        setMessage('');
+
+        const loginRequest = { email, password };
+
+        Swal.fire({
+            title: "Connecting..",
+            html:
+                "השרת יכול להיות במצב שינה, התהליך עלול לקחת כ-40–50 שניות.<br/>" +
+                "<small>Please wait while the server wakes up.</small>",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading(),
+            showConfirmButton: false
+        });
 
         try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 70000);
+
             const response = await fetch(LOGIN_API, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(loginRequest)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginRequest),
+                signal: controller.signal
             });
 
+            clearTimeout(timeout);
             const responseText = await response.text();
+
+            Swal.close();
 
             if (response.ok) {
                 setToken(responseText);
                 localStorage.setItem('jwtToken', responseText);
-                // console.log("Received token:", responseText); //for checks
                 await fetchUserDetails(responseText);
                 navigate(HOME_PAGE);
             } else {
                 setMessage("Login failed, please check password or Email");
             }
-        } catch (error) {
-            console.error("Error during login:", error);
+        } catch (err) {
+            Swal.close();
+            if (err?.name === "AbortError") {
+                setMessage("Timeout: השרת לא הגיב בזמן. נסה/י שוב בעוד רגע.");
+            } else {
+                setMessage("Network error: לא ניתן להתחבר כעת.");
+            }
+            console.error("Error during login:", err);
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
 
     useEffect(() => {
         if (token) {
@@ -190,14 +217,19 @@ function Login() {
                                 </div>
                             </div>
                             <button
-                                className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150"
-                                onClick={handleLoginButton}>
-                                Login
+                                className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                                onClick={handleLoginButton}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Connecting…" : "Login"}
                             </button>
-                            <button
-                                className="mt-2 mx-auto block w-fit text-indigo-600 hover:text-indigo-500 hover:underline"
 
-                                onClick={handleForgotPassButton}>Forgot your password?
+                            <button
+                                className="mt-2 mx-auto block w-fit text-indigo-600 hover:text-indigo-500 hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                                onClick={handleForgotPassButton}
+                                disabled={isSubmitting}
+                            >
+                                Forgot your password?
                             </button>
                         </form>
                     </div>

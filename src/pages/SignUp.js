@@ -20,6 +20,7 @@ function SignUp() {
         email: "",
     });
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const handleChange = (e) => {
@@ -91,7 +92,9 @@ function SignUp() {
         }
 
     const register = async (e) => {
-            e.preventDefault();
+        e.preventDefault();
+
+        if (isSubmitting) return;
         const isValid = Object.values(errors).every(error => !error);
         const allFieldsFilled = Object.values(formData).every(value => value !== "");
         if (!isValid || !allFieldsFilled) {
@@ -102,24 +105,40 @@ function SignUp() {
             });
             return;
         }
+
+        setIsSubmitting(true);
+        Swal.fire({
+            title: "Creating Account…",
+            html: "השרת עשוי להיות במצב שינה — התהליך יכול לקחת כ-50–60 שניות עד להתעוררות.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading(),
+            showConfirmButton: false,
+        });
+
         try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 80000); // 80s
+
             const response = await fetch(SIGNUP_API, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ ...formData}),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...formData }),
+                signal: controller.signal,
             });
 
+            clearTimeout(timeout);
+            Swal.close();
+
             if (!response.ok) {
-                const errorMessage = await response.json();
-                console.log(errorMessage.message)
+                const errorMessage = await response.json().catch(() => ({}));
+                console.log(errorMessage?.message);
                 await Swal.fire({
                     title: "Error!",
-                    text: `Registration failed: ${Object.values(errorMessage)[0]}`,
-                    icon: "error"
+                    text: `Registration failed: ${Object.values(errorMessage)[0] ?? "Unknown error"}`,
+                    icon: "error",
                 });
-                throw new Error(errorMessage.message);
+                throw new Error(errorMessage?.message || "Registration failed");
             }
 
             const result = await response.text();
@@ -127,20 +146,32 @@ function SignUp() {
             await Swal.fire({
                 title: "Good job!",
                 text: "Registration successful!",
-                icon: "success"
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
             });
             handleBackToLogin();
         } catch (err) {
-            console.error("Error registering user:", err);
-            // await Swal.fire({
-            //     title: "Error!",
-            //     text: `Registration failed: ${err.message}`,
-            //     icon: "error"
-            // });
-
+            Swal.close();
+            if (err?.name === "AbortError") {
+                await Swal.fire({
+                    title: "Timeout",
+                    text: "השרת לא הגיב בזמן (ייתכן שעדיין מתעורר). נסה/י שוב בעוד רגע.",
+                    icon: "error",
+                });
+            } else {
+                console.error("Error registering user:", err);
+                await Swal.fire({
+                    title: "Error!",
+                    text: `Registration failed: ${err?.message ?? "Unknown error"}`,
+                    icon: "error",
+                });
+            }
+        } finally {
+            setIsSubmitting(false);
         }
+    };
 
-    }
     const handleBackToLogin=()=>{
         navigate(LOGIN_PAGE)
     }
@@ -306,9 +337,10 @@ function SignUp() {
                             </div>
                             <button
                                 onClick={register}
-                                className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150"
+                                disabled={isSubmitting}
+                                className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
-                                Create account
+                                {isSubmitting ? "Creating Account…" : "Create account"}
                             </button>
                         </form>
                     </div>
