@@ -118,7 +118,7 @@ function SignUp() {
 
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 80000); // 80s
+            const timeout = setTimeout(() => controller.abort(), 120000);
 
             const response = await fetch(SIGNUP_API, {
                 method: "POST",

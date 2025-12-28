@@ -64,7 +64,7 @@ function Login() {
 
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 70000);
+            const timeout = setTimeout(() => controller.abort(), 120000);
 
             const response = await fetch(LOGIN_API, {
                 method: 'POST',
@@ -107,7 +107,6 @@ function Login() {
     }, [token, navigate]);
 
     return (
-        // <div>
 
         <div className="min-h-dvh flex flex-col">
             <main className="w-full flex flex-1 min-h-0">
