@@ -13,6 +13,7 @@ import Footer from "../components/layout/Footer";
 import InputAlerts from "../assets/inputs/InputAlerts";
 import {AiOutlineEye, AiOutlineEyeInvisible} from "react-icons/ai";
 import Swal from "sweetalert2";
+import {fetchWithRetries} from "../utils/fetchWithRetries";
 
 
 function Login() {
@@ -24,7 +25,6 @@ function Login() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
 
 
     const handleEmail = (event) => {
@@ -47,15 +47,15 @@ function Login() {
     const handleLoginButton = async () => {
         if (isSubmitting) return;
         setIsSubmitting(true);
-        setMessage('');
+        setMessage("");
 
         const loginRequest = { email, password };
 
         Swal.fire({
             title: "Connecting..",
             html:
-                "השרת יכול להיות במצב שינה, התהליך עלול לקחת כ-40–50 שניות.<br/>" +
-                "<small>Please wait while the server wakes up.</small>",
+                "Render  יכול להיות בשינה. מנסה להתחבר…<br/>" +
+                "<small id='attemptText'>Attempt 1/10</small>",
             allowOutsideClick: false,
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading(),
@@ -63,24 +63,31 @@ function Login() {
         });
 
         try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 120000);
+            const response = await fetchWithRetries(
+                LOGIN_API,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(loginRequest),
+                },
+                {
+                    maxAttempts: 10,
+                    delayMs: 3000,
+                    timeoutPerAttemptMs: 15000,
+                    onAttempt: (a, max) => {
+                        const el = document.getElementById("attemptText");
+                        if (el) el.textContent = `Attempt ${a}/${max}`;
+                    }
+                }
+            );
 
-            const response = await fetch(LOGIN_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(loginRequest),
-                signal: controller.signal
-            });
-
-            clearTimeout(timeout);
             const responseText = await response.text();
 
             Swal.close();
 
             if (response.ok) {
                 setToken(responseText);
-                localStorage.setItem('jwtToken', responseText);
+                localStorage.setItem("jwtToken", responseText);
                 await fetchUserDetails(responseText);
                 navigate(HOME_PAGE);
             } else {
@@ -88,17 +95,18 @@ function Login() {
             }
         } catch (err) {
             Swal.close();
+
             if (err?.name === "AbortError") {
-                setMessage("Timeout: השרת לא הגיב בזמן. נסה/י שוב בעוד רגע.");
+                setMessage("Timeout: השרת לא הגיב בזמן (Render Free). נסה שוב בעוד רגע.");
             } else {
                 setMessage("Network error: לא ניתן להתחבר כעת.");
             }
+
             console.error("Error during login:", err);
         } finally {
             setIsSubmitting(false);
         }
     };
-
 
     useEffect(() => {
         if (token) {

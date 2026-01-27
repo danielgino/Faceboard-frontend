@@ -7,6 +7,9 @@ import {PasswordInput} from "../assets/inputs/PasswordInput";
 import {GlobalInput} from "../assets/inputs/GlobalInput";
 import logoPNG from "../assets/photos/logo/logoPNG.png";
 import Footer from "../components/layout/Footer";
+import {fetchWithRetries} from "../utils/fetchWithRetries";
+
+
 function SignUp() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -95,8 +98,10 @@ function SignUp() {
         e.preventDefault();
 
         if (isSubmitting) return;
-        const isValid = Object.values(errors).every(error => !error);
-        const allFieldsFilled = Object.values(formData).every(value => value !== "");
+
+        const isValid = Object.values(errors).every((error) => !error);
+        const allFieldsFilled = Object.values(formData).every((value) => value !== "");
+
         if (!isValid || !allFieldsFilled) {
             await Swal.fire({
                 icon: "error",
@@ -107,9 +112,12 @@ function SignUp() {
         }
 
         setIsSubmitting(true);
+
         Swal.fire({
             title: "Creating Account…",
-            html: "השרת עשוי להיות במצב שינה — התהליך יכול לקחת כ-50–60 שניות עד להתעוררות.",
+            html:
+                " השרת יכול להיות בשינה. מנסה ליצור משתמש…<br/>" +
+                "<small id='attemptText'>Attempt 1/10</small>",
             allowOutsideClick: false,
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading(),
@@ -117,32 +125,47 @@ function SignUp() {
         });
 
         try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 120000);
-
-            const response = await fetch(SIGNUP_API, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData }),
-                signal: controller.signal,
-            });
-
-            clearTimeout(timeout);
-            Swal.close();
+            const response = await fetchWithRetries(
+                SIGNUP_API,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...formData }),
+                },
+                {
+                    maxAttempts: 10,
+                    delayMs: 3000,
+                    timeoutPerAttemptMs: 15000,
+                    onAttempt: (a, max) => {
+                        const el = document.getElementById("attemptText");
+                        if (el) el.textContent = `Attempt ${a}/${max}`;
+                    },
+                }
+            );
 
             if (!response.ok) {
-                const errorMessage = await response.json().catch(() => ({}));
-                console.log(errorMessage?.message);
+                Swal.close();
+
+                const errorObj = await response.json().catch(() => ({}));
+                const msg =
+                    Object.values(errorObj)[0] ||
+                    errorObj?.message ||
+                    "Unknown error";
+
                 await Swal.fire({
                     title: "Error!",
-                    text: `Registration failed: ${Object.values(errorMessage)[0] ?? "Unknown error"}`,
+                    text: `Registration failed: ${msg}`,
                     icon: "error",
                 });
-                throw new Error(errorMessage?.message || "Registration failed");
+
+                return; // לא ממשיכים להצלחה
             }
 
             const result = await response.text();
             console.log("User registered successfully:", result);
+
+            Swal.close();
+
             await Swal.fire({
                 title: "Good job!",
                 text: "Registration successful!",
@@ -150,20 +173,22 @@ function SignUp() {
                 timer: 1500,
                 showConfirmButton: false,
             });
+
             handleBackToLogin();
         } catch (err) {
             Swal.close();
+
             if (err?.name === "AbortError") {
                 await Swal.fire({
                     title: "Timeout",
-                    text: "השרת לא הגיב בזמן (ייתכן שעדיין מתעורר). נסה/י שוב בעוד רגע.",
+                    text: "השרת לא הגיב בזמן (Render Free). נסה/י שוב בעוד רגע.",
                     icon: "error",
                 });
             } else {
                 console.error("Error registering user:", err);
                 await Swal.fire({
                     title: "Error!",
-                    text: `Registration failed: ${err?.message ?? "Unknown error"}`,
+                    text: `Registration failed: ${err?.message ?? "Network error / server not ready"}`,
                     icon: "error",
                 });
             }
@@ -171,6 +196,7 @@ function SignUp() {
             setIsSubmitting(false);
         }
     };
+
 
     const handleBackToLogin=()=>{
         navigate(LOGIN_PAGE)
