@@ -77,7 +77,7 @@ function LikeList({ postId, onClose }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50" onClick={onClose}>
-            <Card className="w-96 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <Card className="w-[calc(100%-2rem)] max-w-sm max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <CardBody>
                     <div className="mb-4 flex items-center justify-between">
                         <Typography variant="h5" color="blue-gray">Users Who Liked This Post</Typography>

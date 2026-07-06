@@ -99,11 +99,11 @@ function ResetPassword(){
 
     return(
             <div>
-            <main className="w-full h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+            <main className="w-full h-dvh flex flex-col items-center justify-center bg-gray-50 px-4">
                 <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
                     <div className="flex justify-center">
                         <img
-                            className="w-[400px] h-auto object-contain"
+                            className="w-[180px] md:w-[400px] h-auto object-contain"
                             src={logoPNG}
                             alt="Faceboard logo"
                         />

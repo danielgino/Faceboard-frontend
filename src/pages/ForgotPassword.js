@@ -75,10 +75,10 @@ function ForgotPassword() {
 
     return (
         <div>
-            <main className="w-full min-h-[100svh] flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+            <main className="w-full min-h-[100svh] flex flex-col items-center justify-center bg-gray-50 px-4">
                 <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
                     <div className="flex justify-center">
-                        <img className="w-[400px] h-auto object-contain" src={logoPNG} alt="Faceboard logo" />
+                        <img className="w-[180px] md:w-[400px] h-auto object-contain" src={logoPNG} alt="Faceboard logo" />
                     </div>
                     <div className="text-center">
                         <div className="mt-5 space-y-2">

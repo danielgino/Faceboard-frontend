@@ -161,9 +161,6 @@ function SignUp() {
                 return; // לא ממשיכים להצלחה
             }
 
-            const result = await response.text();
-            console.log("User registered successfully:", result);
-
             Swal.close();
 
             await Swal.fire({

@@ -117,7 +117,7 @@ import Notification from "../interaction/Notification";
 
          <Navbar
              fullWidth={true}
-             className="fixed top-0 left-0 w-full z-[9999] bg-white shadow-md px-4 py-2 lg:px-8 lg:py-4">
+             className="fixed top-0 left-0 w-full z-[9999] bg-white shadow-md px-4 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))] lg:px-8 lg:pt-[calc(1rem+env(safe-area-inset-top))] lg:py-4">
              <div className="w-full px-4 flex flex-wrap items-center justify-between text-blue-gray-900">
 
                  <Typography

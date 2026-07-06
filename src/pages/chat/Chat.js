@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     MainContainer,
     ChatContainer,
@@ -6,6 +6,7 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import "../../assets/styles/ChatOverride.css"
 import ConversationsList from "./ConversationsList";
+import useChatViewportHeight from "./useChatViewportHeight";
 import { useUser } from "../../context/UserProvider";
 import { useMessages } from "../../context/MessageProvider";
 import {formatDate, formatTime} from "../../utils/Utils";
@@ -19,13 +20,8 @@ function Chat() {
     const { fetchConversationMessages, messages, setMessages ,markThreadRead } = useMessages();
     const { sendMessage, sendMarkAsRead, sendActiveChatStatus } = useWebSocketContext();
     const [sendingGhosts, setSendingGhosts] = useState([]);
-     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-      useEffect(() => {
-           const onResize = () => setIsMobile(window.innerWidth < 768);
-           window.addEventListener("resize", onResize);
-           return () => window.removeEventListener("resize", onResize);
-         }, []);
-
+    const chatRootRef = useRef(null);
+    const { height: chatHeight } = useChatViewportHeight(chatRootRef);
 
 
     useEffect(() => {
@@ -106,8 +102,8 @@ function Chat() {
     const userMessages = currentUser ? messages[currentUser.id] : [];
 
     return (
-        <div className="min-h-[calc(100dvh-6rem)]">
-            <MainContainer   responsive style={{ height: "750px"}}>
+        <div ref={chatRootRef} className="min-h-[calc(100dvh-6rem)]">
+            <MainContainer   responsive style={{ height: `${chatHeight}px` }}>
                 <ConversationsList
                     friendsList={user.friendsList}
                     onSelect={handleSelectUser}
