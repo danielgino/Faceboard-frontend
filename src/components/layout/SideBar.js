@@ -1,6 +1,6 @@
 
 import {Card, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,} from "@material-tailwind/react";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {
     CHAT_PAGE,
     FRIENDS_BTN_TEXT, FRIENDS_PAGE,
@@ -19,6 +19,8 @@ import {useNotifications} from "../../context/NotificationProvider";
 
 export function SideBar() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const isChatPage = location.pathname === CHAT_PAGE;
     const{user,logout}=useUser()
     const { messages ,unreadByUser } = useMessages();
     const { notifications, unreadCount: notifUnreadCount, markAllAsRead } = useNotifications();
@@ -120,9 +122,12 @@ export function SideBar() {
             </List>
         </Card>
 
-            {/* Bottom Navigation for Mobile */}
+            {/* Bottom Navigation for Mobile — hidden on /chat so it doesn't
+                compete with the on-screen keyboard for vertical space; Chat
+                has its own back button for navigation. */}
+            {!isChatPage && (
             <div
-                className="fixed bottom-0 left-0 right-0 bg-white shadow-md flex justify-around items-center h-16 md:hidden z-50">
+                className="fixed bottom-0 left-0 right-0 bg-white shadow-md flex justify-around items-center h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] md:hidden z-50">
                 <button onClick={handleProfile} className="flex flex-col items-center text-xs">
                     <SideBarIcons.profile className="h-5 w-5 mb-1"/>
                     {PROFILE_BTN_TEXT}
@@ -176,6 +181,7 @@ export function SideBar() {
                 </button>
 
             </div>
+            )}
         </>
     );
 }

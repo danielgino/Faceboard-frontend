@@ -36,7 +36,7 @@ function Home() {
         <div>
 
 
-            <div className="ml-10 max-w-7xl">
+            <div className="md:ml-10 max-w-7xl">
                 <StoryBar />
                 <Feed isFeed={true}/>
             </div>

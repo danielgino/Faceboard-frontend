@@ -9,11 +9,11 @@ function Page404(){
 
     return (
         <main>
-            <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-start h-screen md:px-8">
+            <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-start h-dvh md:px-8">
                 <div className="max-w-lg mx-auto text-center">
                     <div className="pb-6">
 
-                        <img className="w-[500px] h-auto object-contain mx-auto"
+                        <img className="w-[200px] md:w-[500px] h-auto object-contain mx-auto"
                              src={FaceboardLogo} alt="Faceboard logo"/>
                     </div>
                     <h3 className="text-indigo-800 text-4xl font-semibold sm:text-5xl">

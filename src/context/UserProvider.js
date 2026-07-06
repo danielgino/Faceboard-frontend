@@ -85,7 +85,21 @@ export const UserProvider = ({ children }) => {
         }
     }, [token]);
 
-
+    useEffect(() => {
+        const interceptorId = axios.interceptors.response.use(null, (error) => {
+            const status = error.response?.status;
+            if ((status === 401 || status === 403) && window.location.pathname !== LOGIN_PAGE) {
+                localStorage.removeItem("jwtToken");
+                setUser(null);
+                setOtherUser(null);
+                setUserImages([]);
+                setToken(null);
+                window.location.replace(LOGIN_PAGE);
+            }
+            return Promise.reject(error);
+        });
+        return () => axios.interceptors.response.eject(interceptorId);
+    }, []);
 
     const fetchUserPostImages = useCallback(async (userId) => {
           try {
