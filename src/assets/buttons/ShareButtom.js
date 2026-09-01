@@ -1,104 +1,16 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import { Button } from "../../components/common/Button";
 
-const ShareButton = ({onClick,text,loading}) => {
-    return (
-        <StyledWrapper>
-            <button onClick={onClick} disabled={loading}>
-                <div className="svg-wrapper-1">
-                    <div className="svg-wrapper">
-                        {loading ? (
-                            <span className="spinner" />
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={24} height={24}>
-                                <path fill="none" d="M0 0h24v24H0z" />
-                                <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" />
-                            </svg>
-                        )}
-                    </div>
-                </div>
-                <span>{loading ? "Posting..." : text}</span>
-            </button>
-        </StyledWrapper>
-    );
-}
-
-const spin = keyframes`
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-`;
-
-const StyledWrapper = styled.div`
-    button {
-        font-family: inherit;
-        font-size: 16px;
-        background: #606061;
-        color: white;
-        padding: 0.7em 1em;
-        padding-left: 0.9em;
-        display: flex;
-        align-items: center;
-        border: none;
-        border-radius: 16px;
-        overflow: hidden;
-        transition: all 0.2s;
-        cursor: pointer;
-        height: 40px;
-        opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
-    }
-
-    button:disabled {
-        cursor: not-allowed;
-    }
-
-    button span {
-        display: block;
-        margin-left: 0.3em;
-        transition: all 0.3s ease-in-out;
-    }
-
-    button svg {
-        display: block;
-        transform-origin: center center;
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .spinner {
-        display: block;
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top: 2px solid white;
-        border-radius: 50%;
-        margin-left: 2px;       /* 🆕 מוסיף רווח מהטקסט */
-        animation: ${spin} 0.6s linear infinite;
-    }
-
-    button:hover .svg-wrapper {
-        animation: fly-1 0.6s ease-in-out infinite alternate;
-    }
-
-    button:hover svg {
-        transform: translateX(1.2em) rotate(45deg) scale(1.1);
-    }
-
-    button:hover span {
-        transform: translateX(5em);
-    }
-
-    button:active {
-        transform: scale(0.95);
-    }
-
-    @keyframes fly-1 {
-        from {
-            transform: translateY(0.1em);
-        }
-
-        to {
-            transform: translateY(-0.1em);
-        }
-    }
-`;
+// Fidelity reconciliation: the Design System's composer publish control is
+// a plain primary button ("Post"), not an animated paper-plane button -
+// per the explicit new instruction, visual animation is not business logic
+// and is no longer preserved for its own sake. External prop contract
+// (onClick, text, loading) is unchanged, so AddPost.js - the only
+// consumer - needed no changes.
+const ShareButton = ({ onClick, text, loading }) => (
+    <Button onClick={onClick} loading={loading} className="px-6">
+        {loading ? "Posting..." : text}
+    </Button>
+);
 
 export default ShareButton;

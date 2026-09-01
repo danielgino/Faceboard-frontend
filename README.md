@@ -195,11 +195,8 @@ assets/
 │ ├─ noPhotosYet.png
 │ └─ logo/
 │ ├─ FaceboardLogo.png
-│ ├─ FaceboardLogoV2.png
 │ ├─ LogoLoading.png
-│ ├─ logoPNG.png
-│ ├─ LogoTemp2.png
-│ └─ LogoTemp22.png
+│ └─ logoPNG.png
 │
 └─ styles/
 ├─ ChatOverride.css

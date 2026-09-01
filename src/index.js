@@ -6,12 +6,10 @@ import 'animate.css'
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from "@material-tailwind/react";
 import {UserProvider} from "./context/UserProvider";
-import Modal from 'react-modal';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-Modal.setAppElement('#root');
 root.render(
      <React.StrictMode>
       <ThemeProvider>

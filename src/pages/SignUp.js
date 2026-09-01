@@ -1,13 +1,35 @@
 
 import {useNavigate} from "react-router-dom";
 import React, {useState} from "react";
-import {ALT_RANDOM_USERS, GenderEnum, getAge, LOGIN_PAGE, SIGNUP_API} from "../utils/Utils";
-import Swal from 'sweetalert2'
-import {PasswordInput} from "../assets/inputs/PasswordInput";
-import {GlobalInput} from "../assets/inputs/GlobalInput";
+import {GenderEnum, getAge, LOGIN_PAGE, SIGNUP_API} from "../utils/Utils";
+import {validatePassword, validatePasswordConfirmation} from "../utils/passwordValidation";
+import {isValidEmail} from "../utils/emailValidation";
+import Swal from '../utils/swalTheme'
 import logoPNG from "../assets/photos/logo/logoPNG.png";
-import Footer from "../components/layout/Footer";
 import {fetchWithRetries} from "../utils/fetchWithRetries";
+import AuthLayout, {AuthAvatarCluster} from "../components/auth/AuthLayout";
+import {AuthTextField} from "../components/auth/AuthTextField";
+import {AuthPasswordField} from "../components/auth/AuthPasswordField";
+import {AuthPrimaryButton} from "../components/auth/AuthPrimaryButton";
+import {AuthFieldError} from "../components/auth/AuthFieldError";
+import {Button} from "../components/common/Button";
+
+// Select/date fields aren't a type Input supports, so they aren't migrated
+// to the shared primitive (see the Phase C consumer mapping) — but their
+// class string is aligned to the same token language Input itself uses, so
+// they still read as the same field family. That includes the invalid-state
+// border swap: base classes carry no border colour, and `selectFieldClass`
+// picks the same default/error border tokens Input does off the `error` flag.
+const selectFieldBaseClass =
+    "h-control w-full rounded-control border bg-white px-3.5 text-ds-body text-dsNeutral-900 outline-none transition " +
+    "focus:ring-4 focus:ring-dsFocusRing";
+const selectFieldDefaultBorder =
+    "border-dsNeutral-200 hover:border-dsNeutral-300 focus:border-dsBrand-600";
+const selectFieldErrorBorder = "border-dsDestructive focus:border-dsDestructive";
+const selectFieldClass = (error) =>
+    `${selectFieldBaseClass} ${error ? selectFieldErrorBorder : selectFieldDefaultBorder}`;
+
+const fieldLabelClass = "mb-2 block text-ds-label text-dsNeutral-600";
 
 
 function SignUp() {
@@ -67,23 +89,16 @@ function SignUp() {
                 }
                 break;
             case "email":
-                if (!/\S+@\S+\.\S+/.test(value)) {
+                if (!isValidEmail(value)) {
                     message = "Invalid email";
                 }
                 break;
 
             case "password":
-                if (value.length < 8) {
-                    message = "Password must be at least 8 characters";
-                }
-                else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/.test(value)) {
-                    message = "Password must include uppercase, lowercase, number and symbol";
-                }
+                message = validatePassword(value);
                 break;
             case "confirmPassword":
-                if (value !== formData.password) {
-                    message = "Passwords do not match";
-                }
+                message = validatePasswordConfirmation(formData.password, value);
                 break;
 
 
@@ -103,6 +118,14 @@ function SignUp() {
         const allFieldsFilled = Object.values(formData).every((value) => value !== "");
 
         if (!isValid || !allFieldsFilled) {
+            // Run per-field validation for every field, not only the ones the
+            // user has already interacted with. Without this, a required field
+            // left completely untouched (most visibly the Gender select, which
+            // has no natural "type then clear" interaction) never gets an
+            // `errors` entry, so it stays un-reddened while the generic "fix
+            // the errors" dialog still blocks submission.
+            Object.entries(formData).forEach(([field, value]) => validate(field, value));
+
             await Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -200,180 +223,149 @@ function SignUp() {
     }
 
     return (
-        <div className="min-h-svh flex flex-col">
-            <main className="w-full flex flex-1 min-h-0 overflow-x-hidden">
-                <div
-                    className="relative flex-1 min-h-0 hidden items-center justify-center bg-indigo-50 lg:flex overflow-hidden">
-                    <div className="relative z-10 w-full max-w-md">
-                        <img className="w-[400px] h-auto object-contain"
-                             src={logoPNG} alt="Faceboard logo"/>
-                        <div className=" mt-16 space-y-3">
-                            <h3 className="text-indigo-400 text-3xl font-bold">Start find new friendships</h3>
-                            <p className="text-gray-900">
-                                Create an account and get access to all features
-                            </p>
-                            <div className="flex items-center -space-x-2 overflow-hidden">
-                                <img src="https://randomuser.me/api/portraits/women/79.jpg"
-                                     className="w-10 h-10 rounded-full border-2 border-white" alt={ALT_RANDOM_USERS}/>
-                                <img src="https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg"
-                                     className="w-10 h-10 rounded-full border-2 border-white" alt={ALT_RANDOM_USERS}/>
-                                <img alt={ALT_RANDOM_USERS}
-                                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=a72ca28288878f8404a795f39642a46f"
-                                     className="w-10 h-10 rounded-full border-2 border-white"/>
-                                <img alt={ALT_RANDOM_USERS} src="https://randomuser.me/api/portraits/men/86.jpg"
-                                     className="w-10 h-10 rounded-full border-2 border-white"/>
-                                <img alt={ALT_RANDOM_USERS}
-                                     src="https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e"
-                                     className="w-10 h-10 rounded-full border-2 border-white"/>
-                                <p className="text-sm text-gray-900 font-medium translate-x-5">
-                                    Join all our users
-                                </p>
-                            </div>
-                        </div>
+        <AuthLayout
+            brandHeading="Start finding new friendships."
+            brandSubtext="Create an account and start connecting with people you know."
+        >
+            <img
+                src={logoPNG}
+                alt="Faceboard logo"
+                width="140"
+                height="42"
+                className="mb-8 h-auto w-[120px] object-contain lg:hidden"
+            />
+
+            <h2 className="text-[28px] font-bold leading-tight text-dsNeutral-900 sm:text-[34px]">Create your account</h2>
+            <p className="mt-2.5 text-ds-body text-dsNeutral-600">Join Faceboard to connect with people you know.</p>
+
+            <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-5">
+                <div className="flex gap-4">
+                    <div className="w-1/2">
+                        <AuthTextField
+                            label="Name"
+                            name="name"
+                            onChange={handleChange}
+                            value={formData.name}
+                            type="text"
+                            autoComplete="given-name"
+                            error={errors.name}
+                        />
                     </div>
-                    <div
-                        className="absolute inset-0 my-auto h-[500px] pointer-events-none"
-                        style={{
-                            background: "oklch(0.924 0.003 17.217)",
-                            filter: "blur(118px)"}}>
-
-                    </div>
-                </div>
-                <div className="flex-1 min-h-0 flex justify-center items-start overflow-y-auto py-6
-                lg:items-center lg:py-0">
-                    <div className="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
-                        <div className="">
-                            <div className="mt-5 space-y-2">
-                                <img src={logoPNG} className="lg:hidden w-[200px] h-auto object-contain block mx-auto" alt="Faceboard Logo"/>
-                                <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Sign up</h3>
-                                <p className="">Already have an account?
-                                    <a onClick={handleBackToLogin}
-                                       className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">Log
-                                        in</a></p>
-                            </div>
-                        </div>
-                        <div  className="relative overflow-hidden">
-                            <span className="block w-full h-px bg-gray-300"></span>
-                            <p className="inline-block w-fit text-sm bg-white px-2 absolute -top-2 inset-x-0 mx-auto">Or
-                                continue with</p>
-                        </div>
-                        <form
-                            onSubmit={(e) => e.preventDefault()}
-                            className="space-y-3"
-                        >
-                            <div className="flex gap-4">
-                                <div className="w-1/2">
-                                    <GlobalInput
-                                        label="Name"
-                                        name="name"
-                                        onChange={handleChange}
-                                        value={formData.name}
-                                        type="text"
-                                        error={errors.name}
-                                    />
-                                </div>
-                                <div className="w-1/2">
-                                    <GlobalInput
-                                        label="Lastname"
-                                        name="lastname"
-                                        onChange={handleChange}
-                                        value={formData.lastname}
-                                        type="text"
-                                        error={errors.lastname}/>
-                                </div>
-                            </div>
-                            <div>
-                                <label htmlFor="gender" className="block mb-1 font-medium">Gender</label>
-                                <select
-                                    id="gender"
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border rounded-lg text-gray-700"
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value={GenderEnum.MALE}>Male</option>
-                                    <option value={GenderEnum.FEMALE}>Female</option>
-
-                                </select>
-                                {errors.gender && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <GlobalInput
-                                    label="Username"
-                                    name="username"
-                                    onChange={handleChange}
-                                    value={formData.username}
-                                    type="text"
-                                    error={errors.username}/>
-                            </div>
-
-                            <div>
-                                <GlobalInput
-                                    label="Email"
-                                    name="email"
-                                    onChange={handleChange}
-                                    value={formData.email}
-                                    type="email"
-                                    error={errors.email}/>
-
-                            </div>
-
-                            <div>
-                                <PasswordInput
-                                    name="password"
-                                    label="Password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    error={errors.password}
-                                />
-                            </div>
-
-                            <div>
-                                <PasswordInput
-                                    name="confirmPassword"
-                                    label="Confirm Password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    error={errors.confirmPassword}
-                                />
-
-                            </div>
-                            <div>
-                                <label className="font-medium">
-                                    Birth Date
-                                </label>
-                                <input
-                                    onChange={handleChange}
-                                    value={formData.birthDate}
-                                    name="birthDate"
-                                    type="date"
-                                    required
-                                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                                />
-                                {errors.birthDate && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.birthDate}</p>
-                                )}
-                            </div>
-                            <button
-                                onClick={register}
-                                disabled={isSubmitting}
-                                className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                                {isSubmitting ? "Creating Account…" : "Create account"}
-                            </button>
-                        </form>
+                    <div className="w-1/2">
+                        <AuthTextField
+                            label="Lastname"
+                            name="lastname"
+                            onChange={handleChange}
+                            value={formData.lastname}
+                            type="text"
+                            autoComplete="family-name"
+                            error={errors.lastname}
+                        />
                     </div>
                 </div>
-            </main>
-            <footer className="mt-auto w-full">
-                <Footer/>
 
-            </footer>
-        </div>
+                <div>
+                    <label htmlFor="gender" className={fieldLabelClass}>Gender</label>
+                    <select
+                        id="gender"
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleChange}
+                        aria-invalid={!!errors.gender}
+                        aria-describedby={errors.gender ? "gender-error" : undefined}
+                        className={selectFieldClass(errors.gender)}
+                    >
+                        <option value="">Select Gender</option>
+                        <option value={GenderEnum.MALE}>Male</option>
+                        <option value={GenderEnum.FEMALE}>Female</option>
+                    </select>
+                    <AuthFieldError id="gender" error={errors.gender}/>
+                </div>
+
+                <AuthTextField
+                    label="Username"
+                    name="username"
+                    onChange={handleChange}
+                    value={formData.username}
+                    type="text"
+                    autoComplete="username"
+                    error={errors.username}
+                />
+
+                <AuthTextField
+                    label="Email"
+                    name="email"
+                    onChange={handleChange}
+                    value={formData.email}
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    error={errors.email}
+                />
+
+                <AuthPasswordField
+                    name="password"
+                    label="Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    autoComplete="new-password"
+                    error={errors.password}
+                />
+
+                <AuthPasswordField
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    autoComplete="new-password"
+                    error={errors.confirmPassword}
+                />
+
+                <div>
+                    <label htmlFor="birthDate" className={fieldLabelClass}>
+                        Birth Date
+                    </label>
+                    <input
+                        id="birthDate"
+                        onChange={handleChange}
+                        value={formData.birthDate}
+                        name="birthDate"
+                        type="date"
+                        required
+                        aria-invalid={!!errors.birthDate}
+                        aria-describedby={errors.birthDate ? "birthDate-error" : undefined}
+                        className={selectFieldClass(errors.birthDate)}
+                    />
+                    <AuthFieldError id="birthDate" error={errors.birthDate}/>
+                </div>
+
+                <div className="pt-2">
+                    <AuthPrimaryButton
+                        type="submit"
+                        onClick={register}
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText="Creating account…"
+                    >
+                        Create account
+                    </AuthPrimaryButton>
+                </div>
+            </form>
+
+            <div className="mt-7 lg:hidden">
+                <div className="flex items-center gap-3 rounded-xl bg-dsBrand-50 p-3.5">
+                    <AuthAvatarCluster size="sm"/>
+                    <p className="text-xs font-medium text-dsNeutral-600">A few familiar faces are already here.</p>
+                </div>
+            </div>
+
+            <p className="mt-7 border-t border-dsNeutral-200 pt-6 text-center text-[14.5px] text-dsNeutral-600">
+                Already have an account?{" "}
+                <Button type="button" variant="text" onClick={handleBackToLogin} className="font-semibold">
+                    Log in
+                </Button>
+            </p>
+        </AuthLayout>
     );
 }
 

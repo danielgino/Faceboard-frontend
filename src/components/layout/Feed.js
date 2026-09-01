@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Post from "../posts/Post";
 import AddPost from "../posts/AddPost";
 import { usePosts } from "../../context/PostProvider";
-import ImageLightbox from "../../assets/imagelightbox/ImageLightBox";
 import PostLoader from "../../assets/loaders/PostLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useUser } from "../../context/UserProvider";
@@ -19,9 +18,7 @@ function Feed({ isFeed = false, userId = null }) {
     const pageRef = useRef(0);
     const loadedPages = useRef(new Set());
     const [loading, setLoading] = useState(false);
-    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-    const [lightboxImages, setLightboxImages] = useState([]);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const loadingRef = useRef(loading);
     const [hasMore, setHasMore] = useState(true);
     const { user } = useUser();
     const location = useLocation();
@@ -31,22 +28,26 @@ function Feed({ isFeed = false, userId = null }) {
     const activePosts = isProfileView ? posts : feed;
     const setActivePosts = isProfileView ? setPosts : setFeed;
 
-    const openLightbox = (images, index) => {
-        setLightboxImages(images);
-        setCurrentImageIndex(index);
-        setIsLightboxOpen(true);
-    };
+    // Mirrors `loading` into a ref so loadMorePosts can guard against
+    // concurrent calls without needing `loading` in its own useCallback
+    // deps - including it there would give loadMorePosts a new identity on
+    // every setLoading(true)/setLoading(false) it triggers, which would
+    // re-fire the [readyToLoad, loadMorePosts] effect below on every load
+    // and risk a request-count-changing feedback loop.
+    useEffect(() => {
+        loadingRef.current = loading;
+    }, [loading]);
 
-    const resetPosts = () => {
+    const resetPosts = useCallback(() => {
         setActivePosts([]);
         loadedPages.current.clear();
         pageRef.current = 0;
         setHasMore(true);
-    };
+    }, [setActivePosts]);
 
-    const loadMorePosts = async () => {
+    const loadMorePosts = useCallback(async () => {
         const currentPage = pageRef.current;
-        if (loading || loadedPages.current.has(currentPage)) return;
+        if (loadingRef.current || loadedPages.current.has(currentPage)) return;
 
         setLoading(true);
         try {
@@ -69,7 +70,7 @@ function Feed({ isFeed = false, userId = null }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [fetchPagePosts, isFeed, userId, setActivePosts]);
 
     useEffect(() => {
         setReadyToLoad(false);
@@ -77,13 +78,13 @@ function Feed({ isFeed = false, userId = null }) {
         setTimeout(() => {
             setReadyToLoad(true);
         }, 0);
-    }, [userId, isFeed, location.pathname]);
+    }, [userId, isFeed, location.pathname, resetPosts]);
 
     useEffect(() => {
         if (readyToLoad) {
             loadMorePosts();
         }
-    }, [readyToLoad]);
+    }, [readyToLoad, loadMorePosts]);
 
     return (
         <div className="flex flex-col items-center w-full overflow-x-hidden">
@@ -98,7 +99,7 @@ function Feed({ isFeed = false, userId = null }) {
                     hasMore={hasMore}
                     loader={<div className="flex justify-center mt-4"><PostLoader/></div>}
                     endMessage={
-                        <p style={{textAlign: 'center', marginTop: '1rem'}}>
+                        <p className="text-center mt-4 text-dsNeutral-600">
                             <b>You have reached the end of the feed 🎉</b>
                         </p>
                     }
@@ -110,7 +111,6 @@ function Feed({ isFeed = false, userId = null }) {
                             <Post
                                 key={post.id}
                                 post={post}
-                                onImageClick={openLightbox}
                                 onDelete={(postId) =>
                                     setActivePosts(prev => prev.filter(p => p.id !== postId))
                                 }
@@ -119,13 +119,6 @@ function Feed({ isFeed = false, userId = null }) {
                     )}
                 </InfiniteScroll>
             </div>
-
-            <ImageLightbox
-                images={lightboxImages}
-                isOpen={isLightboxOpen}
-                onClose={() => setIsLightboxOpen(false)}
-                currentIndex={currentImageIndex}
-            />
         </div>
     );
 }

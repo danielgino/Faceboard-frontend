@@ -1,24 +1,25 @@
+import {Input} from "../../components/common/Input";
+import {AuthFieldError} from "../../components/auth/AuthFieldError";
 
-
-export const GlobalInput=({name,label,type,value,onChange,error})=>{
+// ForgotPassword's only field — internals now delegate to the shared Input
+// (adds proper aria-invalid/aria-describedby, which this never had) while
+// keeping the same external name/props so ForgotPassword.js is unaffected.
+export const GlobalInput = ({name, label, type, value, onChange, error}) => {
+    const fieldId = name;
 
     return (
         <div>
-            <label className="font-medium">
-                {label}
-            </label>
-            <input
+            <Input
+                id={fieldId}
                 name={name}
+                label={label}
                 onChange={onChange}
-                value={value || ""}
+                value={value}
                 type={type}
                 required
-                className={`w-full mt-2 px-3 py-2 border ${
-                    error ? "border-red-500" : value ? "border-green-900" : "border-gray-300"
-                } rounded-lg`}/>
-            {error&& <p className="text-red-500 text-sm mt-1">{error}</p>}
-
-
+                error={error}
+            />
+            <AuthFieldError id={fieldId} error={error}/>
         </div>
-    )
-}
+    );
+};

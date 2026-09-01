@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useUser } from "../context/UserProvider";
 import {usePosts} from "./PostProvider";
-import {DELETE_PROFILE_PIC_API, UPLOAD_PROFILE_PIC_API} from "../utils/Utils";
+import {DELETE_PROFILE_PIC_API, fetchWithAuth, JWT_STORAGE_KEY, UPLOAD_PROFILE_PIC_API} from "../utils/Utils";
+import {validateUploadFile, describeRejectionReason} from "../utils/uploadValidation";
 
 const useProfilePictureUpload = () => {
     const { user,setUser, updateUserProfilePicture,fetchUserDetails } = useUser();
@@ -10,9 +11,16 @@ const useProfilePictureUpload = () => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        if (file) {
-            handleUpload(file);
+        event.target.value = "";
+        if (!file) return;
+
+        const validation = validateUploadFile(file);
+        if (!validation.valid) {
+            alert(describeRejectionReason(validation.reason));
+            return;
         }
+
+        handleUpload(file);
     };
 
     const handleUpload = async (file) => {
@@ -26,12 +34,9 @@ const useProfilePictureUpload = () => {
         formData.append("file", file);
 
         try {
-            const response = await fetch(UPLOAD_PROFILE_PIC_API(user.id), {
+            const response = await fetchWithAuth(UPLOAD_PROFILE_PIC_API(user.id), {
                 method: "POST",
                 body: formData,
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-                }
             });
 
             if (!response.ok) {
@@ -44,7 +49,7 @@ const useProfilePictureUpload = () => {
                 ...prevUser,
                 profilePictureUrl: imageUrl
             }));
-            fetchUserDetails(localStorage.getItem('jwtToken'));
+            fetchUserDetails(localStorage.getItem(JWT_STORAGE_KEY));
             fetchUserPosts(user.id);
 
 
@@ -56,11 +61,8 @@ const useProfilePictureUpload = () => {
     };
     const handleRemoveProfilePicture = async () => {
         try {
-            const response = await fetch(DELETE_PROFILE_PIC_API(user.id), {
+            const response = await fetchWithAuth(DELETE_PROFILE_PIC_API(user.id), {
                 method: "DELETE",
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-                }
             });
 
             if (!response.ok) {
@@ -73,7 +75,7 @@ const useProfilePictureUpload = () => {
                 ...prevUser,
                 profilePictureUrl: defaultImageUrl
             }));
-            fetchUserDetails(localStorage.getItem('jwtToken'));
+            fetchUserDetails(localStorage.getItem(JWT_STORAGE_KEY));
             fetchUserPosts(user.id);
 
         } catch (error) {

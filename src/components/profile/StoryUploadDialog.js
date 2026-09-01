@@ -1,7 +1,15 @@
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import {validateUploadFile, describeRejectionReason} from "../../utils/uploadValidation";
 
+// withReactContent(...) doesn't reliably inherit Swal.mixin() defaults
+// (confirmed in browser testing) - so buttonsStyling is set explicitly per
+// call here instead of via the shared utils/swalTheme mixin every other
+// Swal.fire call site uses. The visual theme itself (SwalDesignTheme.css)
+// is keyed off SweetAlert2's own always-present classes, not an opt-in
+// customClass, so it applies here with no extra wiring either way.
 const MySwal = withReactContent(Swal);
+const DS_SWAL_OPTS = { buttonsStyling: false };
 
 export default async function openStoryUploadDialog(uploadStory, fetchStories) {
     try {
@@ -15,10 +23,19 @@ export default async function openStoryUploadDialog(uploadStory, fetchStories) {
             showCancelButton: true,
             confirmButtonText: "Next",
             cancelButtonText: "Cancel",
+            ...DS_SWAL_OPTS,
             preConfirm: (selectedFile) => {
                 if (!selectedFile) {
                     Swal.showValidationMessage("You need to select an image");
+                    return selectedFile;
                 }
+
+                const validation = validateUploadFile(selectedFile);
+                if (!validation.valid) {
+                    Swal.showValidationMessage(describeRejectionReason(validation.reason));
+                    return;
+                }
+
                 return selectedFile;
             },
         });
@@ -31,6 +48,7 @@ export default async function openStoryUploadDialog(uploadStory, fetchStories) {
             inputLabel: "Caption",
             inputPlaceholder: "Write something...",
             showCancelButton: true,
+            ...DS_SWAL_OPTS,
         });
 
         MySwal.fire({
@@ -39,17 +57,18 @@ export default async function openStoryUploadDialog(uploadStory, fetchStories) {
                 Swal.showLoading();
             },
             allowOutsideClick: false,
+            ...DS_SWAL_OPTS,
         });
 
         const uploaded = await uploadStory(file, caption || "");
         if (uploaded) {
             await fetchStories();
-            MySwal.fire("✅ Success", "Story uploaded!", "success");
+            MySwal.fire({ title: "Success", text: "Story uploaded!", icon: "success", ...DS_SWAL_OPTS });
         } else {
-            MySwal.fire("❌ Error", "Upload failed", "error");
+            MySwal.fire({ title: "Error", text: "Upload failed", icon: "error", ...DS_SWAL_OPTS });
         }
     } catch (err) {
         console.error("Upload error:", err);
-        Swal.fire("Error", "Something went wrong!", "error");
+        MySwal.fire({ title: "Error", text: "Something went wrong!", icon: "error", ...DS_SWAL_OPTS });
     }
 }

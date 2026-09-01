@@ -25,6 +25,7 @@ function About() {
                     <div className="mx-auto max-w-screen-md">
                         <div className="mt-4 flex flex-col items-center">
                             <TiltedCard imageSrc={LogoLoading}
+                                        altText="Faceboard logo"
                                         imageWidth="clamp(240px, 80vw, 640px)"
                                         imageHeight="clamp(140px, 45vw, 360px)"/>
                             <p className="mt-2 text-white/80 font-semibold text-white max-w-2xl text-sm md:text-base">

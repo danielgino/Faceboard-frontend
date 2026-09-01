@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { GET_POST_BY_ID } from "../utils/Utils";
+import { fetchWithAuth, GET_POST_BY_ID } from "../utils/Utils";
 import Post from "../components/posts/Post";
 import PostLoader from "../assets/loaders/PostLoader";
 import NoPostsYet from "../assets/loaders/NoPostsYet";
@@ -17,11 +17,7 @@ export default function SinglePostPage() {
         (async () => {
             try {
                 setLoading(true);
-                const res = await fetch(GET_POST_BY_ID(postId), {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
-                    },
-                });
+                const res = await fetchWithAuth(GET_POST_BY_ID(postId));
                 if (!res.ok) throw new Error("Failed to fetch post");
                 const data = await res.json();
                 if (!ignore) setPost(data);

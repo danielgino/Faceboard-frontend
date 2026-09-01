@@ -1,6 +1,7 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
 import {LOGIN_PAGE} from "../utils/Utils";
+import {Button} from "../components/common/Button";
 
 
 function Unauthorized(){
@@ -10,21 +11,18 @@ function Unauthorized(){
        <main>
           <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-start h-screen md:px-8">
              <div className="max-w-lg mx-auto space-y-3 text-center">
-                <h3 className="text-indigo-600 font-semibold">
+                <h3 className="text-ds-label text-dsDestructive">
                    401 Error
                 </h3>
-                <p className="text-indigo-800  text-4xl font-semibold sm:text-5xl">
+                <p className="text-ds-display text-dsNeutral-900">
                    Access Denied
                 </p>
-                <p className="text-gray-600">
+                <p className="text-ds-body text-dsNeutral-600">
                    It looks like you don't have permission to this page. Please log in.  </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
-                   <button
-                       onClick={() => navigate(LOGIN_PAGE)}
-                       className="mt-6 px-5 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-500 active:bg-indigo-700 transition"
-                   >
+                   <Button className="mt-6" onClick={() => navigate(LOGIN_PAGE)}>
                       Back To Login
-                   </button>
+                   </Button>
 
                 </div>
              </div>

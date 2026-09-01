@@ -1,34 +1,51 @@
 
-import {Card, List, ListItem, ListItemPrefix, ListItemSuffix, Chip,} from "@material-tailwind/react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {
     CHAT_PAGE,
-    FRIENDS_BTN_TEXT, FRIENDS_PAGE,
-    INBOX_BTN_TEXT, LOGIN_PAGE,
+    FEED_BTN_TEXT, FRIENDS_BTN_TEXT, FRIENDS_PAGE,
+    HOME_PAGE,
+    INBOX_BTN_TEXT,
     LOGOUT_BTN_TEXT, MOBILE_NOTIFICATIONS_PAGE, NOTIFICATIONS_BTN_TEXT,
     PROFILE_BTN_TEXT,
     PROFILE_PAGE,
-    SEARCH_BTN_TEXT, SEARCH_PAGE, SETTINGS_BTN_TEXT, SETTINGS_PAGE, WEBSITE_NAME
+    SETTINGS_PAGE
 } from "../../utils/Utils";
 import {useUser} from "../../context/UserProvider";
 import SideBarIcons from "../../Icons/SideBarIcons";
-import logoPNG from "../../assets/photos/logo/logoPNG.png"
 import {useMessages} from "../../context/MessageProvider";
 import HeaderBarIcons from "../../Icons/HeaderBarIcons";
 import {useNotifications} from "../../context/NotificationProvider";
+import {useLogout} from "../../hooks/useLogout";
+import NavigationItem from "./NavigationItem";
+import SuggestedFriends from "./SuggestedFriends";
+import {useSuggestedFriends} from "../../hooks/useSuggestedFriends";
+import SafetyTip from "./SafetyTip";
+import {useSafetyTip} from "../../hooks/useSafetyTip";
+import {fluid} from "./navFluid";
+
+// Fidelity reconciliation (Navigation micro-pass): rebuilt against the
+// Design System's actual Desktop Sidebar / Mobile Bottom Navigation
+// compositions (#nav) instead of retoned Material List/ListItem/Chip — a
+// plain rail of NavigationItems (Profile/Friends/Chat+badge/Settings/
+// Logout) and a plain row of NavigationItems for the bottom nav. Dropping
+// Material's List/ListItem here is what makes NavigationItem shareable
+// across all three shells in the first place (the Phase D note about
+// differing interactive-element semantics no longer applies once every
+// shell renders a real <Link>/<button>).
 
 export function SideBar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const isChatPage = location.pathname === CHAT_PAGE;
-    const{user,logout}=useUser()
+    const{user}=useUser()
     const { messages ,unreadByUser } = useMessages();
     const { notifications, unreadCount: notifUnreadCount, markAllAsRead } = useNotifications();
+    const { suggestions, pendingIds, onAdd: onAddSuggestedFriend, onShowMore: onShowMoreSuggestedFriends } = useSuggestedFriends();
+    const { tip: safetyTip, loading: safetyTipLoading, onNext: onNextSafetyTip } = useSafetyTip();
 
     const unreadNotifications =
         typeof notifUnreadCount === "number"
             ? notifUnreadCount
-            : (notifications?.filter(n => !n.isRead).length || 0);
+            : (notifications?.filter(n => !n.read).length || 0);
 
     const getTotalUnread = () => {
         const keys = Object.keys(unreadByUser || {});
@@ -44,144 +61,58 @@ export function SideBar() {
 
     const unreadTotal = getTotalUnread();
 
-    const handleProfile=()=>{
-        navigate(PROFILE_PAGE(user.id))
-    }
-    const handleFriends=()=>{
-        navigate(FRIENDS_PAGE(user.id))
-    }
-    const handleChatPage=()=>{
-        navigate(CHAT_PAGE)
-    }
-    const handleSearchPage=()=>{
-        navigate(SEARCH_PAGE)
-    }
-    const handleSettingsPage=()=> {
-        navigate(SETTINGS_PAGE)
-    }
     const handleOpenNotifications = async () => {
         try { markAllAsRead?.(); } catch (_) {}
         navigate(MOBILE_NOTIFICATIONS_PAGE);
     };
-    const handleLogout = () => {
-        navigate(LOGIN_PAGE, { replace: true, state: { forceLogin: true } });
-        setTimeout(() => {
-            logout();
-        }, 0);
-    };
+    const handleLogout = useLogout();
+
+    const isProfileActive = location.pathname === PROFILE_PAGE(user.id);
+    const isFriendsActive = location.pathname === FRIENDS_PAGE(user.id);
+    const isChatActive = location.pathname === CHAT_PAGE;
+    const isSettingsActive = location.pathname === SETTINGS_PAGE;
+    const isFeedActive = location.pathname === HOME_PAGE;
+    const isNotificationsActive = location.pathname === MOBILE_NOTIFICATIONS_PAGE;
 
     return (
         <>
-        <Card className="hidden md:block sticky top-24 h-[calc(100vh-1rem)] w-64 ml-8 p-4 shadow-xl  shadow-blue-gray-900/5">
-        <div className="mb-2 p-4">
-            <img src={logoPNG}  alt="Faceboard logo" />
-        </div>
-            <List>
-                <ListItem onClick={handleProfile} >
-                    <ListItemPrefix>
-                        <SideBarIcons.profile className="h-5 w-5" />
-                    </ListItemPrefix>
-                    {PROFILE_BTN_TEXT}
-                </ListItem>
-
-                <ListItem  onClick={handleFriends}>
-                    <ListItemPrefix>
-                        <SideBarIcons.friends className="h-5 w-5" />
-                    </ListItemPrefix>
-                    {FRIENDS_BTN_TEXT}
-                </ListItem>
-
-                <ListItem onClick={handleChatPage}>
-                    <ListItemPrefix>
-                        <SideBarIcons.inbox className="h-5 w-5"/>
-                    </ListItemPrefix>
-                    {INBOX_BTN_TEXT}
-
-
-                    <ListItemSuffix>
-                        {unreadTotal > 0 && (
-                            <Chip value={unreadTotal} size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
-                        )}
-                    </ListItemSuffix>
-
-
-                </ListItem>
-
-                <ListItem onClick={handleSettingsPage}>
-                    <ListItemPrefix>
-                        <SideBarIcons.settings className="h-5 w-5"/>
-                    </ListItemPrefix>
-                    Settings
-                </ListItem>
-                <ListItem onClick={(e) => { e.preventDefault(); handleLogout(); }}>
-                    <ListItemPrefix>
-                        <SideBarIcons.logout className="h-5 w-5"/>
-                    </ListItemPrefix>
-                    {LOGOUT_BTN_TEXT}
-                </ListItem>
-            </List>
-        </Card>
-
-            {/* Bottom Navigation for Mobile — hidden on /chat so it doesn't
-                compete with the on-screen keyboard for vertical space; Chat
-                has its own back button for navigation. */}
-            {!isChatPage && (
-            <div
-                className="fixed bottom-0 left-0 right-0 bg-white shadow-md flex justify-around items-center h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] md:hidden z-50">
-                <button onClick={handleProfile} className="flex flex-col items-center text-xs">
-                    <SideBarIcons.profile className="h-5 w-5 mb-1"/>
-                    {PROFILE_BTN_TEXT}
-                </button>
-
-
-
-                <button
-                    onClick={handleOpenNotifications}
-                    className="relative flex flex-col items-center text-xs">
-                      <span className="relative">
-                    <HeaderBarIcons.Notification className="h-5 w-5 mb-1"/>
-                     {unreadNotifications > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
-                       text-[10px] leading-none rounded-full bg-red-600 text-white
-                       flex items-center justify-center ring-2 ring-white shadow">
-                          {unreadNotifications > 99 ? "99+" : unreadNotifications}
-                         </span>
-                             )}
-                            </span>
-                    {NOTIFICATIONS_BTN_TEXT}
-                </button>
-
-
-                <button onClick={handleSearchPage} className="flex flex-col items-center text-xs">
-                    <SideBarIcons.search className="h-5 w-5 mb-1"/>
-                    {SEARCH_BTN_TEXT}
-                </button>
-
-                <button onClick={handleChatPage} className="flex flex-col items-center text-xs">
-                  <span className="relative">
-                 <SideBarIcons.inbox className="h-5 w-5 mb-1"/>
-                      {unreadTotal > 0 && (
-                          <span
-                              className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1
-                           text-[10px] leading-none rounded-full bg-red-600 text-white
-                           flex items-center justify-center shadow ring-2 ring-white">
-                                 {unreadTotal > 99 ? "99+" : unreadTotal}
-                         </span>
-                      )}
-                            </span>
-                    {INBOX_BTN_TEXT}
-                </button>
-                <button onClick={handleSettingsPage} className="flex flex-col items-center text-xs relative">
-                    <SideBarIcons.settings className="h-5 w-5 mb-1"/>
-                    {SETTINGS_BTN_TEXT}
-                </button>
-                <button onClick={handleLogout} className="flex flex-col items-center text-xs">
-                    <SideBarIcons.logout className="h-5 w-5 mb-1"/>
-                    {LOGOUT_BTN_TEXT}
-                </button>
-
+        <aside
+            className="hidden md:flex md:flex-col gap-4 sticky top-[calc(65px+env(safe-area-inset-top))] h-[calc(100vh-81px-env(safe-area-inset-top))] ml-8 flex-shrink-0 overflow-y-auto"
+            style={{ width: fluid(208, 288) }}
+        >
+            <div className="bg-white border border-dsNeutral-100 rounded-ds-lg flex flex-col flex-shrink-0" style={{ padding: fluid(10, 15), gap: fluid(2, 5) }}>
+                <NavigationItem to={PROFILE_PAGE(user.id)} icon={SideBarIcons.Profile} label={PROFILE_BTN_TEXT} active={isProfileActive} variant="rail" />
+                <NavigationItem to={FRIENDS_PAGE(user.id)} icon={SideBarIcons.Friends} label={FRIENDS_BTN_TEXT} active={isFriendsActive} variant="rail" />
+                <NavigationItem to={CHAT_PAGE} icon={SideBarIcons.Inbox} label={INBOX_BTN_TEXT} active={isChatActive} badge={unreadTotal} variant="rail" />
+                <NavigationItem to={SETTINGS_PAGE} icon={SideBarIcons.Settings} label="Settings" active={isSettingsActive} variant="rail" />
+                <NavigationItem onClick={handleLogout} icon={SideBarIcons.Logout} label={LOGOUT_BTN_TEXT} variant="rail" destructive />
             </div>
-            )}
+
+            {/* Data comes from useSuggestedFriends, which fetches real
+                suggestions from GET /friendship/suggestions (cursor/seed/wrapped
+                keyset pagination; "Show more" pages through it). This component
+                stays pure presentation. */}
+            <SuggestedFriends suggestions={suggestions} pendingIds={pendingIds} onAdd={onAddSuggestedFriend} onShowMore={onShowMoreSuggestedFriends} />
+
+            {/* Data comes from useSafetyTip, which fetches a real tip from
+                GET /safety-tips/random (a curated static pool served by the
+                backend - no AI/Gemini, no external API, no API key). "Another
+                tip" refetches; a failed refetch keeps the current tip. */}
+            <SafetyTip tip={safetyTip} loading={safetyTipLoading} onNext={onNextSafetyTip} />
+        </aside>
+
+            {/* Bottom Navigation for Mobile — also shown on /chat; Chat's own
+                height calculation reserves space for this bar so it never
+                covers the message composer. */}
+            <nav
+                aria-label="Primary"
+                className="fixed bottom-0 left-0 right-0 bg-white border-t border-dsNeutral-100 flex items-stretch h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] md:hidden z-50">
+                <NavigationItem to={PROFILE_PAGE(user.id)} icon={SideBarIcons.Profile} label={PROFILE_BTN_TEXT} active={isProfileActive} variant="bottom" />
+                <NavigationItem onClick={handleOpenNotifications} icon={HeaderBarIcons.Notification} label={NOTIFICATIONS_BTN_TEXT} active={isNotificationsActive} badge={unreadNotifications} variant="bottom" />
+                <NavigationItem to={HOME_PAGE} icon={HeaderBarIcons.Feed} label={FEED_BTN_TEXT} active={isFeedActive} variant="bottom" />
+                <NavigationItem to={CHAT_PAGE} icon={SideBarIcons.Inbox} label={INBOX_BTN_TEXT} active={isChatActive} badge={unreadTotal} variant="bottom" />
+                <NavigationItem onClick={handleLogout} icon={SideBarIcons.Logout} label={LOGOUT_BTN_TEXT} variant="bottom" destructive />
+            </nav>
         </>
     );
 }

@@ -7,6 +7,8 @@ import {
     Avatar,
 } from "@chatscope/chat-ui-kit-react";
 import {useMessages} from "../../context/MessageProvider";
+import PrimitiveAvatar from "../../components/common/Avatar";
+import {formatTime} from "../../utils/Utils";
 
 function ConversationsList({friendsList, currentUser, onSelect }) {
     const { messages,unreadByUser  } = useMessages();
@@ -45,19 +47,22 @@ function ConversationsList({friendsList, currentUser, onSelect }) {
                 {filteredFriends.map((friend) => {
                     const lastMsg = messages[friend.id]?.[messages[friend.id].length - 1];
                     const lastContent = lastMsg ? lastMsg.message : friend.lastMessageContent;
+                    const lastTime = lastMsg?.sentTime || friend.lastMessageTime;
                     const unreadCount = getUnreadCount(friend.id);
 
                     return (
                         <Conversation
                             key={friend.id}
                             name={friend.fullName}
-                            lastSenderName={friend.sentByCurrentUser ? "You" : friend.name}
                             info={lastContent}
+                            lastActivityTime={unreadCount === 0 && lastTime ? formatTime(lastTime) : undefined}
                             unreadCnt={unreadCount > 0 ? unreadCount : undefined}
-                            unreadDot={unreadCount > 0}
+                            active={currentUser?.id === friend.id}
                             onClick={() => onSelect(friend)}
                         >
-                            <Avatar name={friend.name} src={friend.profilePictureUrl} />
+                            <Avatar name={friend.fullName}>
+                                <PrimitiveAvatar name={friend.fullName} src={friend.profilePictureUrl} size="100%" style={{width: "100%", height: "100%"}} />
+                            </Avatar>
                         </Conversation>
                     );
                 })}

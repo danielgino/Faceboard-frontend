@@ -1,8 +1,9 @@
 import React from "react";
 import Lightbox from "yet-another-react-lightbox";
+import { Counter } from "yet-another-react-lightbox/plugins";
 import "yet-another-react-lightbox/styles.css";
-import "yet-another-react-lightbox/plugins/thumbnails.css";
-import {Thumbnails} from "yet-another-react-lightbox/plugins";
+import "yet-another-react-lightbox/plugins/counter.css";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import "../styles/ImageLightboxOverride.css";
 
 function ImageLightbox({ images, isOpen, onClose, currentIndex }) {
@@ -16,11 +17,15 @@ function ImageLightbox({ images, isOpen, onClose, currentIndex }) {
             close={onClose}
             index={currentIndex}
             slides={slides}
-            plugins={[Thumbnails]}
-            closeOnBackdropClick={true}
-            closeOnClick={true}
-            controller={{ closeOnBackdropClick: true, closeOnPullDown: true, closeOnClick: true }}
-
+            plugins={[Counter]}
+            animation={{ fade: 250, swipe: 300 }}
+            carousel={{ finite: true }}
+            controller={{ closeOnBackdropClick: true, closeOnPullDown: true }}
+            render={{
+                iconPrev: () => <ChevronLeft size={30} strokeWidth={2.25} />,
+                iconNext: () => <ChevronRight size={30} strokeWidth={2.25} />,
+                iconClose: () => <X size={26} strokeWidth={2.25} />,
+            }}
         />
     );
 }

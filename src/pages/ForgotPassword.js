@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import Footer from "../components/layout/Footer";
 import { FORGOT_PASSWORD_API, LOGIN_PAGE } from "../utils/Utils";
 import { GlobalInput } from "../assets/inputs/GlobalInput";
-import Swal from "sweetalert2";
+import { isValidEmail } from "../utils/emailValidation";
+import Swal from "../utils/swalTheme";
+import {Button} from "../components/common/Button";
 
 function ForgotPassword() {
     const navigate = useNavigate();
@@ -18,7 +20,7 @@ function ForgotPassword() {
         let message = "";
         if (name === "email") {
             const v = (value || "").trim();
-            if (!/\S+@\S+\.\S+/.test(v)) message = "Invalid email";
+            if (!isValidEmail(v)) message = "Invalid email";
         }
         return message;
     };
@@ -75,20 +77,20 @@ function ForgotPassword() {
 
     return (
         <div>
-            <main className="w-full min-h-[100svh] flex flex-col items-center justify-center bg-gray-50 px-4">
-                <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
+            <main className="w-full min-h-[100svh] flex flex-col items-center justify-center bg-dsNeutral-canvas px-4">
+                <div className="w-full space-y-6 text-dsNeutral-600 sm:max-w-md">
                     <div className="flex justify-center">
                         <img className="w-[180px] md:w-[400px] h-auto object-contain" src={logoPNG} alt="Faceboard logo" />
                     </div>
                     <div className="text-center">
                         <div className="mt-5 space-y-2">
-                            <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Reset your password</h3>
+                            <h3 className="text-dsNeutral-900 text-2xl font-bold sm:text-3xl">Reset your password</h3>
                         </div>
                     </div>
-                    <div className="bg-white shadow p-4 py-6 space-y-8 sm:p-6 sm:rounded-lg">
+                    <div className="bg-dsNeutral-surface shadow-ds-low p-4 py-6 space-y-8 sm:p-6 sm:rounded-ds-lg">
                         <div className="relative">
-                            <span className="block w-full h-px bg-gray-300"></span>
-                            <p className="inline-block w-fit text-sm bg-white px-2 absolute -top-2 inset-x-0 mx-auto">
+                            <span className="block w-full h-px bg-dsNeutral-200"></span>
+                            <p className="inline-block w-fit text-sm bg-dsNeutral-surface px-2 absolute -top-2 inset-x-0 mx-auto">
                                 Enter Your email
                             </p>
                         </div>
@@ -103,23 +105,13 @@ function ForgotPassword() {
                                 error={errors.email}
                             />
 
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={`w-full px-4 py-2 text-white font-medium rounded-lg duration-150 ${
-                                    loading ? "bg-indigo-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600"
-                                }`}
-                            >
+                            <Button type="submit" variant="primary" disabled={loading} loading={loading} className="w-full">
                                 {loading ? "Sending..." : "Send reset link"}
-                            </button>
+                            </Button>
 
-                            <button
-                                type="button"
-                                onClick={handleBackToLogin}
-                                className="w-full mt-2 text-indigo-600 hover:underline"
-                            >
+                            <Button type="button" variant="text" onClick={handleBackToLogin} className="w-full">
                                 Back to login
-                            </button>
+                            </Button>
                         </form>
                     </div>
                 </div>

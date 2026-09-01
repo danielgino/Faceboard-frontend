@@ -1,6 +1,49 @@
+/* Modernized fullscreen image viewer — shared by Feed, single-post, and Gallery. */
 
-.yarl__container {
-    background: rgba(0, 0, 0, 0.3) !important; /* שחור שקוף */
-    backdrop-filter: blur(10px) !important;   /* טשטוש  */
+.yarl__portal {
+    /* Design System scrim (#overlay), darkened slightly further for a
+       full-viewport photo backdrop rather than a dialog scrim. */
+    --yarl__color_backdrop: oklch(15% 0.02 275 / .94);
+    --yarl__container_background_color: oklch(15% 0.02 275 / .94);
+    --yarl__fade_animation_duration: 220ms;
+    --yarl__icon_size: 28px;
+    --yarl__color_button: rgba(255, 255, 255, 0.85);
+    --yarl__color_button_active: #fff;
+    --yarl__color_button_disabled: rgba(255, 255, 255, 0.25);
+    --yarl__button_filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.65));
+    --yarl__navigation_button_padding: 12px;
+    --yarl__toolbar_padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 10px 10px;
+    --yarl__counter_top: max(14px, env(safe-area-inset-top));
+    --yarl__counter_left: max(14px, env(safe-area-inset-left));
+    --yarl__counter_padding: 6px 14px;
 }
 
+.yarl__button {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.yarl__button:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.yarl__button:active {
+    transform: scale(0.92);
+}
+
+.yarl__navigation_prev {
+    margin-left: max(6px, env(safe-area-inset-left));
+}
+
+.yarl__navigation_next {
+    margin-right: max(6px, env(safe-area-inset-right));
+}
+
+.yarl__counter {
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.35);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}

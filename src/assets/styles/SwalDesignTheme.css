@@ -1,0 +1,285 @@
+/* Design System (Faceboard Design System.dc.html, #overlay "Modal" +
+   #overlays2 Confirmation/Destructive dialogs) applied to SweetAlert2's own
+   stable class names. SweetAlert2 remains the dialog engine (promise
+   resolution, Escape/backdrop/focus handling, preConfirm, showLoading, all
+   untouched) - this file only restyles its fixed DOM structure to match the
+   design's icon-badge + left-aligned title/body + right-aligned footer
+   composition instead of SweetAlert2's default centered-everything layout.
+   Icon glyphs are swapped via iconHtml (see swalTheme.js), not here.
+
+   Deliberately keyed off SweetAlert2's own always-present classes
+   (.swal2-popup, .swal2-icon, .swal2-confirm, ...) rather than a custom
+   opt-in class: SweetAlert2's `customClass` option is replaced wholesale by
+   whatever any individual .fire() call passes, not merged with the mixin's
+   defaults, so any call site that sets its own customClass (e.g. every
+   destructive confirmation) would silently lose an opt-in class and fall
+   back to fully unstyled SweetAlert2 - confirmed in browser testing. */
+
+.swal2-popup {
+    width: auto;
+    max-width: min(92vw, 400px);
+    padding: 0;
+    border-radius: 16px;
+    box-shadow: 0 24px 64px oklch(15% 0.02 275 / .28);
+    font-family: inherit;
+}
+
+/* Icon + title, side by side and left-aligned, instead of SweetAlert2's
+   default stacked/centered icon-above-title. Scoped to :not(.swal2-toast) -
+   toast mode (AddPost/AddComment success notices) already lays out icon+
+   message horizontally and gets its own rules further down.
+
+   This used to target a `.swal2-header` wrapper that doesn't exist in the
+   installed SweetAlert2 version (11.17.2 has no .swal2-header in its DOM or
+   CSS at all - confirmed by grepping node_modules/sweetalert2), so the rule
+   never matched anything and every non-toast popup silently fell back to
+   SweetAlert2's stock layout: icon, title, and body are plain siblings of
+   .swal2-popup, which is a single-column grid
+   (grid-template-columns: minmax(0,100%)) - so each one stacks in its own
+   row, icon centered above title above text. With no wrapper element
+   available to flex, the fix instead gives the popup two columns for row 1
+   (icon | title) and pins every other direct child back to spanning both
+   columns, so their layout (full-width html-container, actions, inputs,
+   etc.) is unchanged. */
+.swal2-popup:not(.swal2-toast) {
+    grid-template-columns: min-content 1fr;
+    column-gap: 10px;
+}
+
+.swal2-popup:not(.swal2-toast) > * {
+    grid-column: 1 / -1;
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-icon {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin: 18px 0 0 18px;
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-title {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    padding: 18px 44px 16px 0;
+}
+
+.swal2-popup .swal2-icon {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    margin: 2px 0 0;
+    border-width: 0;
+    border-radius: 50%;
+}
+
+.swal2-popup .swal2-icon .swal2-icon-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+}
+
+.swal2-popup .swal2-icon.swal2-warning { background: oklch(96% 0.03 75); color: oklch(45% 0.15 75); }
+.swal2-popup .swal2-icon.swal2-error   { background: oklch(96% 0.03 25); color: oklch(42% 0.17 25); }
+.swal2-popup .swal2-icon.swal2-success { background: oklch(93% 0.05 152); color: oklch(38% 0.1 152); }
+.swal2-popup .swal2-icon.swal2-info,
+.swal2-popup .swal2-icon.swal2-question { background: oklch(95% 0.025 275); color: oklch(38% 0.16 275); }
+
+/* Destructive confirmations (delete/unfriend/reject) pass icon:"warning" +
+   this additive modifier class (SWAL_DESTRUCTIVE_CONFIRM_CLASS in Utils.js)
+   to get the design's red trash-badge instead of the generic amber warning
+   tint. Additive, not a replacement, so it's safe under the customClass
+   "last one wins" behavior described above. */
+.swal2-popup .swal2-icon.ds-swal-icon--destructive {
+    background: oklch(96% 0.03 25) !important;
+    color: oklch(42% 0.17 25) !important;
+}
+
+.swal2-popup .swal2-title {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: oklch(21% 0.014 266);
+    text-align: left;
+}
+
+.swal2-popup .swal2-html-container {
+    margin: 0;
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: oklch(46% 0.014 266);
+    text-align: left;
+}
+
+.swal2-popup .swal2-close {
+    position: absolute;
+    top: 14px;
+    inset-inline-end: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: oklch(94% 0.005 266);
+    color: oklch(46% 0.014 266);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.swal2-popup .swal2-close:hover {
+    background: oklch(88% 0.007 266);
+    color: oklch(21% 0.014 266);
+    transform: none;
+}
+
+.swal2-popup .swal2-actions {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 14px 18px;
+    border-top: 1px solid oklch(94% 0.005 266);
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* Shape lives on .swal2-confirm/.swal2-cancel directly, not .swal2-styled:
+   buttonsStyling:false (set in swalTheme.js) stops SweetAlert2 from ever
+   adding .swal2-styled at all, which would otherwise leave these buttons
+   with no height/padding/radius (confirmed in browser - Cancel rendered as
+   a bare unstyled button while Confirm, styled via a different rule below,
+   still looked correct). */
+.swal2-popup .swal2-confirm,
+.swal2-popup .swal2-cancel {
+    margin: 0;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: none;
+    border-width: 0;
+    cursor: pointer;
+}
+
+/* !important on colors: SweetAlert2 sets its own default confirm/cancel
+   background via inline style regardless of buttonsStyling (confirmed in
+   browser - buttonsStyling:false alone did not stop the default red/blue
+   inline colors), so an external stylesheet needs !important to win. */
+.swal2-popup .swal2-confirm {
+    background: oklch(46% 0.18 275) !important;
+    color: #fff !important;
+}
+
+.swal2-popup .swal2-confirm:focus {
+    box-shadow: 0 0 0 3px oklch(56% 0.18 275 / .35);
+}
+
+.swal2-popup .swal2-confirm.ds-swal-confirm--destructive {
+    background: oklch(50% 0.19 25) !important;
+}
+
+.swal2-popup .swal2-confirm.ds-swal-confirm--destructive:focus {
+    box-shadow: 0 0 0 3px oklch(50% 0.19 25 / .3);
+}
+
+.swal2-popup .swal2-cancel {
+    background: #fff !important;
+    color: oklch(21% 0.014 266) !important;
+    border: 1px solid oklch(78% 0.008 266);
+}
+
+.swal2-popup .swal2-cancel:focus {
+    box-shadow: 0 0 0 3px oklch(78% 0.008 266 / .35);
+}
+
+/* Loading/indeterminate state (Swal.showLoading()) - keep the spinner
+   indeterminate, just retone it to the brand color instead of SweetAlert2's
+   default blue. */
+.swal2-popup .swal2-loader {
+    border-color: oklch(46% 0.18 275) transparent oklch(46% 0.18 275) transparent;
+}
+
+.swal2-popup .swal2-input,
+.swal2-popup .swal2-textarea,
+.swal2-popup .swal2-file {
+    margin: 8px 18px 0;
+    width: calc(100% - 36px);
+    border-radius: 10px;
+    border: 1px solid oklch(78% 0.008 266);
+    box-shadow: none;
+    font-size: 14px;
+}
+
+.swal2-popup .swal2-input:focus,
+.swal2-popup .swal2-textarea:focus {
+    border-color: oklch(46% 0.18 275);
+    box-shadow: 0 0 0 3px oklch(56% 0.18 275 / .18);
+}
+
+.swal2-popup .swal2-validation-message {
+    margin: 8px 18px 0;
+    border-radius: 10px;
+    background: oklch(96% 0.03 25);
+    color: oklch(34% 0.14 25);
+    font-size: 12px;
+}
+
+/* Toast-style success calls (timer + no confirm button, e.g. post/comment
+   added) - design's Toast card (#feedback): white, rounded, floating
+   shadow, icon-badge + message inline. SweetAlert2's toast mode already
+   lays these out horizontally by default; this just applies the surface. */
+/* column-gap only, NOT the `gap` shorthand - see .swal2-icon override below
+   for why a row-gap is dangerous here. Only the icon-to-text horizontal gap
+   is actually wanted; icon and title/text always render as one row. */
+.swal2-popup.swal2-toast {
+    max-width: 92vw;
+    padding: 12px 14px;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px oklch(20% 0.02 275 / .14);
+    column-gap: 10px;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* grid-row: 1/-1 replaces SweetAlert2's own stock `grid-row: 1/99` (see
+   node_modules/sweetalert2) on this element. Stock uses an arbitrarily
+   large span so the icon can vertically center itself against however many
+   content rows exist without knowing the count in advance - but spanning
+   ~98 always-empty implicit row tracks is fragile: it's what caused the
+   toast to render as a near full-height white panel when combined with a
+   row-gap (confirmed via headless Chrome layout dump - popup height jumped
+   from ~110px to 1000px+ purely from the gap multiplying across those
+   phantom rows, see column-gap comment above), and there's no guarantee
+   every layout engine sizes ~98 empty auto tracks identically. `1/-1` spans
+   from the first to the actual last (implicit) row line - exactly the 1-2
+   rows title/html-container occupy, nothing more - so the icon still
+   centers correctly against them, on the same row as the design intends,
+   without relying on a huge fixed span. Logical grid-row property, so this
+   doesn't need separate RTL handling (RTL only mirrors the inline/column
+   axis, which SweetAlert2's own .swal2-rtl rules already manage). */
+.swal2-popup.swal2-toast .swal2-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    margin: 0;
+    grid-row: 1 / -1;
+}
+
+/* Overrides the non-toast .swal2-html-container rule above (16px 18px
+   padding, meant for the bordered modal body) which otherwise wins here on
+   specificity and left the toast's message text out of alignment with its
+   title - indented further right and pushed down relative to the icon. */
+.swal2-popup.swal2-toast .swal2-html-container {
+    margin: 2px 0 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.4;
+}

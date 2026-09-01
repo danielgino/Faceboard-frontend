@@ -4,7 +4,6 @@ import { useNavigate} from 'react-router-dom';
 import {useState,useEffect} from "react";
 import Feed from "../components/layout/Feed";
 import {LOGIN_PAGE} from "../utils/Utils";
-import {usePosts} from "../context/PostProvider";
 import StoryBar from "../components/interaction/StoryBar";
 import PostLoader from "../assets/loaders/PostLoader";
 
@@ -12,14 +11,14 @@ function Home() {
     const { user } = useUser();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const {fetchFeedPosts}=usePosts()
 
-    useEffect(() => {
-        if (user) {
-            fetchFeedPosts();
-        }
-    }, [user]);
-
+    // Feed (rendered below with isFeed={true}) already owns loading/paginating
+    // the feed itself via fetchPagePosts, writing into the same shared `feed`
+    // context state. This page used to also call the unpaginated fetchFeedPosts()
+    // here, which raced Feed's own paginated load against the same state -
+    // whichever resolved last won, sometimes replacing the paginated feed with
+    // an unpaginated one and breaking InfiniteScroll. Feed is the single owner
+    // of feed loading now; this page only handles the auth redirect below.
     useEffect(() => {
         if (!user) {
             navigate(LOGIN_PAGE);
