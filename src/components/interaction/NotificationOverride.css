@@ -1,0 +1,22 @@
+/* Scoped scrollbar styling for the Notifications dropdown/window only. */
+.notif-scrollbar {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #cbd5e1 transparent; /* Firefox: thumb track */
+}
+
+.notif-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notif-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notif-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+}
+
+.notif-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #94a3b8;
+}

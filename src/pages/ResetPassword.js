@@ -2,9 +2,11 @@ import logoPNG from "../assets/photos/logo/logoPNG.png";
 import React, {useEffect, useState } from "react";
 import Footer from "../components/layout/Footer";
 import {PasswordInput} from "../assets/inputs/PasswordInput";
-import Swal from "sweetalert2";
+import Swal from "../utils/swalTheme";
 import {useLocation,useNavigate} from "react-router-dom";
 import {LOGIN_PAGE, RESET_PASSWORD_API} from "../utils/Utils";
+import {validatePassword, validatePasswordConfirmation} from "../utils/passwordValidation";
+import {Button} from "../components/common/Button";
 
 
 function ResetPassword(){
@@ -23,23 +25,16 @@ function ResetPassword(){
             Swal.fire("Invalid link", "Missing or invalid token.", "error")
                 .then(() => navigate(LOGIN_PAGE));
         }
-    }, [token]);
+    }, [token, navigate]);
 
     const validate = (name,value) => {
         let message="";
         switch (name){
             case "password":
-                if (value.length < 8) {
-                    message = "Password must be at least 8 characters";
-                }
-                else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/.test(value)) {
-                    message = "Password must include uppercase, lowercase, number and symbol";
-                }
+                message = validatePassword(value);
                 break;
             case "confirmPassword":
-                if (value !== formData.password) {
-                    message = "Passwords do not match";
-                }
+                message = validatePasswordConfirmation(formData.password, value);
                 break;
 
 
@@ -99,8 +94,8 @@ function ResetPassword(){
 
     return(
             <div>
-            <main className="w-full h-dvh flex flex-col items-center justify-center bg-gray-50 px-4">
-                <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
+            <main className="w-full h-dvh flex flex-col items-center justify-center bg-dsNeutral-canvas px-4">
+                <div className="w-full space-y-6 text-dsNeutral-600 sm:max-w-md">
                     <div className="flex justify-center">
                         <img
                             className="w-[180px] md:w-[400px] h-auto object-contain"
@@ -108,10 +103,10 @@ function ResetPassword(){
                             alt="Faceboard logo"
                         />
                     </div>
-                    <div className="bg-white shadow p-4 py-6 space-y-8 sm:p-6 sm:rounded-lg">
+                    <div className="bg-dsNeutral-surface shadow-ds-low p-4 py-6 space-y-8 sm:p-6 sm:rounded-ds-lg">
                         <div className="relative">
-                            <span className="block w-full h-px bg-gray-300"></span>
-                            <p className="inline-block w-fit text-sm bg-white px-2 absolute -top-2 inset-x-0 mx-auto">Enter
+                            <span className="block w-full h-px bg-dsNeutral-200"></span>
+                            <p className="inline-block w-fit text-sm bg-dsNeutral-surface px-2 absolute -top-2 inset-x-0 mx-auto">Enter
                                 New Strong Password</p>
                         </div>
                         <form
@@ -135,14 +130,14 @@ function ResetPassword(){
                                     onChange={handleChange}
                                     error={errors.confirmPassword}/>
                             </div>
-                            <button
-                                disabled={loading}
-                                className={`w-full px-4 py-2 text-white font-medium rounded-lg duration-150 ${
-                                    loading ? "bg-indigo-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600"
-                                }`}
-                            >
+                            {/* Explicit type="submit": the original relied on
+                                a bare <button>'s implicit default type inside
+                                a form. Button.js defaults to type="button", so
+                                this must be explicit to preserve Enter-key
+                                submit behavior. */}
+                            <Button type="submit" variant="primary" disabled={loading} loading={loading} className="w-full">
                                 {loading ? "Saving..." : "Change password"}
-                            </button>
+                            </Button>
                         </form>
                     </div>
 

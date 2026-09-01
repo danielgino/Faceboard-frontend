@@ -1,67 +1,58 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-    MainContainer,
-    ChatContainer,
-    MessageInput, Avatar, ConversationHeader, MessageList, Message,TypingIndicator
-} from "@chatscope/chat-ui-kit-react";
+import { MainContainer } from "@chatscope/chat-ui-kit-react";
 import "../../assets/styles/ChatOverride.css"
 import ConversationsList from "./ConversationsList";
 import useChatViewportHeight from "./useChatViewportHeight";
 import { useUser } from "../../context/UserProvider";
 import { useMessages } from "../../context/MessageProvider";
-import {formatDate, formatTime} from "../../utils/Utils";
-import {useLocation} from "react-router-dom";
 import {useWebSocketContext} from "../../context/WebSocketProvider";
+import ChatConversationPane from "./components/ChatConversationPane";
 
 function Chat() {
     const { user } = useUser();
     const [currentUser, setCurrentUser] = useState(null);
-    const location = useLocation();
-    const { fetchConversationMessages, messages, setMessages ,markThreadRead } = useMessages();
+    const {
+        fetchConversationMessages,
+        fetchOlderMessages,
+        hasMoreOlderMessages,
+        isLoadingOlderMessages,
+        messages,
+        setMessages,
+        markThreadRead,
+    } = useMessages();
     const { sendMessage, sendMarkAsRead, sendActiveChatStatus } = useWebSocketContext();
     const [sendingGhosts, setSendingGhosts] = useState([]);
     const chatRootRef = useRef(null);
     const { height: chatHeight } = useChatViewportHeight(chatRootRef);
 
 
+    // Sole owner of the active-chat-status and mark-as-read WebSocket events:
+    // every currentUser transition (selecting a conversation, closing one via
+    // handleBack, or unmounting) flows through this one effect instead of
+    // also being sent imperatively from the triggering handler, so each
+    // transition produces exactly one STOMP send instead of two. The early
+    // return (no cleanup registered) when currentUser is null matters just as
+    // much as the send itself: without it, the very first selection (and an
+    // unmount with no conversation open) would register a leave-signal
+    // cleanup for a conversation that was never actually active.
     useEffect(() => {
-        if (currentUser) {
-            sendActiveChatStatus(user.id, currentUser.id);
-            sendMarkAsRead(currentUser.id, user.id);
-
+        if (!currentUser) {
+            return;
         }
+
+        sendActiveChatStatus(user.id, currentUser.id);
+        sendMarkAsRead(currentUser.id, user.id);
 
         return () => {
             sendActiveChatStatus(user.id, null);
         };
-    }, [currentUser]);
-
-
-
-    useEffect(() => {
-        if (user && currentUser) {
-            sendActiveChatStatus(user.id, currentUser.id);
-        }
-    }, []);
-
-
-    useEffect(() => {
-        return () => {
-            sendActiveChatStatus(user.id, null);
-        };
-    }, [location.pathname]);
-
+    }, [currentUser, sendActiveChatStatus, sendMarkAsRead, user.id]);
 
     const handleSelectUser = async (selectedUser) => {
-        if (currentUser && currentUser.id !== selectedUser.id) {
-            sendActiveChatStatus(user.id, null);
-        }
-
         if (!messages[selectedUser.id]) {
             await fetchConversationMessages(user.id, selectedUser.id);
         }
         markThreadRead(selectedUser.id);
-        sendMarkAsRead(selectedUser.id, user.id);
 
         setMessages(prev => {
             if (!prev[selectedUser.id]) return prev;
@@ -99,10 +90,18 @@ function Chat() {
         setSendingGhosts([])
         setCurrentUser(null);
     };
+    const handleLoadOlderMessages = () => {
+        if (currentUser) {
+            fetchOlderMessages(user.id, currentUser.id);
+        }
+    };
     const userMessages = currentUser ? messages[currentUser.id] : [];
 
     return (
-        <div ref={chatRootRef} className="min-h-[calc(100dvh-6rem)]">
+        <div
+            ref={chatRootRef}
+            className="h-[calc(100dvh-80px-4rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-hidden md:h-auto md:overflow-visible md:min-h-[calc(100dvh-6rem)]"
+        >
             <MainContainer   responsive style={{ height: `${chatHeight}px` }}>
                 <ConversationsList
                     friendsList={user.friendsList}
@@ -110,84 +109,17 @@ function Chat() {
                     currentUser={currentUser}
                     messages={messages}
                 />
-                <ChatContainer>
-                    {currentUser ? (
-                        <ConversationHeader>
-                            <ConversationHeader.Back onClick={handleBack} />
-                            <Avatar
-                                src={currentUser.profilePictureUrl}
-                                name={currentUser.fullName}
-                            />
-                            <ConversationHeader.Content
-                                userName={currentUser.fullName}
-
-                                info={currentUser.lastMessageTime !==null ?"Last Active: "+formatDate(currentUser.lastMessageTime) : "No Info yet" }
-                            />
-                        </ConversationHeader>
-                    ) : null}
-                    <MessageList>
-
-                        {userMessages && userMessages.length > 0 ? (
-                            userMessages.map((msg, index) => (
-                                <Message
-                                    key={index}
-                                    model={{
-                                        message: msg.message,
-                                        sentTime: msg.sentTime,
-                                        sender: msg.senderId === user.id ? "You" : "Other",
-                                        direction: msg.senderId === user.id ? 'outgoing' : 'incoming',
-                                        position: 'single',
-                                    }}
-                                >
-                                    <Avatar src={user?.profilePictureUrl} name={currentUser.fullName} />
-                                    {msg.senderId !== user.id && (
-                                        <Avatar src={currentUser?.profilePictureUrl} name={currentUser.fullName} />
-                                    )}
-                                    <Message.Footer>
-                                        {formatTime(msg.sentTime)}
-                                        {msg.senderId === user.id && (
-                                            <span
-                                                style={{
-                                                    marginLeft: "8px",
-                                                    fontSize: "14px",
-                                                    color: msg.isRead ? "green" : "gray"
-                                                }}>✓✓</span> )}
-
-                                    </Message.Footer>
-                                </Message>
-                            ))
-                        ) : null}
-
-
-                        {currentUser && sendingGhosts.map(id => (
-                            <Message
-                                key={`ghost-${id}`}
-                                model={{
-                                    type: "custom",
-                                    sender: "You",
-                                    direction: "outgoing",
-                                    position: "single",
-                                    sentTime: new Date().toISOString()
-                                }}>
-                                <Avatar
-                                    src={user?.profilePictureUrl}
-                                    name={user?.fullName}
-                                />
-                                <Message.CustomContent>
-                                    <div className="pending-bubble">
-                                        <span className="dot" />
-                                        <span className="dot" style={{ animationDelay: ".15s" }} />
-                                        <span className="dot" style={{ animationDelay: ".3s" }} />
-                                    </div>
-                                </Message.CustomContent>
-
-                                <Message.Footer>Sending…</Message.Footer>
-                            </Message>
-                        ))}
-
-                    </MessageList>
-                    <MessageInput placeholder="Type message here..." onSend={handleSend} />
-                </ChatContainer>
+                <ChatConversationPane
+                    currentUser={currentUser}
+                    onBack={handleBack}
+                    messages={userMessages}
+                    sendingGhosts={sendingGhosts}
+                    user={user}
+                    onSend={handleSend}
+                    onLoadOlder={handleLoadOlderMessages}
+                    hasMoreOlder={currentUser ? hasMoreOlderMessages(currentUser.id) : false}
+                    loadingOlder={currentUser ? isLoadingOlderMessages(currentUser.id) : false}
+                />
             </MainContainer>
         </div>
     );

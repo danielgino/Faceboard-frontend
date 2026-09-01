@@ -1,153 +1,134 @@
-import {GlobalInput} from "../assets/inputs/GlobalInput";
-import  {useState} from "react";
-import axios from "axios";
+import  {useState, useRef} from "react";
 import EditableField from "../assets/inputs/EditableField";
 import {useUser} from "../context/UserProvider";
 import {useAutoSaveField} from "../context/useAutoSaveField";
-import {Avatar, Button, Card, CardBody, Typography} from "@material-tailwind/react";
+import {Button} from "../components/common/Button";
+import SectionCard from "../components/common/SectionCard";
 
-import RandomIcons from "../Icons/RandomIcons";
 import useProfilePictureUpload from "../context/useProfilePictureUpload";
-import {SETTINGS_API} from "../utils/Utils";
-import Swal from "sweetalert2";
-import {PasswordInput} from "../assets/inputs/PasswordInput";
+import {FACEBOOK_URL_REGEX, INSTAGRAM_URL_REGEX} from "../utils/Utils";
+import {isValidEmail} from "../utils/emailValidation";
+import ProfilePictureSettings from "../components/settings/ProfilePictureSettings";
+import PasswordSettings from "../components/settings/PasswordSettings";
 
 
 
 function Settings(){
-    const [password,setPassword]=useState("")
-    const [confirmPassword,setConfirmPassword]=useState("")
     const {user,setUser}=useUser();
-    const { uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload(user, setUser);
-    const [currentPassword, setCurrentPassword] = useState(null);
-    const [errors,setErrors]=useState({})
-    const { value: name, onSave: saveName } = useAutoSaveField(user.name, "name",setUser);
-    const { value: lastname, onSave: saveLastname } = useAutoSaveField(user.lastname, "lastname",setUser);
-    const { value: email, onSave: saveEmail } = useAutoSaveField(user.email, "email",setUser);
-    const { value: bio, onSave: saveBio } = useAutoSaveField(user.bio, "bio",setUser);
-    const { value: facebookUrl, onSave: saveFacebookUrl } = useAutoSaveField(user.facebookUrl , "facebookUrl",setUser);
-    const { value: instagramUrl, onSave: saveInstagramUrl } = useAutoSaveField(user.instagramUrl , "instagramUrl",setUser);
+    const { uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload();
+    const { value: name, onSave: saveName, loading: nameLoading } = useAutoSaveField(user.name, "name",setUser);
+    const { value: lastname, onSave: saveLastname, loading: lastnameLoading } = useAutoSaveField(user.lastname, "lastname",setUser);
+    const { value: email, onSave: saveEmail, loading: emailLoading } = useAutoSaveField(user.email, "email",setUser);
+    const { value: bio, onSave: saveBio, loading: bioLoading } = useAutoSaveField(user.bio, "bio",setUser);
+    const { value: facebookUrl, onSave: saveFacebookUrl, loading: facebookUrlLoading } = useAutoSaveField(user.facebookUrl , "facebookUrl",setUser);
+    const { value: instagramUrl, onSave: saveInstagramUrl, loading: instagramUrlLoading } = useAutoSaveField(user.instagramUrl , "instagramUrl",setUser);
 
+    const [isEditingFields, setIsEditingFields] = useState(false);
+    const [savingFields, setSavingFields] = useState(false);
 
-    const handleSubmit = async () => {
-        const payload = {};
+    const nameRef = useRef(null);
+    const lastnameRef = useRef(null);
+    const emailRef = useRef(null);
+    const bioRef = useRef(null);
+    const facebookUrlRef = useRef(null);
+    const instagramUrlRef = useRef(null);
 
-        if (currentPassword?.trim() && password.trim()) {
-            payload.currentPassword = currentPassword;
-            payload.newPassword = password;
-        }
+    const editableFields = [
+        { ref: nameRef, onSave: saveName },
+        { ref: lastnameRef, onSave: saveLastname },
+        { ref: emailRef, onSave: saveEmail },
+        { ref: bioRef, onSave: saveBio },
+        { ref: facebookUrlRef, onSave: saveFacebookUrl },
+        { ref: instagramUrlRef, onSave: saveInstagramUrl },
+    ];
 
-        if (!payload.currentPassword || !payload.newPassword) {
-            alert("Please fill both current and new password.");
-            return;
-        }
+    const handleEditFieldsClick = () => {
+        setIsEditingFields(true);
+    };
 
+    const handleSaveFieldsClick = async () => {
+        const validated = editableFields.map(({ ref, onSave }) => ({
+            onSave,
+            result: ref.current?.validateAndGetValue(),
+        }));
+
+        const hasInvalid = validated.some(({ result }) => !result || !result.valid);
+        if (hasInvalid) return;
+
+        setSavingFields(true);
         try {
-            await axios.put(SETTINGS_API, payload, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-                    "Content-Type": "application/json"
-                },
-            });
-            await Swal.fire({
-                title: "Success!",
-                text: `Password updated successfully`,
-                icon: "success"
-            });
-        } catch (e) {
-            console.log("🔥 Server error:", e.response?.data);
-            await Swal.fire({
-                title: "Error!",
-                text: `Please Check Password Fields`,
-                icon: "error"
-            });
-
+            // BUG (multi-field PATCH regression): these must run sequentially,
+            // not concurrently via Promise.all. Each field's onSave is its own
+            // independent PUT /user/settings request, and the backend's
+            // updateUserDetails does a non-atomic read-modify-write of the
+            // whole User row (no @Version/@DynamicUpdate). Firing them all at
+            // once let two in-flight requests each read the row before the
+            // other's write had landed, so whichever request's save committed
+            // last would persist its own now-stale snapshot of the field the
+            // other request had just changed - silently losing that update.
+            // Awaiting them one at a time guarantees each request's read
+            // reflects every previous request's already-committed write.
+            const results = [];
+            for (const { onSave, result } of validated) {
+                results.push(await onSave(result.value));
+            }
+            const allSucceeded = results.every(Boolean);
+            if (allSucceeded) {
+                setIsEditingFields(false);
+            }
+        } finally {
+            setSavingFields(false);
         }
     };
 
-    const validate = (name,value) => {
-        let message="";
-        switch (name){
-
-            case "password":
-                if (value.length < 8) {
-                    message = "Password must be at least 8 characters";
-                }
-                else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/.test(value)) {
-                    message = "Password must include uppercase, lowercase, number and symbol";
-                }
-                break;
-            case "confirmPassword":
-                if (value !== password) {
-                    message = "Passwords do not match";
-                }
-                break;
-
-
-            default:
-                break;
-        }
-        setErrors((prev) => ({ ...prev, [name]: message }));
-
-    }
-
     return (
-        <div className="flex justify-center items-start min-h-screen bg-gradient-to-tr from-gray-100 to-gray-200 p-6">
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8 space-y-8">
-                <div className="flex flex-col items-center">
-                    <div className="relative">
-                        <Avatar size="xxl" src={user.profilePictureUrl} alt="avatar" className="border-4 border-white shadow-md" />
-                        <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md cursor-pointer hover:scale-105 transition">
-                            <input type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
-                            {uploading ? (
-                                <span className="text-xs text-blue-500">...</span>
-                            ) : (
-                                <RandomIcons.Edit className="w-5 h-5 text-gray-600" />
-                            )}
-                        </label>
-                        <button
-                            onClick={handleRemoveProfilePicture}
-                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
-                            title="Remove Profile Picture"
-                        >
-                            ×
-                        </button>
+        <div className="w-full max-w-2xl mx-auto py-6 sm:py-10 space-y-6">
+            <ProfilePictureSettings
+                user={user}
+                uploading={uploading}
+                onFileChange={handleFileChange}
+                onRemove={handleRemoveProfilePicture}
+            />
+
+            <SectionCard title="Profile Information">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                    <EditableField ref={nameRef} id="name" label="Name" value={name} editing={isEditingFields} saveInProgress={nameLoading} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
+                    <EditableField ref={lastnameRef} id="lastname" label="Lastname" value={lastname} editing={isEditingFields} saveInProgress={lastnameLoading} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
+                    <EditableField ref={emailRef} id="email" label="Email" value={email} editing={isEditingFields} saveInProgress={emailLoading} validate={(val) => !isValidEmail(val) ? "Invalid email" : ""} />
+                    <div className="sm:col-span-2">
+                        <EditableField ref={bioRef} id="bio" label="Biography" value={bio} editing={isEditingFields} saveInProgress={bioLoading} multiline rows={3} maxLength={150} validate={(val) => val.length > 150 ? "Only 150 characters allowed" : ""} />
                     </div>
-                    <Typography variant="h4" color="blue-gray" className="mt-4">
-                        {user.fullName}
-                    </Typography>
-                    <Typography variant="small" color="gray" className="text-center">
-                        Manage your account settings
-                    </Typography>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <EditableField id="name" label="Name" value={name} onSave={saveName} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
-                    <EditableField id="lastname" label="Lastname" value={lastname} onSave={saveLastname} validate={(val) => val.length < 2 ? "Must be at least 2 characters" : ""} />
-                    <EditableField id="email" label="Email" value={email} onSave={saveEmail} validate={(val) => !/\S+@\S+\.\S+/.test(val) ? "Invalid email" : ""} />
-                    <EditableField id="bio" label="Biography" value={bio} onSave={saveBio} multiline rows={3} validate={(val) => val.length > 150 ? "Only 150 characters allowed" : ""} />
-                    <EditableField id="facebookurl" label="Facebook URL" value={facebookUrl} onSave={saveFacebookUrl} validate={(val) => val && !/^https?:\/\/(www\.)?facebook\.com\/[^\s]+$/.test(val) ? "Invalid Facebook URL" : ""} />
-                    <EditableField id="instagramurl"  label="Instagram URL" value={instagramUrl} onSave={saveInstagramUrl} validate={(val) => val && !/^https?:\/\/(www\.)?instagram\.com\/[^\s]+$/.test(val) ? "Invalid Instagram URL" : ""} />
+                {/* Social Links subsection - same card as Profile Information,
+                    not a separate SectionCard, so it reads as one unified
+                    "form" rather than two cards pasted together. Reuses the
+                    in-card section-break convention from
+                    ProfilePersonalDetails.js (border-t border-dsNeutral-100)
+                    instead of SectionCard's own header treatment, which is
+                    sized for a top-level card title. */}
+                <div className="mt-6 pt-6 border-t border-dsNeutral-100">
+                    <h3 className="text-ds-label font-semibold text-dsNeutral-600 mb-4">Social Links</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        <EditableField ref={facebookUrlRef} id="facebookurl" label="Facebook URL" value={facebookUrl} editing={isEditingFields} saveInProgress={facebookUrlLoading} validate={(val) => val && !FACEBOOK_URL_REGEX.test(val) ? "Invalid Facebook URL" : ""} />
+                        <EditableField ref={instagramUrlRef} id="instagramurl"  label="Instagram URL" value={instagramUrl} editing={isEditingFields} saveInProgress={instagramUrlLoading} validate={(val) => val && !INSTAGRAM_URL_REGEX.test(val) ? "Invalid Instagram URL" : ""} />
+                    </div>
                 </div>
 
-                <Card className="bg-gray-50 shadow-md rounded-xl">
-                    <CardBody>
-                        <Typography variant="h6" color="blue-gray" className="mb-4 text-center">
-                            Change Password
-                        </Typography>
+                <div className="flex justify-center pt-6">
+                    <Button
+                        onClick={isEditingFields ? handleSaveFieldsClick : handleEditFieldsClick}
+                        disabled={savingFields}
+                        loading={savingFields}
+                        variant="primary"
+                        className="w-full sm:w-auto"
+                    >
+                        {isEditingFields ? (savingFields ? "Saving..." : "Save") : "Edit"}
+                    </Button>
+                </div>
+            </SectionCard>
 
-                        <PasswordInput id="currentPassword" label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} error={errors.currentPassword} />
-                        <PasswordInput  id="NewPassword" label="New Password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); validate("password", e.target.value); }} error={errors.password} />
-                        <PasswordInput  id="ConfirmPassword" label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); validate("confirmPassword", e.target.value); }} error={errors.confirmPassword} />
-
-                        <div className="flex justify-center mt-6">
-                            <Button onClick={handleSubmit} color="blue" size="lg">
-                                Save Changes
-                            </Button>
-                        </div>
-                    </CardBody>
-                </Card>
-            </div>
+            <PasswordSettings />
         </div>
     );
 }

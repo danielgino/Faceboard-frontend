@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext } from "react";
 import {
     ACCEPT_FRIEND_REQUEST_API,
     CHECK_FRIENDS_STATUS_API, DECLINE_FRIEND_REQUEST_API,
+    fetchWithAuth,
     REMOVE_FRIEND_API,
     SEND_FRIEND_REQUEST_API
 } from "../utils/Utils";
@@ -9,21 +10,25 @@ import {
 const FriendshipContext = createContext();
 
 export const FriendshipProvider = ({ children }) => {
-    const [friendStatus, setFriendStatus] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    const checkFriendStatus = async (userId, friendId) => {
+    // Phase 10: this provider used to also hold a single shared `friendStatus`
+    // slot, set as a side effect of every one of these calls. That's global
+    // state for what is actually a per-call, per-target result - and since
+    // checkFriendStatus is called for many different target users at once
+    // (e.g. LikeList checks every liker on a post in a loop) while
+    // UserDetails/FriendshipActionButton reactively renders whatever
+    // `friendStatus` last happened to hold, the two consumers stomped on each
+    // other whenever both were mounted at once (opening a post's like list
+    // while viewing that post's owner's profile - Profile.js renders both
+    // UserDetails and Feed/Like/LikeList simultaneously). Each function here
+    // now just performs its request and returns/resolves; the one real
+    // reactive consumer (UserDetails.js) owns its own local friendStatus
+    // state instead.
+    const checkFriendStatus = useCallback(async (userId, friendId) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-            const response = await fetch(CHECK_FRIENDS_STATUS_API(userId,friendId), {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await fetchWithAuth(CHECK_FRIENDS_STATUS_API(userId,friendId));
 
             if (response.status === 404 || response.status === 400) {
-                console.log(`ℹ️ No friendship found between ${userId} and ${friendId}`);
-                setFriendStatus(null);
+                // 404/400 = no friendship record between these two users (not an error)
                 return null;
             }
 
@@ -31,38 +36,39 @@ export const FriendshipProvider = ({ children }) => {
                 throw new Error("Failed to fetch friend status");
             }
 
-            const data = await response.json();
-            setFriendStatus(data);
-            return data;
+            return await response.json();
         } catch (error) {
             console.error("Error checking friend status:", error);
-            setFriendStatus(null);
             return null;
         }
-    };
+    }, []);
 
 
+    // SUG-002: now returns whether the request actually succeeded, instead of always resolving
+    // (even on a non-2xx response) with no way for a caller to tell. This is a safe,
+    // backward-compatible contract change: existing callers (LikeList.js, UserDetails.js) only
+    // ever `await` this and never inspected its return value, so their behavior is unchanged;
+    // useSuggestedFriends is the first caller to actually check it, to roll back its optimistic
+    // "Sent" state on failure instead of showing "Sent" for a request that never went through.
+    // Still never throws - a network error is reported the same way as a non-2xx response
+    // (false), not as an exception a caller would need a new try/catch to handle.
     const sendFriendRequest = async (userId, otherUserId) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-            await fetch(SEND_FRIEND_REQUEST_API(userId,otherUserId), {
+            const response = await fetchWithAuth(SEND_FRIEND_REQUEST_API(userId,otherUserId), {
                 method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
             });
-            setFriendStatus({ senderId: userId, receiverId: otherUserId, status: "PENDING" });
+            return response.ok;
         } catch (err) {
             console.error("Error sending friend request", err);
+            return false;
         }
     };
 
     const acceptFriendRequest = async (userId, otherUserId) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-            await fetch(ACCEPT_FRIEND_REQUEST_API(userId,otherUserId), {
+            await fetchWithAuth(ACCEPT_FRIEND_REQUEST_API(userId,otherUserId), {
                 method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
             });
-            setFriendStatus({ senderId: otherUserId, receiverId: userId, status: "ACCEPTED" });
         } catch (err) {
             console.error("Error accepting friend request", err);
         }
@@ -70,25 +76,19 @@ export const FriendshipProvider = ({ children }) => {
 
     const declineFriendRequest = async (userId, otherUserId) => {
         try {
-            const token = localStorage.getItem("jwtToken");
             const senderId = Number(otherUserId);
             const receiverId = Number(userId);
 
-            console.log("🚀 Declining with:", { senderId, receiverId });
-
-            await fetch(DECLINE_FRIEND_REQUEST_API, {
+            await fetchWithAuth(DECLINE_FRIEND_REQUEST_API, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     senderId,
                     receiverId,
                 }),
             });
-            setFriendStatus({ senderId, receiverId, status: "DECLINED" });
-
         } catch (err) {
             console.error("Error declining friend request", err);
         }
@@ -96,17 +96,12 @@ export const FriendshipProvider = ({ children }) => {
 
 
     const removeFriendship = async (userId, otherUserId) => {
-        try {
-            const token = localStorage.getItem("jwtToken");
-            await fetch(REMOVE_FRIEND_API(userId,otherUserId), {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setFriendStatus(null);
-        } catch (err) {
-            console.error("Error removing friendship:", err);
+        const response = await fetchWithAuth(REMOVE_FRIEND_API(userId,otherUserId), {
+            method: "DELETE",
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to remove friendship");
         }
     };
 
@@ -114,8 +109,6 @@ export const FriendshipProvider = ({ children }) => {
     return (
         <FriendshipContext.Provider
             value={{
-                friendStatus,
-                loading,
                 checkFriendStatus,
                 sendFriendRequest,
                 acceptFriendRequest,

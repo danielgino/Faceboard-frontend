@@ -1,16 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Stories from "react-insta-stories";
-import { Avatar, Button, Typography, Input, Textarea } from "@material-tailwind/react";
+import { X, Plus } from "lucide-react";
 import { useStories } from "../../context/StoryProvider";
 import { useUser } from "../../context/UserProvider";
 import { WithHeader } from "react-insta-stories";
+import { Avatar as PrimitiveAvatar } from "../common/Avatar";
 import openStoryUploadDialog from "../profile/StoryUploadDialog";
-import {isMobile} from "../../utils/Utils";
+import {useIsMobile} from "../../hooks/useIsMobile";
+
+// Fidelity reconciliation (Phase G): rail rebuilt against the Design
+// System's AddStory/StoryPreview rail (#stories) - 64px avatar, plus-badge
+// on the current user's own circle, ring color distinguishing it from
+// friends' story circles. Every handler/effect below (grouping, Escape/Tab
+// trap, focus entry/return, onAllStoriesEnd sequencing) is unchanged - see
+// the ledger for the one item intentionally NOT touched here: there is no
+// per-story viewed/unviewed data in StoryProvider to key a ring color off,
+// so every friend circle uses the design's single "has a story" ring
+// treatment - not a MISSING DESIGN STATE this pass invents new business
+// logic to fill. (Phase J: the stories.reduce below is now safe against a
+// non-array response - StoryProvider.fetchStories normalizes the payload
+// to an array before it reaches this component.)
+const RING_MINE = { boxShadow: "0 0 0 3px #fff, 0 0 0 5px oklch(88% 0.007 266)" };
+const RING_FRIEND = { boxShadow: "0 0 0 3px #fff, 0 0 0 5px oklch(46% 0.18 275)" };
+
 function StoryBar() {
     const [showStories, setShowStories] = useState(false);
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
-    const { stories, uploadStory, fetchStories } = useStories();
+    const { stories, loading, uploadStory, fetchStories } = useStories();
     const { user } = useUser();
+    // Phase J: migrated off Utils.js's static (module-load-time) isMobile,
+    // which never updated on resize/rotation - see useIsMobile.js's own
+    // HOOK-003 comment for the other call sites that already made this move.
+    const isMobile = useIsMobile();
+
+    const dialogRef = useRef(null);
+    const closeButtonRef = useRef(null);
+    const previouslyFocusedElementRef = useRef(null);
 
     const groupedStories = stories.reduce((acc, story) => {
         if (!acc[story.fullName]) {
@@ -33,7 +58,7 @@ function StoryBar() {
                         <img
                             src={story.imageUrl}
                             alt=""
-                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            className="w-full h-full object-cover"
                         />
                         {story.caption && (
                             <div
@@ -69,64 +94,142 @@ function StoryBar() {
         setShowStories(true);
     };
 
+    const closeStoryViewer = () => {
+        setShowStories(false);
+        setCurrentGroupIndex(null);
+    };
+
+    // Phase 9: the story viewer is a custom fixed overlay (no modal library),
+    // so Escape-to-close has to be added explicitly - native dialog/library
+    // modals elsewhere in the app (SweetAlert2, yet-another-react-lightbox)
+    // already provide this themselves.
+    //
+    // Phase 12: also traps Tab within the dialog. react-insta-stories
+    // exposes no ref/focus API (checked its installed type defs/README -
+    // its props are all content/timing/callbacks, nothing focus-related),
+    // and its own tap-to-navigate zones aren't native focusable elements
+    // (keyboardNavigation defaults to false, and this call site doesn't
+    // enable it). Rather than coupling to any of that, the trap queries
+    // generically for whatever IS focusable inside the dialog at trap time
+    // - the same library-agnostic approach already used in LikeList - so it
+    // stays correct regardless of what react-insta-stories (or a future
+    // library swap) renders internally.
+    useEffect(() => {
+        if (!showStories) return;
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                closeStoryViewer();
+                return;
+            }
+            if (e.key === "Tab" && dialogRef.current) {
+                const focusable = dialogRef.current.querySelectorAll(
+                    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                );
+                if (focusable.length === 0) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [showStories]);
+
+    // Focus entry/return for the same custom overlay.
+    useEffect(() => {
+        if (showStories) {
+            previouslyFocusedElementRef.current = document.activeElement;
+            closeButtonRef.current?.focus();
+        } else {
+            previouslyFocusedElementRef.current?.focus?.();
+        }
+    }, [showStories]);
+
     const safeStories = (storyGroups[currentGroupIndex]?.stories || []).filter(
         (s) => typeof s.content === "function"
     );
 
     return (
-        <div
-            className="relative bg-white shadow-md rounded-xl my-5
+        <div className="relative bg-white border border-dsNeutral-100 shadow-ds-low rounded-ds-lg my-5
   w-full mx-auto
   max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl
   overflow-x-hidden">
-            <div className="w-full overflow-x-auto overflow-y-hidden px-2 sm:px-4">
-                <div className="flex items-center gap-4 py-2 h-[140px] min-w-fit">
+            <div className="w-full overflow-x-auto overflow-y-hidden px-3 sm:px-4">
+                <div className="flex items-center gap-4 py-3 min-w-fit">
 
-                    <div
-                        className="flex flex-col items-center justify-center cursor-pointer"
+                    <button
+                        type="button"
+                        className="flex flex-col items-center justify-center gap-1.5 cursor-pointer border-0 bg-transparent p-0 flex-shrink-0"
                         onClick={() => openStoryUploadDialog(uploadStory, fetchStories)}
                     >
                         <div className="relative">
-                            <Avatar
+                            <PrimitiveAvatar
                                 src={user.profilePictureUrl}
-                                alt="You"
-                                variant="circular"
-                                size="xl"
-                                className="border-2 border-gray-300 "
+                                name={user.fullName}
+                                alt="Your story"
+                                size={64}
+                                style={RING_MINE}
                             />
-                            <div
-                                className="absolute bottom-0 right-0 bg-blue-500 text-white text-sm rounded-full w-5 h-5 flex items-center justify-center">
-                                +
-                            </div>
+                            <span
+                                className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-dsBrand-600 border-2 border-white flex items-center justify-center"
+                                aria-hidden="true">
+                                <Plus size={12} strokeWidth={2.75} className="text-white" />
+                            </span>
                         </div>
-                        <div className="text-center text-[12px] mt-1 text-gray-900 w-16 truncate">
-                            Your Story
+                        <span className="text-center text-[11px] font-medium text-dsNeutral-600 w-16 truncate">
+                            Your story
+                        </span>
+                    </button>
+
+                    {loading && stories.length === 0 && (
+                        <div className="flex items-center gap-4" aria-hidden="true">
+                            {[0, 1, 2].map((i) => (
+                                <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-full bg-dsNeutral-100 animate-pulse" />
+                                    <div className="w-10 h-2 rounded bg-dsNeutral-100 animate-pulse" />
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
 
                     {storyGroups.map((userGroup, index) => (
-                        <div
+                        <button
+                            type="button"
                             key={index}
-                            className="flex flex-col items-center cursor-pointer"
+                            className="flex flex-col items-center gap-1.5 cursor-pointer border-0 bg-transparent p-0 flex-shrink-0"
                             onClick={() => handleStoryClick(index)}
                         >
-                            <Avatar
+                            <PrimitiveAvatar
                                 src={userGroup.profilePictureUrl}
+                                name={userGroup.fullName}
                                 alt={userGroup.fullName}
-                                variant="circular"
-                                size="xl"
-                                className="border-4 border-blue-500 hover:scale-110 transition duration-200 "
+                                size={64}
+                                style={RING_FRIEND}
+                                className="hover:scale-105 transition duration-200"
                             />
-                            <div className="text-center text-[12px] mt-1 text-gray-900 w-16 truncate">
+                            <span className="text-center text-[11px] font-medium text-dsNeutral-600 w-16 truncate">
                                 {userGroup.fullName}
-                            </div>
-                        </div>
+                            </span>
+                        </button>
                     ))}
                 </div>
             </div>
 
             {showStories && currentGroupIndex !== null && (
-                <div className="fixed inset-0 bg-black z-[9999] flex items-center justify-center">
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center"
+                    style={{background: "oklch(21% 0.014 266)"}}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Story viewer"
+                    ref={dialogRef}
+                >
                     <div className="relative">
                         <Stories
                             stories={safeStories}
@@ -150,14 +253,13 @@ function StoryBar() {
                             }}
                         />
                         <button
-                            className="absolute top-4 right-4 z-[10000] bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center"
-                            style={{pointerEvents: "auto"}}
-                            onClick={() => {
-                                setShowStories(false);
-                                setCurrentGroupIndex(null);
-                            }}
+                            type="button"
+                            className="absolute top-4 right-4 z-[10000] bg-black/40 text-white rounded-full w-9 h-9 flex items-center justify-center pointer-events-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                            onClick={closeStoryViewer}
+                            aria-label="Close story"
+                            ref={closeButtonRef}
                         >
-                            ✕
+                            <X size={18} strokeWidth={2} />
                         </button>
                     </div>
                 </div>

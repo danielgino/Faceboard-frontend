@@ -1,4 +1,3 @@
-import './App.css';
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -51,48 +50,48 @@ function App() {
             <LightboxProvider>
                 <GlobalImageLightbox/>
                 <Router>
-                    <SearchProvider>
-                        <Routes>
-                            <Route element={<RouteGuard auth="public" redirectIfAuthedTo={HOME_PAGE} />}>
-                                <Route path={SIGNUP_PAGE} element={<SignUp/>}/>
-                                <Route path={LOGIN_PAGE} element={<Login />} />
-                                <Route path={FORGOT_PASSWORD_PAGE} element={<ForgotPassword/>} />
-                                <Route path={RESET_PASSWORD_PAGE} element={<ResetPassword/>} />
-                                <Route path={ABOUT_PAGE} element={<About/>}/>
-                            </Route>
-                            <Route element={<RouteGuard auth="protected" redirectTo={UNAUTHORIZED_PAGE}/>}>
-                                <Route element={
-                                    <FriendshipProvider>
-                                        <NotificationProvider>
-                                            <MessageProvider>
-                                                <WebSocketProvider>
-                                                    <WebSocketHandler />
-                                                    <StoryProvider>
-                                                        <PostProvider>
+                    <Routes>
+                        <Route element={<RouteGuard auth="public" redirectIfAuthedTo={HOME_PAGE} />}>
+                            <Route path={SIGNUP_PAGE} element={<SignUp/>}/>
+                            <Route path={LOGIN_PAGE} element={<Login />} />
+                            <Route path={FORGOT_PASSWORD_PAGE} element={<ForgotPassword/>} />
+                            <Route path={RESET_PASSWORD_PAGE} element={<ResetPassword/>} />
+                            <Route path={ABOUT_PAGE} element={<About/>}/>
+                        </Route>
+                        <Route element={<RouteGuard auth="protected" redirectTo={UNAUTHORIZED_PAGE}/>}>
+                            <Route element={
+                                <FriendshipProvider>
+                                    <NotificationProvider>
+                                        <MessageProvider>
+                                            <WebSocketProvider>
+                                                <WebSocketHandler />
+                                                <StoryProvider>
+                                                    <PostProvider>
+                                                        <SearchProvider>
                                                             <MainLayout />
-                                                        </PostProvider>
-                                                    </StoryProvider>
-                                                </WebSocketProvider>
-                                            </MessageProvider>
-                                        </NotificationProvider>
-                                    </FriendshipProvider>
-                                }>
-                                    <Route path={HOME_PAGE} element={<Home />} />
-                                    <Route path={FRIENDS_PAGE_LINK} element={<Friends />} />
-                                    <Route path={MOBILE_NOTIFICATIONS_PAGE} element={<MobileNotifications/>} />
-                                    <Route path={CHAT_PAGE} element={<Chat />} />
-                                    <Route path={PROFILE_PAGE_LINK} element={<Profile />} />
-                                    <Route path={ALBUM_PAGE_LINK} element={<Album />} />
-                                    <Route path={SEARCH_PAGE} element={<SearchPage />} />
-                                    <Route path={SETTINGS_PAGE} element={<Settings />} />
-                                    <Route path={SINGLE_POST_PAGE_LINK} element={<SinglePostPage />} />
+                                                        </SearchProvider>
+                                                    </PostProvider>
+                                                </StoryProvider>
+                                            </WebSocketProvider>
+                                        </MessageProvider>
+                                    </NotificationProvider>
+                                </FriendshipProvider>
+                            }>
+                                <Route path={HOME_PAGE} element={<Home />} />
+                                <Route path={FRIENDS_PAGE_LINK} element={<Friends />} />
+                                <Route path={MOBILE_NOTIFICATIONS_PAGE} element={<MobileNotifications/>} />
+                                <Route path={CHAT_PAGE} element={<Chat />} />
+                                <Route path={PROFILE_PAGE_LINK} element={<Profile />} />
+                                <Route path={ALBUM_PAGE_LINK} element={<Album />} />
+                                <Route path={SEARCH_PAGE} element={<SearchPage />} />
+                                <Route path={SETTINGS_PAGE} element={<Settings />} />
+                                <Route path={SINGLE_POST_PAGE_LINK} element={<SinglePostPage />} />
 
-                                </Route>
                             </Route>
-                            <Route path={UNAUTHORIZED_PAGE} element={<Unauthorized />} />
-                            <Route path="*" element={<Page404 />} />
-                        </Routes>
-                    </SearchProvider>
+                        </Route>
+                        <Route path={UNAUTHORIZED_PAGE} element={<Unauthorized />} />
+                        <Route path="*" element={<Page404 />} />
+                    </Routes>
                 </Router>
             </LightboxProvider>
         </UserProvider>

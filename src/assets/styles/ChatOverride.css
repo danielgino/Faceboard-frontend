@@ -1,9 +1,34 @@
+/* Faceboard Design System fidelity pass (Phase H).
+   Chatscope's component tree is themed entirely through these class/CSS-
+   variable overrides - no direct-child structure is changed anywhere in the
+   chat JSX. Selector prefixes (.cs-*) come from Chatscope's own compiled
+   class names (see @chatscope/chat-ui-kit-styles/dist/default/styles.css). */
 
-@media (max-width: 768px) {
+/* Breakpoint alignment: Chat.js's own outer container already switches at
+   this project's REAL compiled Tailwind `md` (720px, via the Material
+   Tailwind `withMT` wrapper - not the stock 768px). This stylesheet and
+   useChatViewportHeight.js previously used a stale 768px, which produced a
+   confirmed defect: at 720-767px the outer shell rendered as desktop
+   (Sidebar + two-pane MainContainer) while this stylesheet still forced
+   Chatscope into single-pane "mobile" mode, hiding the entire chat-container
+   (message list + composer) with nothing to replace it - a blank pane.
+   Verified in a real browser at 719/720/767/768/900px before changing this
+   value; see the Phase H report for the per-viewport evidence. */
+@media (max-width: 719px) {
 
     .cs-main-container {
         grid-template-columns: 1fr !important;
         gap: 0 !important;
+        min-height: 0 !important;
+    }
+
+    .cs-chat-container {
+        min-height: 0 !important;
+    }
+
+    .cs-message-list {
+        min-height: 0 !important;
+        flex: 1 1 auto !important;
     }
 
     .cs-message-input {
@@ -87,35 +112,346 @@
     }
 }
 
+/* ============================================================
+   Design tokens (mirrors tailwind.config.js `ds*` extension - kept as raw
+   oklch() values here since this stylesheet isn't processed by Tailwind).
+   ============================================================ */
+:root {
+    --chat-brand-50: oklch(97.5% 0.012 275);
+    --chat-brand-100: oklch(95% 0.025 275);
+    --chat-brand-600: oklch(46% 0.18 275);
+    --chat-brand-700: oklch(38% 0.16 275);
+    --chat-neutral-canvas: oklch(96.5% 0.006 275);
+    --chat-neutral-surface: #ffffff;
+    --chat-neutral-100: oklch(94% 0.005 266);
+    --chat-neutral-200: oklch(88% 0.007 266);
+    --chat-neutral-500: oklch(58% 0.012 266);
+    --chat-neutral-600: oklch(46% 0.014 266);
+    --chat-neutral-900: oklch(21% 0.014 266);
+    --chat-success: oklch(50% 0.13 152);
+}
+
+/* ============================================================
+   Sidebar / conversation list
+   ============================================================ */
+.cs-sidebar.my-sidebar {
+    background: var(--chat-neutral-surface);
+    border-right: 1px solid var(--chat-neutral-100);
+}
+
+.cs-search {
+    background: var(--chat-neutral-canvas) !important;
+    border-radius: 999px !important;
+    margin: 12px !important;
+    border: none !important;
+}
+.cs-search__input {
+    background: transparent !important;
+    font-size: 14px !important;
+    color: var(--chat-neutral-900) !important;
+}
+.cs-search__input::placeholder {
+    color: var(--chat-neutral-500) !important;
+}
+.cs-search__search-icon {
+    color: var(--chat-brand-600) !important;
+}
+
+.cs-conversation {
+    padding: 10px 14px !important;
+    border-bottom: 1px solid var(--chat-neutral-100);
+    transition: background-color .12s ease;
+}
+.cs-conversation:hover {
+    background: var(--chat-neutral-canvas) !important;
+}
+.cs-conversation.cs-conversation--active {
+    background: var(--chat-brand-50) !important;
+}
+.cs-conversation > .cs-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+}
+.cs-conversation__content {
+    padding-left: 2px !important;
+}
+.cs-conversation__name {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--chat-neutral-900) !important;
+}
+.cs-conversation__info,
+.cs-conversation__info-content {
+    font-size: 12px !important;
+    color: var(--chat-neutral-500) !important;
+}
+.cs-conversation__last-activity-time {
+    font-size: 11px !important;
+    color: var(--chat-neutral-500) !important;
+}
+.cs-conversation__unread {
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    border-radius: 999px !important;
+    background: var(--chat-brand-600) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+/* Unread rows: bolder name + darker preview text, matching the design's
+   unread-vs-read text-weight distinction (no unread dot is rendered - see
+   ConversationsList.js, which intentionally no longer passes unreadDot
+   since the design shows only the count pill, not a redundant dot). */
+.cs-conversation:has(.cs-conversation__unread) .cs-conversation__name {
+    font-weight: 700 !important;
+}
+.cs-conversation:has(.cs-conversation__unread) .cs-conversation__info,
+.cs-conversation:has(.cs-conversation__unread) .cs-conversation__info-content {
+    color: var(--chat-neutral-900) !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================================
+   Conversation header
+   ============================================================ */
+.cs-conversation-header {
+    background: var(--chat-neutral-surface) !important;
+    border-bottom: 1px solid var(--chat-neutral-100) !important;
+    padding: 10px 16px !important;
+}
+.cs-conversation-header__avatar > .cs-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+}
+.cs-conversation-header__user-name {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--chat-neutral-900) !important;
+}
+.cs-conversation-header__info {
+    font-size: 11px !important;
+    color: var(--chat-neutral-500) !important;
+}
+.cs-back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--chat-neutral-100);
+    color: var(--chat-neutral-900);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+.cs-back-btn:hover {
+    background: var(--chat-neutral-200);
+}
+.cs-chat-empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--chat-neutral-500);
+    text-align: center;
+    padding: 24px;
+}
+.cs-chat-empty-state p {
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   Message list / bubbles
+   ============================================================ */
+.cs-message-list {
+    background: var(--chat-neutral-canvas) !important;
+}
+
+/* Day separators (chatscope's own MessageSeparator - its flex row +
+   ::before/::after line pseudo-elements already give the "── label ──"
+   shape; only retoning it from the theme's default blue to the Faceboard
+   neutral scale, no structural change). Deliberately subtle: no background
+   card, no fixed width, sized well under the bubble/footer type scale so it
+   never competes visually with message content. */
+.cs-message-separator {
+    color: var(--chat-neutral-500) !important;
+    background-color: transparent !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+.cs-message-separator::before,
+.cs-message-separator::after {
+    background-color: var(--chat-neutral-200) !important;
+}
+
+/* The actual flex item shrinking inside .cs-message's row layout is
+   .cs-message__content-wrapper (chatscope: display:flex, flex-direction:
+   column, flex-shrink left at its default of 1 with min-width:auto). Its
+   automatic minimum size is derived from its descendants, and
+   .cs-message__content inherits overflow-wrap:anywhere from chatscope's
+   base styles.css, which lets that automatic minimum collapse to ~1
+   character. Capping/sizing .cs-message__content alone (previous attempt)
+   doesn't help: as a nested flex child, its own width is resolved against
+   whatever width the wrapper was shrunk to. The cap and shrink-protection
+   both have to live on the wrapper, the layer actually being shrunk. */
+.cs-message--outgoing .cs-message__content-wrapper,
+.cs-message--incoming .cs-message__content-wrapper {
+    flex-shrink: 0;
+    max-width: min(70%, 480px) !important;
+}
+
 .cs-message--outgoing .cs-message__content,
 .cs-message--incoming .cs-message__content {
-    max-width: 100% !important;
     overflow: visible !important;
+}
+
+.cs-message__content {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    border-radius: 16px !important;
+}
+.cs-message--incoming .cs-message__content {
+    background: var(--chat-neutral-surface) !important;
+    color: var(--chat-neutral-900) !important;
+    border-end-start-radius: 4px !important;
+}
+.cs-message--outgoing .cs-message__content {
+    background: var(--chat-brand-600) !important;
+    color: #fff !important;
+    border-end-end-radius: 4px !important;
+}
+
+/* Design shows no avatar on sent bubbles (right-aligned, full-width bubble
+   column); received bubbles keep a small 24px avatar. */
+.cs-message--outgoing .cs-message__avatar {
+    display: none !important;
+}
+.cs-message--incoming .cs-message__avatar .cs-avatar {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+}
+
+.cs-message__footer {
+    font-size: 10px !important;
+    color: var(--chat-neutral-500) !important;
+    align-items: center;
+}
+.cs-message--outgoing .cs-message__footer {
+    justify-content: flex-end;
+}
+.cs-read-receipt {
+    color: var(--chat-neutral-500);
+    vertical-align: middle;
+}
+.cs-read-receipt--read {
+    color: var(--chat-success);
+}
+
+/* ============================================================
+   Composer
+   ============================================================ */
+.cs-message-input {
+    background: var(--chat-neutral-canvas) !important;
+    padding: 10px 12px !important;
+    align-items: center !important;
+    gap: 8px;
+}
+.cs-message-input__content-editor-wrapper,
+.cs-message-input__content-editor-container {
+    background: var(--chat-neutral-surface) !important;
+    border-radius: 999px !important;
+}
+.cs-message-input__content-editor-wrapper {
+    padding: 0.55em 1em !important;
+    border: 1px solid var(--chat-neutral-200);
+    transition: box-shadow .12s ease, border-color .12s ease;
+}
+/* Chatscope's own default (styles.css:884-897) paints this innermost
+   contenteditable div with a hardcoded light-blue background-color -
+   invisible while empty/unfocused (fully covered by the placeholder's own
+   box) but exposed the moment it gains a layout box on focus/typing,
+   showing through the white pill above as a stray blue fill. Overriding it
+   to transparent here (rather than a second opaque white, which would just
+   be a second, redundant paint on top of the wrapper's) removes that layer
+   outright instead of papering over it. */
+.cs-message-input__content-editor {
+    background: transparent !important;
+    font-size: 13px !important;
+    color: var(--chat-neutral-900) !important;
+    outline: none !important;
+}
+/* Single, intentional focus indicator: a dsBrand ring on the pill boundary
+   itself (not the inner editor), so there is exactly one focus treatment,
+   not a native browser outline stacked on top of a Chatscope default. */
+.cs-message-input__content-editor-wrapper:focus-within {
+    border-color: var(--chat-brand-600);
+    box-shadow: 0 0 0 3px oklch(56% 0.18 275 / .18);
+}
+
+.cs-message-input__tools .cs-button--attachment {
+    color: var(--chat-brand-600) !important;
+}
+
+.cs-message-input__tools .cs-button--send {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--chat-brand-600);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z'/%3E%3Cpath d='m21.854 2.147-10.94 10.939'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px 14px;
+}
+.cs-message-input__tools .cs-button--send svg {
+    display: none;
+}
+.cs-message-input__tools .cs-button--send:disabled {
+    background-color: var(--chat-neutral-200);
+    opacity: 1;
+}
+
+/* ============================================================
+   Sending-ghost bubble (unchanged behavior, retoned to match the bubble
+   palette above instead of the old generic indigo-tint placeholder)
+   ============================================================ */
+.pending-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 20px;
+    min-height: 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--chat-brand-600);
+    opacity: .55;
 }
 
 .cs-message__custom-content {
     display: inline-flex !important;
 }
 
-.pending-bubble {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-
-    min-width: 20px;
-    min-height: 16px;
-    padding: 10px 14px;
-    border-radius: 12px;
-
-    background: rgba(99,102,241,0.15);
-}
-
 .dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 99px;
-    background: #9ca3af;
+    background: #ffffff;
     display: inline-block;
     animation: dotPulse 1s infinite ease-in-out;
 }

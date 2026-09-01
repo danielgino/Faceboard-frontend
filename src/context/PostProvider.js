@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import {
     DELETE_COMMENT_API,
     DELETE_POST_API,
     EDIT_POST_API,
-    GET_FEED_POSTS_API,
-    GET_PAGINATED_POSTS_API, GET_USER_POSTS_API
+    fetchWithAuth,
+    GET_PAGINATED_POSTS_API, GET_USER_POSTS_API,
+    JWT_STORAGE_KEY, POSTS_PAGE_SIZE
 } from "../utils/Utils";
 
 const PostContext = createContext();
@@ -12,69 +13,34 @@ const PostContext = createContext();
 export const PostProvider = ({ children }) => {
     const [posts, setPosts] = useState([]);
     const [feed,setFeed]=useState([])
-    const [loading, setLoading] = useState(true);
 
     const fetchUserPosts = async (userId) => {
         try {
-            const token=localStorage.getItem("jwtToken");
+            const token=localStorage.getItem(JWT_STORAGE_KEY);
             if (!token){
                 throw new Error("User Not Authenticated!")
             }
 
-            const response = await fetch(GET_USER_POSTS_API(userId), {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(GET_USER_POSTS_API(userId));
             if (!response.ok) {
                 throw new Error('Failed to fetch user posts');
             }
 
             const postsData = await response.json();
             setPosts(postsData);
-            setLoading(false)
         } catch (err) {
             console.error('Error fetching user posts:', err);
-            setLoading(false)
         }
     };
 
-    const fetchFeedPosts = async ( ) => {
+    const fetchPagePosts = useCallback(async ({ page = 0, size = POSTS_PAGE_SIZE, isFeed = true, userId = null }) => {
         try {
-            const token=localStorage.getItem("jwtToken");
-            if (!token){
-                throw new Error("User Not Authenticated!")
-            }
-
-            const response = await fetch(GET_FEED_POSTS_API, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                throw new Error('Failed to fetch posts');
-            }
-
-            const feedData = await response.json();
-            setFeed(feedData);
-            setLoading(false)
-        } catch (err) {
-            console.error('Error fetching  posts:', err);
-            setLoading(false)
-        }
-    };
-    const fetchPagePosts = async ({ page = 0, size = 10, isFeed = true, userId = null }) => {
-        try {
-            const token = localStorage.getItem("jwtToken");
+            const token = localStorage.getItem(JWT_STORAGE_KEY);
             if (!token) throw new Error("User Not Authenticated!");
 
             const url = GET_PAGINATED_POSTS_API({ userId, page, size, isFeed });
 
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(url);
 
             if (!response.ok) throw new Error('Failed to fetch posts');
 
@@ -84,17 +50,12 @@ export const PostProvider = ({ children }) => {
             console.error('Error fetching paginated posts:', err);
             return [];
         }
-    };
+    }, []);
 
     const deletePost = async (postId) => {
-        const token = localStorage.getItem("jwtToken");
-
         try {
-            const res = await fetch(DELETE_POST_API(postId), {
+            const res = await fetchWithAuth(DELETE_POST_API(postId), {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
             });
 
             if (res.ok) {
@@ -109,18 +70,17 @@ export const PostProvider = ({ children }) => {
     };
 
     const editPost = async (postId, newContent) => {
-        const token = localStorage.getItem("jwtToken");
+        const token = localStorage.getItem(JWT_STORAGE_KEY);
         if (!token) {
             console.error("User not authenticated");
             return;
         }
 
         try {
-            const response = await fetch(EDIT_POST_API(postId), {
+            const response = await fetchWithAuth(EDIT_POST_API(postId), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ content: newContent }),
             });
@@ -156,23 +116,13 @@ export const PostProvider = ({ children }) => {
         }
     };
 
-    const setUpdatePosts = (newPosts) => {
-        setPosts(newPosts);
-    };
     const deleteComment = async (commentId) => {
-        const token = localStorage.getItem("jwtToken");
-
         try {
-            const res = await fetch(DELETE_COMMENT_API(commentId), {
+            const res = await fetchWithAuth(DELETE_COMMENT_API(commentId), {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
             });
 
-            if (res.ok) {
-                console.log(`Comment ${commentId} deleted successfully.`);
-            } else {
+            if (!res.ok) {
                 const err = await res.text();
                 console.error("Delete comment failed:", err);
             }
@@ -181,9 +131,9 @@ export const PostProvider = ({ children }) => {
         }
     };
     return (
-        <PostContext.Provider value={{ posts,feed,setFeed,loading,editPost,
-            fetchPagePosts,fetchFeedPosts,fetchUserPosts, addPost,
-            setUpdatePosts,setPosts,deletePost,deleteComment }}>
+        <PostContext.Provider value={{ posts,feed,setFeed,editPost,
+            fetchPagePosts,fetchUserPosts, addPost,
+            setPosts,deletePost,deleteComment }}>
             {children}
         </PostContext.Provider>
     );

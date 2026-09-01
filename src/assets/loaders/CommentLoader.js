@@ -1,29 +1,23 @@
 import React from 'react';
-import { Card, CardHeader, CardBody } from "@material-tailwind/react";
 
+// Matches Comment.js's actual CommentItem shape (avatar + rounded bubble,
+// see the Feed reconciliation pass) instead of the Material Card/CardHeader
+// layout that shape moved away from - a skeleton should mirror the real
+// component it's standing in for. Also aligned to the design's
+// CommentSkeleton token (#feedback): 24-28px avatar circle + one shimmer
+// line, white surface.
 function CommentLoader() {
     return (
-        <Card shadow={false} className="w-full max-w-[48rem] bg-gray-50 px-4 py-2 mb-4 animate-pulse">
-            <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 flex items-center gap-4 pt-0 pb-8"
-            >
-                <div className="rounded-full bg-gray-300 h-12 w-12" />
-                <div className="flex w-full flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                        <div className="bg-gray-300 h-4 w-32 rounded" />
-                        <div className="bg-gray-300 h-3 w-20 rounded" />
-                    </div>
-                    <div className="bg-gray-300 h-3 w-24 rounded" />
+        <div className="flex w-full max-w-[48rem] items-start gap-2.5 mb-3 animate-pulse">
+            <div className="rounded-full bg-dsNeutral-100 h-7 w-7 flex-shrink-0" />
+            <div className="flex-1 rounded-ds-lg bg-dsNeutral-canvas px-3 py-2.5">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="bg-dsNeutral-200 h-2.5 w-24 rounded" />
+                    <div className="bg-dsNeutral-200 h-2 w-10 rounded" />
                 </div>
-            </CardHeader>
-            <CardBody className="mb-6 p-0 space-y-2">
-                <div className="bg-gray-300 h-3 w-full rounded" />
-                <div className="bg-gray-300 h-3 w-3/4 rounded" />
-            </CardBody>
-        </Card>
+                <div className="bg-dsNeutral-200 h-2.5 w-3/4 rounded" />
+            </div>
+        </div>
     );
 }
 

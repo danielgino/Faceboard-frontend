@@ -1,23 +1,27 @@
-import React, {useState, useRef, useId} from 'react';
+import React, {useState, useRef, useId, useEffect} from 'react';
+import { Smile, X } from "lucide-react";
 import { Textarea } from "@material-tailwind/react";
 import {usePosts} from "../../context/PostProvider";
 import {useUser} from "../../context/UserProvider";
 import RandomIcons from "../../Icons/RandomIcons";
 import EmojiLibrary from "../interaction/EmojiLibrary";
 import ShareButton from "../../assets/buttons/ShareButtom";
-import {
-    Card,
-    CardHeader,
-    CardBody,
-    Typography,
-    Avatar,
-} from "@material-tailwind/react";
-import {ADD_POST_API} from "../../utils/Utils";
-import Swal from "sweetalert2";
+import {Typography} from "@material-tailwind/react";
+import {ADD_POST_API, fetchWithAuth, JWT_STORAGE_KEY} from "../../utils/Utils";
+import {MAX_POST_IMAGES, MAX_POST_IMAGES_TOTAL_SIZE, validateUploadFiles, describeRejectionReason} from "../../utils/uploadValidation";
+import Swal from "../../utils/swalTheme";
+import {Avatar as PrimitiveAvatar} from "../common/Avatar";
 
 function AddPost() {
     const [postText, setPostText] = useState('');
+    // Each entry is { file, previewUrl } - previewUrl is created once, at
+    // selection time, and stored alongside its File so it's stable across
+    // re-renders (typing, emoji picks, etc.) instead of being recreated
+    // every render. Revoked explicitly on removal, on successful submit,
+    // and on unmount (see below) so nothing outlives its usefulness.
     const [selectedImages, setSelectedImages] = useState([]);
+    const selectedImagesRef = useRef(selectedImages);
+    selectedImagesRef.current = selectedImages;
     const fileInputRef = useRef();
     const {user}=useUser();
     const [isPosting, setIsPosting] = useState(false);
@@ -27,14 +31,28 @@ function AddPost() {
     const postContentId = `post-content-${safeUid}`;
     const imageInputId  = `imageupload-${safeUid}`;
 
+    // Revokes whatever preview URLs are still outstanding when AddPost
+    // unmounts (e.g. the user navigated away with images selected but never
+    // submitted/removed them). Reads the ref rather than closing over
+    // selectedImages directly so this always sees the latest selection,
+    // not whatever it was when the component first mounted.
+    useEffect(() => {
+        return () => {
+            selectedImagesRef.current.forEach(({previewUrl}) => URL.revokeObjectURL(previewUrl));
+        };
+    }, []);
 
     const handlePostChange = (e) => {
         setPostText(e.target.value);
     };
     const removeImage = (indexToRemove) => {
-        setSelectedImages((prev) =>
-            prev.filter((_, index) => index !== indexToRemove)
-        );
+        setSelectedImages((prev) => {
+            const removed = prev[indexToRemove];
+            if (removed) {
+                URL.revokeObjectURL(removed.previewUrl);
+            }
+            return prev.filter((_, index) => index !== indexToRemove);
+        });
     };
     const handlePostSubmit = async () => {
         if (isPosting) return;
@@ -44,7 +62,7 @@ function AddPost() {
             await Swal.fire("Empty Post", "Share something to the world!", "warning");
             return;
         }
-            const token = localStorage.getItem('jwtToken');
+            const token = localStorage.getItem(JWT_STORAGE_KEY);
             if (!token) {
                 await Swal.fire("Error", "Unauthorized", "error");
                 return;
@@ -52,17 +70,14 @@ function AddPost() {
 
             const formData = new FormData();
             formData.append("postText", postText);
-            selectedImages.forEach((file) => {
+            selectedImages.forEach(({file}) => {
                 formData.append("files", file);
             });
 
             try {
                 setIsPosting(true);
-                const response = await fetch(ADD_POST_API, {
+                const response = await fetchWithAuth(ADD_POST_API, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
                     body: formData,
                 });
 
@@ -83,6 +98,7 @@ function AddPost() {
                     toast: true,
                     position: 'center',
                 });
+                selectedImages.forEach(({previewUrl}) => URL.revokeObjectURL(previewUrl));
                 setPostText('');
                 setSelectedImages([]);
             } catch (err) {
@@ -98,52 +114,42 @@ function AddPost() {
     return (
         <div className='add-post-container'>
 
-            <div className="w-full mb-6 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl  xl:max-w-5xl mx-auto px-2 sm:px-4">
-                <Card shadow={false} className="w-full px-4 py-2 shadow-md rounded-xl">
-                    <CardHeader
-                        color="transparent"
-                        floated={false}
-                        shadow={false}
-                        className="mx-0 flex items-center gap-4 pt-0 pb-8"
-                    >
-                        <Avatar
-                            size="lg"
-                            variant="circular"
+            <div className="w-full mb-6 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-none mx-auto px-2 sm:px-4 lg:px-0">
+                <div className="w-full px-4 py-3 shadow-ds-low rounded-ds-lg border border-dsNeutral-100 bg-white">
+                    <div className="flex items-center gap-3 mb-3">
+                        <PrimitiveAvatar
+                            size="md"
                             src={user.profilePictureUrl}
+                            name={user.fullName}
                             alt={user.fullName}
                         />
-                        <div className="flex w-full flex-col gap-0.5">
-                            <div className="flex items-center justify-between">
-                                <Typography variant="h6" color="blue-gray">
-                                    {user.fullName}
-                                </Typography>
-                                <div className="5 flex items-center gap-0">
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </CardHeader>
-                    <CardBody className="mb-6 p-0">
+                        <Typography className="text-ds-user-name text-dsNeutral-900">
+                            {user.fullName}
+                        </Typography>
+                    </div>
+                    <div>
                         {selectedImages.length > 0 && (
                             <div className="mt-4 flex gap-2 overflow-x-auto w-full max-w-full">
-                                {selectedImages.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        className="relative cursor-pointer"
+                                {selectedImages.map((item, index) => (
+                                    <button
+                                        type="button"
+                                        key={item.previewUrl}
+                                        className="relative block cursor-pointer border-0 bg-transparent p-0"
                                         onClick={() => removeImage(index)}
                                         title="Click to remove"
+                                        aria-label={`Remove selected image ${index + 1}`}
                                     >
                                         <img
-                                            src={URL.createObjectURL(file)}
-                                            alt={`preview-${index}`}
-                                            className="w-24 h-24 object-cover rounded-md"
+                                            src={item.previewUrl}
+                                            alt=""
+                                            className="w-24 h-24 object-cover rounded-control"
                                         />
-                                        <div
-                                            className="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 rounded-bl">
-                                            ✕
-                                        </div>
-                                    </div>
+                                        <span
+                                            className="absolute top-0 right-0 bg-dsScrim text-white p-0.5 rounded-bl"
+                                            aria-hidden="true">
+                                            <X size={12} strokeWidth={2}/>
+                                        </span>
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -160,14 +166,14 @@ function AddPost() {
                                       containerProps={{ className: "grid h-full rounded-md" }}
                                       placeholder={`What's going on in your mind, ${user.name}?`} rows={6}/>
                         </div>
-                    </CardBody>
-                        <div className="flex w-full items-center gap-1">
+                    </div>
+                        <div className="flex w-full items-center gap-1 mt-3">
                             <label
                                 htmlFor={imageInputId}
                                 className="
                                  p-2 rounded-full
-                                 hover:bg-gray-100
-                                    focus:outline-none focus:ring-2 focus:ring-gray-400
+                                 hover:bg-dsNeutral-100
+                                    focus:outline-none focus:ring-2 focus:ring-dsFocusRing
                                 cursor-pointer
                                  transition"
                                 aria-label="Upload images"
@@ -193,18 +199,51 @@ function AddPost() {
                                 accept="image/*"
                                 multiple
                                 ref={fileInputRef}
+                                className="hidden"
                                 onChange={(e) => {
                                     const files = Array.from(e.target.files);
-                                    setSelectedImages(prev => [...prev, ...files]);
+                                    e.target.value = "";
+                                    if (files.length === 0) return;
+
+                                    const {valid, rejected} = validateUploadFiles(files);
+                                    const remainingSlots = Math.max(0, MAX_POST_IMAGES - selectedImages.length);
+                                    const withinCount = valid.slice(0, remainingSlots);
+                                    const droppedForCount = valid.slice(withinCount.length);
+
+                                    const existingTotalSize = selectedImages.reduce((sum, {file}) => sum + file.size, 0);
+                                    const {valid: accepted, rejected: rejectedForTotalSize} = validateUploadFiles(withinCount, {
+                                        maxTotalSize: MAX_POST_IMAGES_TOTAL_SIZE,
+                                        existingTotalSize,
+                                    });
+
+                                    if (rejected.length > 0 || droppedForCount.length > 0 || rejectedForTotalSize.length > 0) {
+                                        const messages = [
+                                            ...rejected.map(({file, reason}) => `${file.name}: ${describeRejectionReason(reason)}`),
+                                            ...rejectedForTotalSize.map(({file, reason}) => `${file.name}: ${describeRejectionReason(reason)}`),
+                                            ...(droppedForCount.length > 0 ? [`You can upload up to ${MAX_POST_IMAGES} images per post.`] : []),
+                                        ];
+                                        Swal.fire("Some files were not added", messages.join("\n"), "warning");
+                                    }
+
+                                    if (accepted.length === 0) return;
+
+                                    const newItems = accepted.map((file) => ({
+                                        file,
+                                        previewUrl: URL.createObjectURL(file),
+                                    }));
+                                    setSelectedImages(prev => [...prev, ...newItems]);
                                 }}
-                                style={{display: 'none'}}
                             />
-                            <EmojiLibrary onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}/>
-                        </div>
-                        <div className="flex justify-end gap-2">
+                            <EmojiLibrary
+                                icon={Smile}
+                                triggerClassName="p-2 rounded-full hover:bg-dsNeutral-100 transition text-dsNeutral-600"
+                                triggerLabel="Choose emoji"
+                                onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}
+                            />
+                            <div className="flex-1"/>
                             <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting}/>
                         </div>
-                </Card>
+                </div>
 
             </div>
 

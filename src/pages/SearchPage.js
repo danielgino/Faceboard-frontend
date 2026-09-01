@@ -1,59 +1,65 @@
+import { SearchX } from "lucide-react";
 import { useSearch } from "../context/SearchProvider";
-import { Avatar } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import { PROFILE_PAGE } from "../utils/Utils";
-import  {useEffect, useState} from "react";
 import Search from "../components/interaction/Search";
+import {useIsMobile} from "../hooks/useIsMobile";
+import {Avatar as PrimitiveAvatar} from "../components/common/Avatar";
+import LoadingSpinner from "../assets/loaders/LoadingSpinner";
 
+// Fidelity reconciliation (Phase G): rebuilt against the Design System's
+// SearchResult card (#people) - 56px avatar, name, "View profile" text
+// link, compact card - instead of a large left-aligned row. Also wires up
+// SearchProvider's existing `loading` flag, which this page never consumed
+// before (a real gap, not a design-token issue - no new API/state added).
+// Query state ownership, debounce, request cancellation, and result
+// routing are all unchanged - only presentation changed.
 function SearchPage() {
-    const { searchResults } = useSearch();
-    const [isMobile, setIsMobile] = useState(false);
+    const { searchResults, search, loading } = useSearch();
+    const isMobile = useIsMobile();
 
+    const hasQuery = search.trim().length > 0;
 
-
-    useEffect(() => {
-        const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
-        checkIsMobile();
-        window.addEventListener("resize", checkIsMobile);
-        return () => window.removeEventListener("resize", checkIsMobile);
-    }, []);
     return (
-        <div className="w-full px-6 py-8 bg-gray-100 min-h-screen">
-            {isMobile?
-            <div className="flex justify-center mb-6">
-                <Search/>
-            </div>
-            :""}
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8">
+            {isMobile && (
+                <div className="flex justify-center mb-6">
+                    <Search/>
+                </div>
+            )}
 
-            <h2 className="text-center text-xl font-bold text-gray-800 mb-8">
+            <h1 className="text-center text-ds-page-title text-dsNeutral-900 mb-6">
                 Search Results
-            </h2>
+            </h1>
 
-            {searchResults.length === 0 ? (
-                <p className="text-center text-gray-500">No users found.</p>
+            {loading ? (
+                <div className="flex justify-center py-10">
+                    <LoadingSpinner className="w-6 h-6 text-dsBrand-600" />
+                </div>
+            ) : searchResults.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center py-14 bg-white border border-dsNeutral-100 rounded-ds-lg max-w-md mx-auto">
+                    <SearchX className="w-8 h-8 text-dsNeutral-200 mb-2" strokeWidth={1.75} />
+                    <p className="text-ds-body text-dsNeutral-500">
+                        {hasQuery ? `No results for "${search}"` : "No users found."}
+                    </p>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {searchResults.map((user) => (
                         <div
                             key={user.id}
-                            className="bg-white shadow-lg rounded-lg p-6 flex items-center space-x-4 hover:shadow-xl transition"
+                            className="bg-white border border-dsNeutral-100 rounded-ds-lg p-4 flex flex-col items-center gap-2 text-center"
                         >
-                            <Avatar
-                                src={user.profilePictureUrl}
-                                alt={user.fullName}
-                                className="w-16 h-16"
-                            />
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-800">
-                                    {user.fullName}
-                                </h2>
-                                <Link
-                                    to={PROFILE_PAGE(user.id)}
-                                    className="mt-2 text-blue-500 hover:underline block"
-                                >
-                                    View Profile
-                                </Link>
-                            </div>
+                            <PrimitiveAvatar src={user.profilePictureUrl} name={user.fullName} alt={user.fullName} size={56} />
+                            <p className="text-ds-user-name text-dsNeutral-900 truncate max-w-full">
+                                {user.fullName}
+                            </p>
+                            <Link
+                                to={PROFILE_PAGE(user.id)}
+                                className="text-ds-caption font-semibold text-dsBrand-600 hover:text-dsBrand-700"
+                            >
+                                View profile
+                            </Link>
                         </div>
                     ))}
                 </div>

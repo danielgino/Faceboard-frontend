@@ -3,7 +3,7 @@
 function InputAlerts({text,onClose}){
 
 return (
-    <div className="mt-12 mx-4 px-4 rounded-md border-l-4 border-red-500 bg-red-50 md:max-w-2xl md:mx-auto md:px-8">
+    <div className="rounded-lg border border-red-200 border-l-4 border-l-red-500 bg-red-50 px-4">
         <div className="flex justify-between py-3">
             <div className="flex">
                 <div>

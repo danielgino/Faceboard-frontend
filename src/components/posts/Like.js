@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Tooltip, Typography } from "@material-tailwind/react";
+import { Tooltip } from "@material-tailwind/react";
 import HeartIcon from "../../Icons/HeartIcon";
-import { ADD_LIKE_API } from "../../utils/Utils";
+import { ADD_LIKE_API, fetchWithAuth, JWT_STORAGE_KEY } from "../../utils/Utils";
 import LikeList from "../interaction/LikeList"
 function Like({ postId, likeCount, likedByCurrentUser }) {
     const [likes, setLikes] = useState(likeCount ?? 0);
@@ -13,7 +13,7 @@ function Like({ postId, likeCount, likedByCurrentUser }) {
         if (loading) return;
         setLoading(true);
 
-        const token = localStorage.getItem("jwtToken");
+        const token = localStorage.getItem(JWT_STORAGE_KEY);
         if (!token) {
             alert("User not authenticated");
             setLoading(false);
@@ -25,11 +25,10 @@ function Like({ postId, likeCount, likedByCurrentUser }) {
         };
 
         try {
-            const response = await fetch(ADD_LIKE_API, {
+            const response = await fetchWithAuth(ADD_LIKE_API, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify(likeData)
             });
@@ -52,17 +51,17 @@ function Like({ postId, likeCount, likedByCurrentUser }) {
         }
     };
     return (
-        <div className="flex items-center gap-1">
-            <div className="flex items-center h-6">
-                    <HeartIcon liked={liked} handleLikes={handleLikes} loading={loading} />
-            </div>
+        <div className="flex items-center gap-1.5">
+            <HeartIcon liked={liked} handleLikes={handleLikes} loading={loading} />
             <Tooltip content={`${likes} Likes`}>
-                <Typography
-                    className="font-bold text-sm ml-1 text-gray-700 cursor-pointer hover:underline"
+                <button
+                    type="button"
+                    className="text-ds-caption font-semibold text-dsNeutral-600 hover:underline border-0 bg-transparent p-0 cursor-pointer"
                     onClick={() => setShowLikeList(true)}
+                    aria-label={`View who liked this post (${likes})`}
                 >
                     {likes}
-                </Typography>
+                </button>
             </Tooltip>
             {showLikeList && (
                 <LikeList
