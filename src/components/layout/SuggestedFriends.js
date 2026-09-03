@@ -4,7 +4,24 @@ import { Avatar as PrimitiveAvatar } from "../common/Avatar";
 // at a smaller size for this card. Kept local rather than reusing the full
 // FriendshipActionButton, which needs a live FriendshipStatus plus
 // accept/decline/remove wiring this sidebar preview doesn't have.
-function AddButton({ pending, onClick }) {
+function AddButton({ pending, disabled, onClick }) {
+    // Demo Mode: a genuinely disabled control (native `disabled`, not just styling) - clicking it
+    // cannot fire onClick, so no friend-request API call can ever be sent from here. Distinct from
+    // the `pending` ("Sent") state below, which would otherwise misleadingly imply a request had
+    // already gone through.
+    if (disabled) {
+        return (
+            <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Adding friends is disabled in Demo Mode."
+                className="flex-shrink-0 h-7 px-3 rounded-control bg-dsNeutral-100 text-dsNeutral-300 text-[11px] font-semibold cursor-not-allowed"
+            >
+                Add
+            </button>
+        );
+    }
     if (pending) {
         return (
             <span className="flex-shrink-0 h-7 px-3 rounded-control bg-white text-dsNeutral-300 border border-dsNeutral-100 text-[11px] font-semibold flex items-center cursor-not-allowed">
@@ -30,7 +47,7 @@ function AddButton({ pending, onClick }) {
 // the real GET /friendship/suggestions integration) rather than fetching
 // anything itself - this component doesn't know or care where the data
 // came from.
-function SuggestedFriends({ suggestions = [], pendingIds = [], onAdd, onShowMore }) {
+function SuggestedFriends({ suggestions = [], pendingIds = [], onAdd, onShowMore, disabled = false }) {
     if (suggestions.length === 0) return null;
 
     return (
@@ -47,7 +64,7 @@ function SuggestedFriends({ suggestions = [], pendingIds = [], onAdd, onShowMore
                                 <p className="text-ds-handle text-dsNeutral-500 truncate">@{person.username}</p>
                             </div>
                         </div>
-                        <AddButton pending={pendingIds.includes(person.id)} onClick={() => onAdd?.(person.id)} />
+                        <AddButton pending={pendingIds.includes(person.id)} disabled={disabled} onClick={() => onAdd?.(person.id)} />
                     </div>
                 ))}
             </div>

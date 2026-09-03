@@ -1,0 +1,107 @@
+/* Demo Mode neon border - shared decoration for the "Explore as Demo User" Login CTA and
+   DemoModeBanner. Faceboard brand colors only (dsBrand-100/500/600/700 oklch values).
+
+   Perimeter-tracing runner: an SVG rounded-rect OUTLINE (`fill: none`, stroke only) via the
+   <DemoNeonBorder> component - a static dim "track" rect plus a "runner" rect whose
+   `stroke-dasharray`/`stroke-dashoffset` animate a short bright segment along the same path.
+   Since both rects have `fill: none`, nothing ever paints the shape's interior, so this can't
+   read as a rotating wedge - only which segment of the outline is bright changes.
+
+   `isolation: isolate` on the host + the SVG's `z-index: -1` keeps it behind the host's own
+   text/icon without touching that markup; `pointer-events: none` keeps it non-interactive. The
+   SVG never extends past the host's own box, so it can't cause horizontal scrolling or clip
+   against an ancestor with `overflow-x: hidden` (e.g. Feed.js's content wrapper). */
+
+.demo-neon-border {
+    --demo-neon-track: oklch(95% 0.025 275); /* dsBrand-100 */
+    --demo-neon-c1: oklch(56% 0.17 275); /* dsBrand-500 */
+    --demo-neon-c2: oklch(46% 0.18 275); /* dsBrand-600 */
+    --demo-neon-c3: oklch(38% 0.16 275); /* dsBrand-700 */
+    position: relative;
+    isolation: isolate;
+}
+
+.demo-neon-border-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.demo-neon-border-track,
+.demo-neon-border-runner {
+    x: 1px;
+    y: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    fill: none;
+}
+
+.demo-neon-border-track {
+    stroke: var(--demo-neon-track);
+    stroke-width: 2;
+}
+
+.demo-neon-border-runner {
+    stroke: var(--demo-neon-c2);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    animation: demo-neon-runner-move linear infinite;
+}
+
+@keyframes demo-neon-runner-move {
+    to {
+        stroke-dashoffset: -100;
+    }
+}
+
+/* Button variant: the primary CTA (recruiters/visitors land here first), so the brighter, faster,
+   more noticeable runner. rx matches Button.js's own `rounded-control` token (10px). */
+.demo-neon-border-svg--button .demo-neon-border-track,
+.demo-neon-border-svg--button .demo-neon-border-runner {
+    rx: 10px;
+}
+
+.demo-neon-border-svg--button .demo-neon-border-runner {
+    stroke-dasharray: 20 80;
+    animation-duration: 3.2s;
+    filter: drop-shadow(0 0 3px oklch(56% 0.17 275 / 0.7));
+}
+
+.demo-neon-border--button {
+    box-shadow: 0 0 14px 0 oklch(56% 0.17 275 / 0.3);
+    transition: box-shadow 200ms ease-out;
+}
+
+.demo-neon-border--button:hover,
+.demo-neon-border--button:focus-visible {
+    box-shadow: 0 0 20px 2px oklch(56% 0.17 275 / 0.45);
+}
+
+/* Banner variant: slower, softer, and a longer trailing segment - reinforces "you're in Demo
+   Mode" without competing with the Feed content underneath it. rx matches the banner's own
+   `rounded-ds-lg` token (16px). */
+.demo-neon-border-svg--banner .demo-neon-border-track,
+.demo-neon-border-svg--banner .demo-neon-border-runner {
+    rx: 16px;
+}
+
+.demo-neon-border-svg--banner .demo-neon-border-runner {
+    stroke-width: 2;
+    stroke-dasharray: 18 82;
+    animation-duration: 7s;
+    filter: drop-shadow(0 0 2px oklch(56% 0.17 275 / 0.4));
+}
+
+.demo-neon-border--banner {
+    box-shadow: 0 0 10px 0 oklch(56% 0.17 275 / 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .demo-neon-border-runner {
+        animation: none;
+        stroke-dasharray: none;
+    }
+}

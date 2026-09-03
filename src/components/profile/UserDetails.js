@@ -39,17 +39,29 @@ const DETAILS_MAX_WIDTH = fluid(384, 560);
      const [friendStatus, setFriendStatus] = useState(null);
 
 
+     // M-GAL1 fix: waits for the session's own `user` to have loaded before fetching the viewed
+     // profile/gallery at all - this component already shows a loading skeleton the whole time
+     // `!user` anyway (see `isLoading` below), so this adds no visible delay. Without this gate,
+     // a direct page load/refresh on a profile URL could fire this fetch while `user` (and so
+     // `user.demo`, the gallery source's own session-level gate) was still unresolved, sending
+     // the gallery fetch down the real-backend path even for a Demo session - and nothing then
+     // reliably corrected it back to the local Demo gallery afterward. Passing
+     // fetchUserDetailsById's OWN return value (the just-fetched profile) to fetchUserPostImages,
+     // rather than reading `otherUser` state, avoids a second, independent one-render-behind race
+     // on top: `otherUser` only commits a render after the response arrives, but the response
+     // data itself is already in hand right here.
+     const hasUser = !!user;
      useEffect(() => {
          const fetchData = async () => {
-             if (otherUserId) {
+             if (otherUserId && hasUser) {
                  clearOtherUser();
-                 await fetchUserDetailsById(otherUserId);
-                 await fetchUserPostImages(otherUserId);
+                 const viewedProfile = await fetchUserDetailsById(otherUserId);
+                 await fetchUserPostImages(otherUserId, viewedProfile?.username);
              }
          };
 
          fetchData();
-     }, [otherUserId, clearOtherUser, fetchUserDetailsById, fetchUserPostImages]);
+     }, [otherUserId, hasUser, clearOtherUser, fetchUserDetailsById, fetchUserPostImages]);
 
      const currentUser = otherUserId ? otherUser : user;
      const isOwnProfile = user && Number(user.id) === Number(otherUserId);

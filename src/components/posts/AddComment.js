@@ -10,7 +10,7 @@ import { Avatar as PrimitiveAvatar } from "../common/Avatar";
 const MAX_TEXTAREA_HEIGHT = 120; // px — roughly 5-6 lines before it scrolls internally
 
 function AddComment({ postId, onCommentAdded }) {
-    const { user } = useUser();
+    const { user, isDemo } = useUser();
     const [commentText, setCommentText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
@@ -31,7 +31,7 @@ function AddComment({ postId, onCommentAdded }) {
     const handleSubmit = async (e) => {
         e?.preventDefault?.();
 
-        if (isSubmitting) return;
+        if (isSubmitting || isDemo) return;
 
         if (!commentText.trim()) {
             Swal.fire({
@@ -101,7 +101,7 @@ function AddComment({ postId, onCommentAdded }) {
         textareaRef.current?.focus();
     };
 
-    const canSubmit = commentText.trim().length > 0 && !isSubmitting;
+    const canSubmit = commentText.trim().length > 0 && !isSubmitting && !isDemo;
 
     return (
         <form
@@ -136,10 +136,11 @@ function AddComment({ postId, onCommentAdded }) {
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={() => setIsComposing(false)}
                         rows={1}
-                        placeholder="Write a comment..."
+                        placeholder={isDemo ? "Demo mode is read-only." : "Write a comment..."}
+                        disabled={isDemo}
                         aria-label="Comment text"
                         aria-describedby={`${taId}-help`}
-                        className="flex-1 min-w-0 resize-none bg-transparent border-0 outline-none focus:ring-0 text-ds-body text-dsNeutral-900 placeholder:text-dsNeutral-500 py-1.5 max-h-[120px] overflow-y-auto leading-5"
+                        className="flex-1 min-w-0 resize-none bg-transparent border-0 outline-none focus:ring-0 text-ds-body text-dsNeutral-900 placeholder:text-dsNeutral-500 py-1.5 max-h-[120px] overflow-y-auto leading-5 disabled:cursor-not-allowed disabled:opacity-60"
                     />
                     <span id={`${taId}-help`} className="sr-only">
                         Press Enter to submit, Shift and Enter for a new line
@@ -149,7 +150,7 @@ function AddComment({ postId, onCommentAdded }) {
                         type="submit"
                         disabled={!canSubmit}
                         aria-label="Post comment"
-                        title="Post comment"
+                        title={isDemo ? "Commenting is disabled in Demo Mode." : "Post comment"}
                         className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-dsBrand-600 hover:bg-dsBrand-50 active:scale-95 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-dsBrand-600"
                     >
                         {isSubmitting ? (

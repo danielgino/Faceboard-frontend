@@ -1,13 +1,15 @@
 import {Camera, Trash2} from "lucide-react";
 import {Typography} from "@material-tailwind/react";
 import SectionCard from "../common/SectionCard";
+import DemoReadOnlyNotice from "../common/DemoReadOnlyNotice";
 
 // Avatar display (with initials fallback) + upload/remove controls. Owns
 // the remove-picture confirm dialog since it's local to this button; the
 // actual upload/remove API calls stay owned by useProfilePictureUpload in
 // Settings, passed down already-bound.
-function ProfilePictureSettings({user, uploading, onFileChange, onRemove}) {
+function ProfilePictureSettings({user, uploading, onFileChange, onRemove, disabled = false}) {
     const handleRemoveClick = () => {
+        if (disabled) return;
         if (window.confirm("Remove your profile picture?")) {
             onRemove();
         }
@@ -42,21 +44,23 @@ function ProfilePictureSettings({user, uploading, onFileChange, onRemove}) {
                 </Typography>
 
                 <div className="flex gap-3 mt-4">
-                    <label className={`flex items-center gap-2 px-4 py-2 rounded-full bg-dsNeutral-100 hover:bg-dsNeutral-200 text-dsNeutral-600 text-sm font-medium transition cursor-pointer ${uploading ? "opacity-60 pointer-events-none" : ""}`}>
-                        <input type="file" onChange={onFileChange} className="hidden" accept="image/*" disabled={uploading} />
+                    <label className={`flex items-center gap-2 px-4 py-2 rounded-full bg-dsNeutral-100 hover:bg-dsNeutral-200 text-dsNeutral-600 text-sm font-medium transition cursor-pointer ${(uploading || disabled) ? "opacity-60 pointer-events-none" : ""}`}>
+                        <input type="file" onChange={onFileChange} className="hidden" accept="image/*" disabled={uploading || disabled} />
                         <Camera size={16} />
                         {uploading ? "Uploading..." : "Change profile picture"}
 
                     </label>
                     <button
                         onClick={handleRemoveClick}
-                        disabled={uploading}
+                        disabled={uploading || disabled}
+                        title={disabled ? "Editing your profile picture is disabled in Demo Mode." : undefined}
                         className="flex items-center gap-2 px-4 py-2 rounded-full text-dsDestructive hover:bg-dsDestructive/10 text-sm font-medium transition disabled:opacity-60"
                     >
                         <Trash2 size={16} />
                         Remove
                     </button>
                 </div>
+                {disabled && <DemoReadOnlyNotice message="Demo Mode — profile picture cannot be edited." />}
             </div>
         </SectionCard>
     );

@@ -8,12 +8,13 @@ import { Heart } from 'lucide-react';
 // before, so Like.js - the only consumer - needed no changes at all;
 // handleLikes is still called with no arguments on click, exactly as it
 // always ignored the checkbox's own event value previously.
-const HeartIcon = ({ handleLikes, liked, loading }) => {
+const HeartIcon = ({ handleLikes, liked, loading, disabled, title }) => {
     return (
         <button
             type="button"
             onClick={() => handleLikes?.()}
-            disabled={loading}
+            disabled={loading || disabled}
+            title={title}
             aria-label={liked ? 'Unlike' : 'Like'}
             aria-pressed={liked}
             className="flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-60"

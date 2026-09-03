@@ -1,6 +1,30 @@
 import { handleUnauthorized, JWT_STORAGE_KEY } from "./authCleanup";
+import Swal from "./swalTheme";
 
 export { JWT_STORAGE_KEY };
+
+// Demo Mode: backend-authoritative denial codes from DemoAccessFilter (see
+// DemoAccessFilter.java) - DEMO_READ_ONLY for any mutation attempt, DEMO_ACCESS_DENIED for a
+// read outside the Demo allowlist. Centralized here (fetchWithAuth is the one choke point nearly
+// every API call already goes through) instead of touching every mutation component
+// individually - real users never see this, since the backend never returns these codes for a
+// ROLE_USER session.
+const DEMO_DENIAL_MESSAGES = {
+    DEMO_READ_ONLY: "Demo mode is read-only.",
+    DEMO_ACCESS_DENIED: "This isn't available in Demo mode.",
+};
+
+const showDemoDenialToast = (message) => {
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "info",
+        title: message,
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+    });
+};
 
 export const getRandomUsers = (users, count) => {
     if (!users || users.length === 0) return [];
@@ -147,6 +171,21 @@ export const fetchWithAuth = async (url, options = {}) => {
         handleUnauthorized(LOGIN_PAGE);
     }
 
+    if (response.status === 403) {
+        // Read via a clone so the original response body stream is left untouched for the
+        // caller - fetchWithAuth's contract is to hand back the real Response unmodified.
+        try {
+            const body = await response.clone().json();
+            const message = body && DEMO_DENIAL_MESSAGES[body.code];
+            if (message) {
+                showDemoDenialToast(message);
+            }
+        } catch (e) {
+            // Not a JSON body (e.g. a non-Demo 403) - nothing to surface here, caller's own
+            // error handling takes over as before.
+        }
+    }
+
     return response;
 };
 
@@ -217,6 +256,7 @@ export const FORGOT_PASSWORD_API=`${API_BASE_URL}/auth/forgot-password`
 //API PROVIDERS
 export const SIGNUP_API       = `${API_BASE_URL}/user/register`;
 export const LOGIN_API        = `${API_BASE_URL}/auth/login`;
+export const DEMO_LOGIN_API   = `${API_BASE_URL}/auth/demo`;
 export const SETTINGS_API     = `${API_BASE_URL}/user/settings`;
 //USER PROVIDERS
 

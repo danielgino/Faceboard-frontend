@@ -23,9 +23,44 @@ jest.mock("sweetalert2", () => ({
     mixin: () => ({ fire: (...args) => mockSwalFire(...args) }),
 }));
 
+let mockIsDemo = false;
+jest.mock("../../../context/UserProvider", () => ({
+    useUser: () => ({ isDemo: mockIsDemo }),
+}));
+
 beforeEach(() => {
     mockFetchWithAuth.mockReset();
     mockSwalFire.mockClear();
+    mockIsDemo = false;
+});
+
+// Demo Mode: password inputs and Save Changes must be genuinely disabled (native `disabled`),
+// and submitting must never issue the PUT even if triggered some other way (defense in depth
+// behind the backend's own DEMO_READ_ONLY rejection).
+describe("Demo Mode", () => {
+    beforeEach(() => {
+        mockIsDemo = true;
+    });
+
+    test("password fields and Save Changes are disabled, and no request is ever sent", async () => {
+        render(<PasswordSettings />);
+
+        expect(screen.getByLabelText("Current Password")).toBeDisabled();
+        expect(screen.getByLabelText("New Password")).toBeDisabled();
+        expect(screen.getByLabelText("Confirm New Password")).toBeDisabled();
+        const saveButton = screen.getByText("Save Changes");
+        expect(saveButton).toBeDisabled();
+
+        fireEvent.click(saveButton);
+
+        expect(mockFetchWithAuth).not.toHaveBeenCalled();
+    });
+
+    test("shows the Demo Mode read-only notice", () => {
+        render(<PasswordSettings />);
+
+        expect(screen.getByText(/Demo Mode.*password cannot be changed/i)).toBeInTheDocument();
+    });
 });
 
 test("shows the shared password-validation message while typing an invalid new password", () => {

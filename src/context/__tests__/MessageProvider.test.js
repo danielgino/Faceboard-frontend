@@ -158,6 +158,35 @@ test("stops requesting once a returned page is smaller than the page size", asyn
     expect(mockFetchWithAuth.mock.calls.length).toBe(callsBeforeExtraClick);
 });
 
+test("Demo Chat crash regression: a denied/failed conversation fetch (e.g. a 403 JSON error body, as returned by DemoAccessFilter for a not-yet-allowlisted endpoint) never crashes and never stores a non-array value that a later .map() call would throw on", async () => {
+    mockFetchWithAuth.mockImplementation(async (url) => {
+        if (url.includes("unread-summary")) {
+            return { ok: true, json: async () => ({}) };
+        }
+        // Exactly the shape that crashed Chat: a plain error object instead of an array.
+        return {
+            ok: false,
+            status: 403,
+            json: async () => ({ code: "DEMO_ACCESS_DENIED", message: "This is not available in Demo mode." }),
+        };
+    });
+
+    render(
+        <MessageProvider>
+            <Consumer />
+        </MessageProvider>
+    );
+
+    // Must not throw - this is the actual regression being guarded against.
+    await act(async () => {
+        fireEvent.click(screen.getByText("initial"));
+    });
+
+    // And must not have stored the error object as if it were the messages array.
+    expect(screen.getByTestId("ids").textContent).toBe("");
+    expect(screen.getByTestId("hasMore").textContent).toBe("false");
+});
+
 test("does not issue a second overlapping request while one is already in flight", async () => {
     queueConversationResponse(makeBatch(Array.from({ length: 50 }, (_, i) => i + 51)));
 

@@ -23,7 +23,7 @@ function AddPost() {
     const selectedImagesRef = useRef(selectedImages);
     selectedImagesRef.current = selectedImages;
     const fileInputRef = useRef();
-    const {user}=useUser();
+    const {user, isDemo}=useUser();
     const [isPosting, setIsPosting] = useState(false);
     const {addPost}=usePosts()
     const uid = useId();
@@ -55,7 +55,7 @@ function AddPost() {
         });
     };
     const handlePostSubmit = async () => {
-        if (isPosting) return;
+        if (isPosting || isDemo) return;
 
         const cleanedText = postText.trim();
         if (cleanedText === '' && selectedImages.length === 0) {
@@ -160,28 +160,31 @@ function AddPost() {
                                       name="postText"
                                       onChange={handlePostChange}
                                       variant="static"
+                                      disabled={isDemo}
                                       aria-describedby={`${postContentId}-help`}
                                       label=" "
                                       labelProps={{ htmlFor: postContentId, className: "sr-only", "aria-hidden": true }}
                                       containerProps={{ className: "grid h-full rounded-md" }}
-                                      placeholder={`What's going on in your mind, ${user.name}?`} rows={6}/>
+                                      placeholder={isDemo ? "Posting is disabled in Demo Mode." : `What's going on in your mind, ${user.name}?`} rows={6}/>
                         </div>
                     </div>
                         <div className="flex w-full items-center gap-1 mt-3">
                             <label
                                 htmlFor={imageInputId}
-                                className="
+                                className={`
                                  p-2 rounded-full
                                  hover:bg-dsNeutral-100
                                     focus:outline-none focus:ring-2 focus:ring-dsFocusRing
                                 cursor-pointer
-                                 transition"
+                                 transition ${isDemo ? "opacity-40 pointer-events-none cursor-not-allowed" : ""}`}
                                 aria-label="Upload images"
-                                title="Upload images"
+                                title={isDemo ? "Uploading images is disabled in Demo Mode." : "Upload images"}
                                 role="button"
-                                tabIndex={0}
-                                onClick={() => fileInputRef.current?.click()}
+                                tabIndex={isDemo ? -1 : 0}
+                                aria-disabled={isDemo || undefined}
+                                onClick={() => { if (!isDemo) fileInputRef.current?.click(); }}
                                 onKeyDown={(e) => {
+                                    if (isDemo) return;
                                     if (e.key === "Enter" || e.key === " ") {
                                         e.preventDefault();
                                         fileInputRef.current?.click();
@@ -200,6 +203,7 @@ function AddPost() {
                                 multiple
                                 ref={fileInputRef}
                                 className="hidden"
+                                disabled={isDemo}
                                 onChange={(e) => {
                                     const files = Array.from(e.target.files);
                                     e.target.value = "";
@@ -241,7 +245,7 @@ function AddPost() {
                                 onEmojiClick={(emoji) => setPostText(prev => prev + emoji.emoji)}
                             />
                             <div className="flex-1"/>
-                            <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting}/>
+                            <ShareButton onClick={handlePostSubmit} text={"Share"} loading={isPosting} disabled={isDemo}/>
                         </div>
                 </div>
 

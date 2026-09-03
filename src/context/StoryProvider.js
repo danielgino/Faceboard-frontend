@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
 import {useUser} from "./UserProvider";
 import {fetchWithAuth, GET_FRIENDS_STORIES_API, UPLOAD_STORY_API} from "../utils/Utils";
+import {getDemoStories} from "./demoStories";
 
 const StoryContext = createContext();
 
@@ -12,6 +13,13 @@ export const StoryProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const fetchStories = useCallback(async () => {
         if (!user) return null;
+        // Demo Mode: GET /api/stories/friends is not on the Demo allowlist (see demoStories.js's
+        // own comment for why) - a Demo session gets the fixed local mock list with no backend
+        // request at all, instead of a 403.
+        if (user.demo) {
+            setStories(getDemoStories());
+            return null;
+        }
         setLoading(true);
         try {
             const response = await fetchWithAuth(GET_FRIENDS_STORIES_API);
@@ -38,6 +46,13 @@ export const StoryProvider = ({ children }) => {
         }
     }, [user, fetchStories]);
     const uploadStory = async (file, caption) => {
+        // Demo Mode: read-only - never call the excluded upload endpoint. StoryBar.js already
+        // disables the "Your story" control so this path shouldn't normally be reachable for a
+        // Demo session, but this stays a real, independent guard rather than relying solely on
+        // that UI state, matching how every other Demo mutation guard in this app is layered.
+        if (user?.demo) {
+            return null;
+        }
         const formData = new FormData();
         formData.append("file", file);
         if (caption) formData.append("caption", caption);

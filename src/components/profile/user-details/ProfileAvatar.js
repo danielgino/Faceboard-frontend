@@ -16,7 +16,7 @@ function ProfileAvatar({imageUrl, name, isOwnProfile, uploading, onFileChange, o
                 <PrimitiveAvatar src={imageUrl} name={name} alt={`${name}'s profile picture`} size={96} className="shadow-[0_0_0_4px_#fff]" />
 
                 {isOwnProfile && (
-                    <div className="absolute -bottom-1 -right-1 flex items-center gap-1.5">
+                    <div className="absolute -bottom-1 right-0 flex items-center gap-1.5">
                         <label className="cursor-pointer">
                             <input
                                 type="file"

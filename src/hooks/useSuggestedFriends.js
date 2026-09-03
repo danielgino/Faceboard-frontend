@@ -13,8 +13,19 @@ import { useFriendship } from "../context/FriendshipProvider";
 // without needing any new prop on that component.
 const SUGGESTIONS_PAGE_SIZE = 3;
 
+// Demo Mode: GET /friendship/suggestions is not on the Demo allowlist, so a small static mock
+// list is used instead - pure frontend data, no backend request, nothing to scope or leak.
+// Fictional people, not the seeded demo_alex/demo_jamie/demo_sam accounts (demo_user is already
+// friends with all three, so showing them again as "suggested" would be a contradiction).
+// Negative ids make clear at a glance these never came from the backend.
+const MOCK_DEMO_SUGGESTIONS = [
+    { id: -101, fullName: "Taylor Brooks", username: "taylor.brooks", profilePictureUrl: "/demo-assets/profiles/taylor-brooks.jpeg" },
+    { id: -102, fullName: "Morgan Lee", username: "morgan.lee", profilePictureUrl: "/demo-assets/profiles/morgan-lee.jpeg" },
+    { id: -103, fullName: "Casey Nguyen", username: "casey.nguyen", profilePictureUrl: "/demo-assets/profiles/casey-nguyen.jpeg" },
+];
+
 export function useSuggestedFriends() {
-    const { user } = useUser();
+    const { user, isDemo } = useUser();
     const { sendFriendRequest } = useFriendship();
 
     const [suggestions, setSuggestions] = useState([]);
@@ -110,8 +121,9 @@ export function useSuggestedFriends() {
     }, []);
 
     useEffect(() => {
+        if (isDemo) return; // Demo Mode: mock data below, no real request is ever issued.
         fetchPage(null, null, null, true);
-    }, [fetchPage]);
+    }, [fetchPage, isDemo]);
 
     const onAdd = async (id) => {
         setPendingIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -132,7 +144,14 @@ export function useSuggestedFriends() {
           }
         : undefined;
 
-    return { suggestions, pendingIds, onAdd, onShowMore };
+    // Demo Mode: fixed mock list, no pagination, no Add (no friend-request API call must ever be
+    // sent for Demo) - `disabled: true` tells SuggestedFriends.js to render a non-interactive Add
+    // control instead of wiring onAdd up to anything.
+    if (isDemo) {
+        return { suggestions: MOCK_DEMO_SUGGESTIONS, pendingIds: [], onAdd: undefined, onShowMore: undefined, disabled: true };
+    }
+
+    return { suggestions, pendingIds, onAdd, onShowMore, disabled: false };
 }
 
 export default useSuggestedFriends;

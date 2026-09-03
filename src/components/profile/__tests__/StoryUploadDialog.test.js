@@ -22,6 +22,16 @@ jest.mock("sweetalert2-react-content", () => ({
     }),
 }));
 
+// The post-upload Success/Error popup uses the shared ThemedSwal (utils/swalTheme) directly,
+// same as every other plain title/text/icon popup in the app (SharePostModal, UserDetails, ...)
+// - mocked independently of the raw "sweetalert2" mock above, which only backs the file-picker/
+// caption steps' MySwal.
+const mockThemedSwalFire = jest.fn();
+jest.mock("../../../utils/swalTheme", () => ({
+    __esModule: true,
+    default: { fire: (...args) => mockThemedSwalFire(...args) },
+}));
+
 const openStoryUploadDialog = require("../StoryUploadDialog").default;
 
 function makeFile(name, { type = "image/png", size = 1024 } = {}) {
@@ -74,4 +84,46 @@ test("still shows the original message when no file was selected", async () => {
 
     expect(preConfirm(undefined)).toBeUndefined();
     expect(mockShowValidationMessage).toHaveBeenCalledWith("You need to select an image");
+});
+
+describe("post-upload result popup", () => {
+    function mockFileThenCaptionThenUploading() {
+        mockMySwalFire
+            .mockImplementationOnce(() => Promise.resolve({ value: makeFile("story.png") })) // file picker
+            .mockImplementationOnce(() => Promise.resolve({ value: "caption" })) // caption
+            .mockImplementationOnce(() => Promise.resolve({})); // "Uploading..." (not awaited by the dialog)
+    }
+
+    test("uses the shared ThemedSwal (not the raw MySwal) for a successful upload", async () => {
+        mockFileThenCaptionThenUploading();
+        const uploadStory = jest.fn(() => Promise.resolve({ id: "s1" }));
+        const fetchStories = jest.fn(() => Promise.resolve());
+
+        await openStoryUploadDialog(uploadStory, fetchStories);
+
+        expect(mockThemedSwalFire).toHaveBeenCalledWith({
+            title: "Success",
+            text: "Story uploaded!",
+            icon: "success",
+        });
+        // The result popup is themed identically to every other plain
+        // Faceboard popup - no toast/position/DS_SWAL_OPTS overrides.
+        expect(mockThemedSwalFire.mock.calls[0][0]).not.toHaveProperty("toast");
+        expect(mockThemedSwalFire.mock.calls[0][0]).not.toHaveProperty("buttonsStyling");
+    });
+
+    test("uses the shared ThemedSwal for a failed upload", async () => {
+        mockFileThenCaptionThenUploading();
+        const uploadStory = jest.fn(() => Promise.resolve(null));
+        const fetchStories = jest.fn();
+
+        await openStoryUploadDialog(uploadStory, fetchStories);
+
+        expect(mockThemedSwalFire).toHaveBeenCalledWith({
+            title: "Error",
+            text: "Upload failed",
+            icon: "error",
+        });
+        expect(fetchStories).not.toHaveBeenCalled();
+    });
 });

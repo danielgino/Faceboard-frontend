@@ -27,9 +27,10 @@ jest.mock("../../utils/Utils", () => ({
 }));
 
 let mockUser;
+let mockIsDemo;
 const mockSetUser = jest.fn();
 jest.mock("../../context/UserProvider", () => ({
-    useUser: () => ({ user: mockUser, setUser: mockSetUser }),
+    useUser: () => ({ user: mockUser, setUser: mockSetUser, isDemo: mockIsDemo }),
 }));
 
 beforeEach(() => {
@@ -42,8 +43,36 @@ beforeEach(() => {
         facebookUrl: "",
         instagramUrl: "",
     };
+    mockIsDemo = false;
     mockFetchWithAuth.mockReset();
     mockSetUser.mockReset();
+});
+
+// Demo Mode: the same Edit/Save control gates the profile-details fields and the Social Links
+// subsection (same card, no separate button) - disabling it here is enough to keep both
+// non-actionable without touching EditableField itself.
+describe("Demo Mode", () => {
+    beforeEach(() => {
+        mockIsDemo = true;
+    });
+
+    test("the Edit button is disabled and never issues a request when clicked", () => {
+        render(<Settings />);
+
+        const editButton = screen.getByRole("button", { name: "Edit" });
+        expect(editButton).toBeDisabled();
+
+        fireEvent.click(editButton);
+
+        expect(mockFetchWithAuth).not.toHaveBeenCalled();
+        expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
+    });
+
+    test("shows the Demo Mode read-only notice below the profile section", () => {
+        render(<Settings />);
+
+        expect(screen.getByText(/Demo Mode.*profile details cannot be edited/i)).toBeInTheDocument();
+    });
 });
 
 function pendingResponses() {
