@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { Maximize2 } from "lucide-react";
 import { useLightbox } from "../context/LightBoxContext";
-import { useUser } from "../context/UserProvider";
+import { useUser, getDemoGalleryImages } from "../context/UserProvider";
 import { useParams } from "react-router-dom";
 import NoAlbumYet from "../assets/loaders/NoAlbumYet";
 import AlbumPageLoader from "../assets/loaders/AlbumPageLoader";
@@ -9,7 +9,7 @@ import { fetchWithAuth, GET_USER_IMAGES_API } from "../utils/Utils";
 
 function Album() {
     const { openLightbox } = useLightbox();
-    const { user, otherUser } = useUser();
+    const { user, otherUser, fetchUserDetailsById } = useUser();
     const { userId } = useParams();
     const [userImages, setUserImages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +24,8 @@ function Album() {
     // 6. Fetching locally with the same ignore-flag pattern SinglePostPage.js
     // already uses (rather than relying on shared state a stale response
     // could clobber from outside this component) closes that race without
-    // touching UserProvider itself.
+    // touching UserProvider itself. The Demo branch below reuses the same
+    // `ignore` guard for its own async profile-resolution step.
     useEffect(() => {
         if (!userId) return;
         let ignore = false;
@@ -32,6 +33,21 @@ function Album() {
         setIsLoading(true);
         (async () => {
             try {
+                if (user?.demo) {
+                    // Demo Mode: GET /post/{userId}/all-post-images stays excluded from the Demo
+                    // allowlist - never called here. Resolves the viewed profile's username
+                    // directly (never from possibly-stale `otherUser`, which a direct/refreshed
+                    // /album/:userId visit may never have populated): own id needs no extra
+                    // request; any other id uses the same GET /user/by-id path UserDetails uses.
+                    const profileUsername = (Number(userId) === Number(user.id))
+                        ? user.username
+                        : (await fetchUserDetailsById(userId))?.username;
+                    if (!ignore) {
+                        setUserImages(getDemoGalleryImages(profileUsername));
+                    }
+                    return;
+                }
+
                 const response = await fetchWithAuth(GET_USER_IMAGES_API(userId));
                 if (!response.ok) throw new Error("Failed to fetch album images");
                 const images = await response.json();
@@ -50,7 +66,7 @@ function Album() {
         return () => {
             ignore = true;
         };
-    }, [userId]);
+    }, [userId, user?.demo, user?.id, user?.username, fetchUserDetailsById]);
     const currentUser = (user && Number(user.id) === Number(userId)) ? user : otherUser;
 
     if (isLoading) {

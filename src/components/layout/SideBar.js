@@ -39,7 +39,7 @@ export function SideBar() {
     const{user}=useUser()
     const { messages ,unreadByUser } = useMessages();
     const { notifications, unreadCount: notifUnreadCount, markAllAsRead } = useNotifications();
-    const { suggestions, pendingIds, onAdd: onAddSuggestedFriend, onShowMore: onShowMoreSuggestedFriends } = useSuggestedFriends();
+    const { suggestions, pendingIds, onAdd: onAddSuggestedFriend, onShowMore: onShowMoreSuggestedFriends, disabled: suggestedFriendsDisabled } = useSuggestedFriends();
     const { tip: safetyTip, loading: safetyTipLoading, onNext: onNextSafetyTip } = useSafetyTip();
 
     const unreadNotifications =
@@ -92,7 +92,7 @@ export function SideBar() {
                 suggestions from GET /friendship/suggestions (cursor/seed/wrapped
                 keyset pagination; "Show more" pages through it). This component
                 stays pure presentation. */}
-            <SuggestedFriends suggestions={suggestions} pendingIds={pendingIds} onAdd={onAddSuggestedFriend} onShowMore={onShowMoreSuggestedFriends} />
+            <SuggestedFriends suggestions={suggestions} pendingIds={pendingIds} onAdd={onAddSuggestedFriend} onShowMore={onShowMoreSuggestedFriends} disabled={suggestedFriendsDisabled} />
 
             {/* Data comes from useSafetyTip, which fetches a real tip from
                 GET /safety-tips/random (a curated static pool served by the

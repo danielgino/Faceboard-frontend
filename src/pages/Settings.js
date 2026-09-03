@@ -10,11 +10,12 @@ import {FACEBOOK_URL_REGEX, INSTAGRAM_URL_REGEX} from "../utils/Utils";
 import {isValidEmail} from "../utils/emailValidation";
 import ProfilePictureSettings from "../components/settings/ProfilePictureSettings";
 import PasswordSettings from "../components/settings/PasswordSettings";
+import DemoReadOnlyNotice from "../components/common/DemoReadOnlyNotice";
 
 
 
 function Settings(){
-    const {user,setUser}=useUser();
+    const {user,setUser,isDemo}=useUser();
     const { uploading, handleFileChange,handleRemoveProfilePicture } = useProfilePictureUpload();
     const { value: name, onSave: saveName, loading: nameLoading } = useAutoSaveField(user.name, "name",setUser);
     const { value: lastname, onSave: saveLastname, loading: lastnameLoading } = useAutoSaveField(user.lastname, "lastname",setUser);
@@ -43,6 +44,7 @@ function Settings(){
     ];
 
     const handleEditFieldsClick = () => {
+        if (isDemo) return;
         setIsEditingFields(true);
     };
 
@@ -88,6 +90,7 @@ function Settings(){
                 uploading={uploading}
                 onFileChange={handleFileChange}
                 onRemove={handleRemoveProfilePicture}
+                disabled={isDemo}
             />
 
             <SectionCard title="Profile Information">
@@ -118,7 +121,7 @@ function Settings(){
                 <div className="flex justify-center pt-6">
                     <Button
                         onClick={isEditingFields ? handleSaveFieldsClick : handleEditFieldsClick}
-                        disabled={savingFields}
+                        disabled={savingFields || isDemo}
                         loading={savingFields}
                         variant="primary"
                         className="w-full sm:w-auto"
@@ -126,6 +129,7 @@ function Settings(){
                         {isEditingFields ? (savingFields ? "Saving..." : "Save") : "Edit"}
                     </Button>
                 </div>
+                {isDemo && <DemoReadOnlyNotice message="Demo Mode — profile details cannot be edited." />}
             </SectionCard>
 
             <PasswordSettings />

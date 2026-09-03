@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from "../context/UserProvider";
 import {
+    DEMO_LOGIN_API,
     FORGOT_PASSWORD_PAGE,
     HOME_PAGE,
     JWT_STORAGE_KEY,
@@ -16,6 +17,8 @@ import {AuthTextField} from "../components/auth/AuthTextField";
 import {AuthPasswordField} from "../components/auth/AuthPasswordField";
 import {AuthPrimaryButton} from "../components/auth/AuthPrimaryButton";
 import {Button} from "../components/common/Button";
+import DemoNeonBorder from "../components/common/DemoNeonBorder";
+import "../assets/styles/DemoNeonBorder.css";
 
 
 function Login() {
@@ -25,6 +28,7 @@ function Login() {
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDemoSubmitting, setIsDemoSubmitting] = useState(false);
 
 
     const handleEmail = (event) => {
@@ -39,6 +43,41 @@ function Login() {
 
     const handleSignUpButton = () => {
         navigate(SIGNUP_PAGE);
+    };
+
+    // Demo Mode: mirrors handleLoginButton's token-store/fetch-user/navigate flow, but hits
+    // POST /auth/demo (no credentials) instead of /auth/login. Backend enforcement
+    // (DemoAccessFilter/ROLE_DEMO) is authoritative regardless of anything here.
+    const handleDemoButton = async () => {
+        if (isDemoSubmitting) return;
+        setIsDemoSubmitting(true);
+        setMessage("");
+
+        try {
+            const response = await fetchWithRetries(
+                DEMO_LOGIN_API,
+                { method: "POST" },
+                { maxAttempts: 3, delayMs: 2000, timeoutPerAttemptMs: 15000 }
+            );
+
+            if (response.ok) {
+                const responseText = await response.text();
+                localStorage.setItem(JWT_STORAGE_KEY, responseText);
+                await fetchUserDetails(responseText);
+                navigate(HOME_PAGE);
+            } else if (response.status === 404) {
+                setMessage("Demo mode is currently unavailable.");
+            } else if (response.status === 429) {
+                setMessage("Too many Demo requests right now, please try again shortly.");
+            } else {
+                setMessage("Could not start Demo session, please try again.");
+            }
+        } catch (err) {
+            setMessage("Network error: unable to start Demo session.");
+            console.error("Error starting demo session:", err);
+        } finally {
+            setIsDemoSubmitting(false);
+        }
     };
     const handleForgotPassButton = () => {
         navigate(FORGOT_PASSWORD_PAGE);
@@ -150,6 +189,17 @@ function Login() {
                         className="block w-full text-center text-sm"
                     >
                         Forgot your password?
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="text"
+                        onClick={handleDemoButton}
+                        disabled={isSubmitting || isDemoSubmitting}
+                        className="demo-neon-border demo-neon-border--button block w-full rounded-control border border-dsBrand-200 py-2.5 text-center text-ds-button font-semibold no-underline hover:no-underline"
+                    >
+                        <DemoNeonBorder variant="button" />
+                        {isDemoSubmitting ? "Starting Demo…" : "Explore as Demo User"}
                     </Button>
                 </div>
             </form>

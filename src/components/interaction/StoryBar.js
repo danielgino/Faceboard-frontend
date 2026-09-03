@@ -27,7 +27,7 @@ function StoryBar() {
     const [showStories, setShowStories] = useState(false);
     const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
     const { stories, loading, uploadStory, fetchStories } = useStories();
-    const { user } = useUser();
+    const { user, isDemo } = useUser();
     // Phase J: migrated off Utils.js's static (module-load-time) isMobile,
     // which never updated on resize/rotation - see useIsMobile.js's own
     // HOOK-003 comment for the other call sites that already made this move.
@@ -165,8 +165,11 @@ function StoryBar() {
 
                     <button
                         type="button"
-                        className="flex flex-col items-center justify-center gap-1.5 cursor-pointer border-0 bg-transparent p-0 flex-shrink-0"
-                        onClick={() => openStoryUploadDialog(uploadStory, fetchStories)}
+                        className="flex flex-col items-center justify-center gap-1.5 cursor-pointer border-0 bg-transparent p-0 flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => { if (!isDemo) openStoryUploadDialog(uploadStory, fetchStories); }}
+                        disabled={isDemo}
+                        aria-disabled={isDemo || undefined}
+                        title={isDemo ? "Story uploads are disabled in Demo Mode." : undefined}
                     >
                         <div className="relative">
                             <PrimitiveAvatar

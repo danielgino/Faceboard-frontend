@@ -100,3 +100,74 @@ test("a failed login shows the existing error message and no popup - unchanged",
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(screen.queryByText(/connecting/i)).not.toBeInTheDocument();
 });
+
+// Neon-border polish: the animated glow is decoration only, applied via className, with no new
+// wrapper DOM node and no interactive layer of its own - these tests prove the styling hook
+// lands only on the intended button and that the button's real click behavior is untouched.
+describe("Demo Mode neon border", () => {
+    test("only 'Explore as Demo User' gets the neon-border classes - the normal Log in button does not", () => {
+        render(<Login />);
+
+        const demoButton = screen.getByRole("button", { name: /explore as demo user/i });
+        expect(demoButton.className).toContain("demo-neon-border");
+        expect(demoButton.className).toContain("demo-neon-border--button");
+
+        const loginButton = screen.getByRole("button", { name: "Log in" });
+        expect(loginButton.className).not.toContain("demo-neon-border");
+    });
+
+    test("the runner is a decorative, aria-hidden SVG perimeter outline inside the Demo button - not a rotating background", () => {
+        render(<Login />);
+
+        const demoButton = screen.getByRole("button", { name: /explore as demo user/i });
+        const svg = demoButton.querySelector("svg.demo-neon-border-svg--button");
+        expect(svg).not.toBeNull();
+        expect(svg).toHaveAttribute("aria-hidden", "true");
+        // Both rects are outline-only (fill: none in CSS) - a track (always visible) and a
+        // runner (the animated dash) tracing the same rounded-rect path, not a gradient fill.
+        expect(svg.querySelectorAll("rect.demo-neon-border-track")).toHaveLength(1);
+        expect(svg.querySelectorAll("rect.demo-neon-border-runner")).toHaveLength(1);
+
+        // The normal Log in button must not render this decoration at all.
+        const loginButton = screen.getByRole("button", { name: "Log in" });
+        expect(loginButton.querySelector("svg.demo-neon-border-svg")).toBeNull();
+    });
+
+    test("clicking 'Explore as Demo User' still starts a Demo session exactly as before - no extra clickable layer intercepts it", async () => {
+        mockFetchWithRetries.mockResolvedValue({ ok: true, text: async () => "demo-jwt-token" });
+
+        render(<Login />);
+        await act(async () => {
+            fireEvent.click(screen.getByRole("button", { name: /explore as demo user/i }));
+        });
+
+        expect(mockFetchWithRetries).toHaveBeenCalledTimes(1);
+        expect(localStorage.getItem("jwtToken")).toBe("demo-jwt-token");
+        expect(mockFetchUserDetails).toHaveBeenCalledWith("demo-jwt-token");
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    test("the Demo button's own loading/disabled state still works with the neon classes present", async () => {
+        mockFetchWithRetries.mockReturnValue(new Promise(() => {})); // never resolves in this test
+
+        render(<Login />);
+        const demoButton = screen.getByRole("button", { name: /explore as demo user/i });
+        fireEvent.click(demoButton);
+
+        const loadingButton = await screen.findByRole("button", { name: /starting demo/i });
+        expect(loadingButton).toBeDisabled();
+        expect(loadingButton.className).toContain("demo-neon-border");
+    });
+
+    test("a second click while a Demo session is already starting does not fire a second request", async () => {
+        mockFetchWithRetries.mockReturnValue(new Promise(() => {}));
+
+        render(<Login />);
+        const demoButton = screen.getByRole("button", { name: /explore as demo user/i });
+        fireEvent.click(demoButton);
+        fireEvent.click(demoButton);
+        fireEvent.click(demoButton);
+
+        await waitFor(() => expect(mockFetchWithRetries).toHaveBeenCalledTimes(1));
+    });
+});

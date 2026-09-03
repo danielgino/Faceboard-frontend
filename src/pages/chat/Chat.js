@@ -36,7 +36,10 @@ function Chat() {
     // unmount with no conversation open) would register a leave-signal
     // cleanup for a conversation that was never actually active.
     useEffect(() => {
-        if (!currentUser) {
+        // Demo Mode: WebSocket never connects for a demo session (backend rejects CONNECT
+        // outright regardless), so these sends would only ever no-op with a console warning -
+        // skip them outright instead.
+        if (!currentUser || user?.demo) {
             return;
         }
 
@@ -46,7 +49,7 @@ function Chat() {
         return () => {
             sendActiveChatStatus(user.id, null);
         };
-    }, [currentUser, sendActiveChatStatus, sendMarkAsRead, user.id]);
+    }, [currentUser, sendActiveChatStatus, sendMarkAsRead, user.id, user?.demo]);
 
     const handleSelectUser = async (selectedUser) => {
         if (!messages[selectedUser.id]) {
@@ -55,7 +58,9 @@ function Chat() {
         markThreadRead(selectedUser.id);
 
         setMessages(prev => {
-            if (!prev[selectedUser.id]) return prev;
+            // Array.isArray, not just a truthiness check - see MessageProvider.js's
+            // fetchConversationMessages for the full Demo Chat crash root-cause note.
+            if (!Array.isArray(prev[selectedUser.id])) return prev;
 
             const updated = prev[selectedUser.id].map(msg =>
                 msg.senderId === selectedUser.id ? { ...msg, isRead: true } : msg

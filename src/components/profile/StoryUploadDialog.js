@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import ThemedSwal from "../../utils/swalTheme";
 import {validateUploadFile, describeRejectionReason} from "../../utils/uploadValidation";
 
 // withReactContent(...) doesn't reliably inherit Swal.mixin() defaults
@@ -7,7 +8,11 @@ import {validateUploadFile, describeRejectionReason} from "../../utils/uploadVal
 // call here instead of via the shared utils/swalTheme mixin every other
 // Swal.fire call site uses. The visual theme itself (SwalDesignTheme.css)
 // is keyed off SweetAlert2's own always-present classes, not an opt-in
-// customClass, so it applies here with no extra wiring either way.
+// customClass, so it applies here with no extra wiring either way. The
+// file-picker/caption steps below still need this raw MySwal (input +
+// preConfirm aren't exposed by the ThemedSwal mixin); the post-upload
+// result popup instead uses ThemedSwal directly, matching every other
+// plain title/text/icon popup in the app (SharePostModal, UserDetails, etc.).
 const MySwal = withReactContent(Swal);
 const DS_SWAL_OPTS = { buttonsStyling: false };
 
@@ -63,9 +68,9 @@ export default async function openStoryUploadDialog(uploadStory, fetchStories) {
         const uploaded = await uploadStory(file, caption || "");
         if (uploaded) {
             await fetchStories();
-            MySwal.fire({ title: "Success", text: "Story uploaded!", icon: "success", ...DS_SWAL_OPTS });
+            ThemedSwal.fire({ title: "Success", text: "Story uploaded!", icon: "success" });
         } else {
-            MySwal.fire({ title: "Error", text: "Upload failed", icon: "error", ...DS_SWAL_OPTS });
+            ThemedSwal.fire({ title: "Error", text: "Upload failed", icon: "error" });
         }
     } catch (err) {
         console.error("Upload error:", err);

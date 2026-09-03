@@ -9,7 +9,7 @@ import {AuthFieldError} from "../../components/auth/AuthFieldError";
 // owns its own independent `showPassword` state (the `[name]`-keyed object
 // was vestigial — every instance only ever reads/writes its own `name` key —
 // simplified to a plain per-instance boolean with identical outward behavior).
-export const PasswordInput = ({id, name, label, value, onChange, error}) => {
+export const PasswordInput = ({id, name, label, value, onChange, error, disabled = false}) => {
     const [visible, setVisible] = useState(false);
     // ResetPassword.js's two call sites don't pass `id`, only `name` — match
     // Input's own id/name fallback so the label's htmlFor and AuthFieldError's
@@ -30,6 +30,7 @@ export const PasswordInput = ({id, name, label, value, onChange, error}) => {
                     type={visible ? "text" : "password"}
                     required
                     error={error}
+                    disabled={disabled}
                     className="pr-11"
                 />
                 <button

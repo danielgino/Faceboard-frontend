@@ -34,7 +34,11 @@ export const MessageProvider = ({ children }) => {
     const markThreadRead = (peerId) => {
         resetUnreadFor(peerId);
         setMessages((prev) => {
-            const arr = prev[peerId] || [];
+            // Array.isArray, not just a truthiness/`|| []` fallback: a failed or denied
+            // conversation fetch (see fetchConversationMessages below) must never leave a
+            // non-array value here for .map() to be called on - see the Demo Chat crash root
+            // cause note there for why this mattered in practice.
+            const arr = Array.isArray(prev[peerId]) ? prev[peerId] : [];
             const updated = arr.map((m) =>
                 m.senderId === peerId ? { ...m, isRead: true } : m
             );
@@ -67,10 +71,19 @@ export const MessageProvider = ({ children }) => {
         }
     }, [user?.id]);
 
+    // A failed/denied request's body (e.g. a 403 JSON error) is never stored into `messages` -
+    // only a genuine array is - so downstream `.map()` calls (Chat.js, markThreadRead) can never
+    // crash on a non-array value, regardless of why a fetch didn't return one.
     const fetchConversationMessages = async (userId, otherUserId) => {
         try {
             const res = await fetchWithAuth(GET_CONVERSATION_BETWEEN_USERS_API(userId, otherUserId));
-            const messagesData = await res.json();
+            if (!res.ok) {
+                console.warn("Failed to fetch conversation messages:", res.status);
+                setMessages((prev) => ({ ...prev, [otherUserId]: Array.isArray(prev[otherUserId]) ? prev[otherUserId] : [] }));
+                return;
+            }
+            const parsed = await res.json();
+            const messagesData = Array.isArray(parsed) ? parsed : [];
 
             setMessages((prev) => ({ ...prev, [otherUserId]: messagesData }));
             setOlderMessagesMeta((prev) => ({

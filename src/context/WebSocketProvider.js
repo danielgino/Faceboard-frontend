@@ -24,7 +24,10 @@ export const WebSocketProvider = ({ children }) => {
     const pendingOnConnectRef = useRef([]);
 
     const connect = useCallback((onConnectCallback) => {
-        if (!user?.id) return;
+        // Demo Mode: the backend rejects every STOMP CONNECT for a demo session outright (see
+        // JwtChannelInterceptor.java) - never attempt one, regardless of caller, so stompjs's
+        // reconnectDelay never retries a connection that can only ever fail.
+        if (!user?.id || user?.demo) return;
 
         if (clientRef.current && connectedUserIdRef.current === user.id) {
             // Already connected (or connecting) as this exact user -
@@ -82,7 +85,7 @@ export const WebSocketProvider = ({ children }) => {
         client.activate();
         clientRef.current = client;
         connectedUserIdRef.current = user.id;
-    }, [user?.id]);
+    }, [user?.id, user?.demo]);
 
     useEffect(() => {
         return () => {

@@ -7,8 +7,8 @@ import { Button } from "../../components/common/Button";
 // and is no longer preserved for its own sake. External prop contract
 // (onClick, text, loading) is unchanged, so AddPost.js - the only
 // consumer - needed no changes.
-const ShareButton = ({ onClick, text, loading }) => (
-    <Button onClick={onClick} loading={loading} className="px-6">
+const ShareButton = ({ onClick, text, loading, disabled }) => (
+    <Button onClick={onClick} loading={loading} disabled={disabled} className="px-6" title={disabled ? "Posting is disabled in Demo Mode." : undefined}>
         {loading ? "Posting..." : text}
     </Button>
 );

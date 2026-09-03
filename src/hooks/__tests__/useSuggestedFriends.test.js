@@ -9,8 +9,9 @@ import { renderHook, waitFor, act } from "@testing-library/react";
 // optimistic "Sent" state when sendFriendRequest actually succeeds.
 
 const mockUser = { id: 99 };
+let mockIsDemo = false;
 jest.mock("../../context/UserProvider", () => ({
-    useUser: () => ({ user: mockUser }),
+    useUser: () => ({ user: mockUser, isDemo: mockIsDemo }),
 }));
 
 const mockSendFriendRequest = jest.fn();
@@ -41,6 +42,40 @@ beforeEach(() => {
     mockFetchWithAuth.mockReset();
     mockSuggestedFriendsApi.mockClear();
     mockSendFriendRequest.mockReset();
+    mockIsDemo = false;
+});
+
+// Demo Mode: GET /friendship/suggestions is not on the backend's Demo allowlist. Rather than an
+// empty card, a small static mock list is shown - with no backend request at all.
+describe("Demo Mode", () => {
+    test("returns a populated mock list without ever calling the real suggestions endpoint", async () => {
+        mockIsDemo = true;
+
+        const { result } = renderHook(() => useSuggestedFriends());
+
+        // Give any accidental effect a tick to fire before asserting it didn't.
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(result.current.suggestions.length).toBeGreaterThan(0);
+        expect(result.current.disabled).toBe(true);
+        expect(mockFetchWithAuth).not.toHaveBeenCalled();
+        expect(mockSuggestedFriendsApi).not.toHaveBeenCalled();
+    });
+
+    test("onAdd/onShowMore are not provided, so a suggestion can never trigger a friend-request call", async () => {
+        mockIsDemo = true;
+
+        const { result } = renderHook(() => useSuggestedFriends());
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(result.current.onAdd).toBeUndefined();
+        expect(result.current.onShowMore).toBeUndefined();
+        expect(mockSendFriendRequest).not.toHaveBeenCalled();
+    });
 });
 
 test("initial load requests the first page with no cursor/seed/wrapped and exposes the returned suggestions", async () => {

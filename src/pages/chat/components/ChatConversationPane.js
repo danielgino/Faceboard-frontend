@@ -5,6 +5,7 @@ import { ArrowLeft, MessageCircle } from "lucide-react";
 import { formatDate } from "../../../utils/Utils";
 import renderMessageBubbles from "./renderMessageBubbles";
 import PrimitiveAvatar from "../../../components/common/Avatar";
+import { useUser } from "../../../context/UserProvider";
 
 // Owns the entire right-hand chat pane (header, message list, composer).
 // chatscope's ChatContainer/ConversationHeader match their header/list/
@@ -15,6 +16,10 @@ import PrimitiveAvatar from "../../../components/common/Avatar";
 // (see its own file) so MessageList receives a flat <Message> array, the
 // only child shape its own validator accepts.
 function ChatConversationPane({currentUser, onBack, messages, sendingGhosts, user, onSend, onLoadOlder, hasMoreOlder, loadingOlder}) {
+    // Demo Mode: WebSocketProvider never opens a connection for a demo session (the backend
+    // rejects CONNECT outright either way), so a send here would otherwise silently no-op with
+    // only a console warning - disabling the input gives an honest, immediate signal instead.
+    const { isDemo } = useUser();
     return (
         <ChatContainer>
             {currentUser ? (
@@ -54,7 +59,12 @@ function ChatConversationPane({currentUser, onBack, messages, sendingGhosts, use
                 removing the control from the DOM entirely (not just
                 disabling it) - no attachment feature exists, so a
                 visible-but-inert paperclip icon is not shipped (Phase J). */}
-            <MessageInput placeholder="Type message here..." onSend={onSend} disabled={!currentUser} attachButton={false} />
+            <MessageInput
+                placeholder={isDemo ? "Demo mode is read-only." : "Type message here..."}
+                onSend={onSend}
+                disabled={!currentUser || isDemo}
+                attachButton={false}
+            />
         </ChatContainer>
     );
 }

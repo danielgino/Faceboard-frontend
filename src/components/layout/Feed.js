@@ -7,6 +7,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useUser } from "../../context/UserProvider";
 import NoPostsYet from "../../assets/loaders/NoPostsYet";
 import { useLocation } from "react-router-dom";
+import DemoModeBanner from "../common/DemoModeBanner";
 
 function Feed({ isFeed = false, userId = null }) {
     const {
@@ -90,6 +91,8 @@ function Feed({ isFeed = false, userId = null }) {
         <div className="flex flex-col items-center w-full overflow-x-hidden">
             <div
                 className="w-full max-w-[100vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 sm:px-4 overflow-x-hidden">
+
+                {isFeed && user?.demo && <DemoModeBanner/>}
 
                 {(isFeed || Number(userId) === user?.id) && <AddPost/>}
 

@@ -30,7 +30,7 @@ import SharePostModal from "./SharePostModal";
 // than dropped.
 function Post({ post, onDelete }) {
     const [showComments, setShowComments] = useState(false);
-    const { user } = useUser();
+    const { user, isDemo } = useUser();
     const { editPost, deletePost } = usePosts();
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(post.content);
@@ -196,8 +196,11 @@ function Post({ post, onDelete }) {
 
                 <button
                     type="button"
-                    onClick={() => setShowShareModal(true)}
-                    className="flex items-center gap-1.5 text-dsNeutral-600 hover:text-dsNeutral-900 transition"
+                    onClick={() => { if (!isDemo) setShowShareModal(true); }}
+                    disabled={isDemo}
+                    title={isDemo ? "Sharing is disabled in Demo Mode." : undefined}
+                    aria-disabled={isDemo || undefined}
+                    className="flex items-center gap-1.5 text-dsNeutral-600 hover:text-dsNeutral-900 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-dsNeutral-600"
                     aria-label="Share this post"
                 >
                     <RandomIcons.Share/>
