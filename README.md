@@ -1,302 +1,122 @@
+# Faceboard Frontend
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/f5783ee3-9716-4606-ac48-422ba553cd1a" alt="Facrboard React Project" width="550"/>
-</p>
+React client for Faceboard, a social network with posts, friendships, real-time chat and notifications. It talks to the [Faceboard backend](https://github.com/danielgino/Faceboard-backend) over a REST API and a STOMP/WebSocket connection.
 
-### Link: https://faceboard-frontend.vercel.app
+This repo covers the client only — API design, auth internals and data storage live in the backend repository.
 
-### The site is still under testing.*
+## Live Demo
 
-### Full Explanation and instructions coming soon!
+https://faceboard-frontend.vercel.app
 
-# Faceboard - A Modern Social Network 🧑‍🤝‍🧑📱
+The Login page has an "Explore as Demo User" button that logs into a shared, read-only demo account — no sign-up needed. Mutating actions (posting, liking, messaging, editing a profile, etc.) are disabled in the UI, and the backend rejects them independently.
 
-**Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
-*The site is under active testing.*
+## Screenshots
 
-Faceboard is a full‑featured social network built with a modern web stack. It offers posts (with up to 4 images), likes, comments, a complete friends system, real‑time chat, live notifications (with optional sounds), password resets via email, and a responsive UI that feels great on desktop and mobile.
+TODO: add screenshots of the feed, chat and profile pages.
 
----
+## Features
 
-## ✨ Features
+- News feed with posts, image uploads, likes and comments
+- Friend requests, friend list and suggested friends
+- User search
+- Stories and a profile image gallery
+- Real-time notifications
+- Real-time chat with persisted history, read receipts and sharing a post's permalink into a conversation
+- Profile and account settings
+- Responsive layout: sidebar navigation on desktop, bottom navigation on mobile
+- Demo mode with a read-only sample account
 
-* **Posts**: create, edit, and delete posts; attach up to **4 images** (via Cloudinary)
-* **Images**: file picker upload, optimized cloud delivery
-* **Reactions**: like & comment on posts
-* **Comments**: add and delete.
-* **Friends System**: request, accept/decline.
-* **Chat (Real-time)**: WebSockets (STOMP + SockJS), **unread counters**, **read receipts** (green ✓)
-* **Notifications**: full real-time system with **incoming sound support**
-* **Authentication & Security**: JWT secured APIs, role handling, **password reset via email**
-* **Profile Management**: edit personal details & profile picture
-* **Responsive**: fully responsive (desktop ↔ mobile)
-* **Error Handling**: friendly **404** and **403 (no permission)** pages
+## Frontend Highlights
 
----
+- State managed through React Context providers (user, posts, messages, notifications, friendships, stories, search) rather than Redux
+- All authenticated requests go through a single `fetchWithAuth` helper (`src/utils/Utils.js`) that attaches the JWT, handles 401 cleanup and surfaces demo-mode denials
+- Route protection via a `RouteGuard` component that gates public/protected routes and redirects based on auth state
+- WebSocket client built directly on `@stomp/stompjs`, with reconnect and heartbeat configured on the STOMP client; the provider never opens a connection for a demo session
+- Infinite-scroll feed with page-based fetching and de-duplication
+- Client-side upload validation (type/size) ahead of the backend's own checks
+- Responsive desktop sidebar / mobile bottom-nav layout driven by the same route set
 
-## 🧰 Tech Stack
+## Tech Stack
 
-### Frontend
+- React 18, React Router
+- Create React App (`react-scripts`)
+- Tailwind CSS and styled-components
+- `@stomp/stompjs` for WebSocket/STOMP messaging
+- ChatScope UI Kit for the chat interface
+- Jest and React Testing Library
 
-* **React (CRA)** + **React Router**
-* **Tailwind CSS** (utility-first styling)
-* **shadcn/ui**, **Aceternity**, **Magic UI** (UI components)
-* **Axios** (REST)
-* **STOMP.js + SockJS** (WebSockets)
-* **SweetAlert2**, **Lottie**, **Framer Motion**
+## Client Architecture
 
-### Backend
+`App.js` wraps the route tree in `UserProvider`, then nests the protected routes inside the domain providers (`FriendshipProvider`, `NotificationProvider`, `MessageProvider`, `WebSocketProvider`, `StoryProvider`, `PostProvider`, `SearchProvider`). `RouteGuard` decides, per route group, whether to render the page, redirect to login, or show `Unauthorized`/`Page404`.
 
-* **Spring Boot** (REST API + WebSockets)
-* **JWT** auth (HS256)
-* **MySQL** (relational DB)
-* **Cloudinary** SDK (image storage)
-* **Java Mail** (password resets)
+`WebSocketProvider` owns the STOMP client lifecycle (connect/reconnect/teardown on login, logout and account switch); `WebSocketHandler` subscribes to the per-user message, notification and read-receipt topics and pushes updates into the relevant context. All REST calls go through `fetchWithAuth`, which is the one place that attaches the JWT and reacts to 401/403 responses.
 
----
+Pages live under `src/pages`, reusable UI under `src/components`, and shared logic under `src/hooks` and `src/utils`.
 
-## 📸 Application Screenshots
+## Demo Mode
 
+The Demo button logs into a shared account flagged `demo: true` on `/auth/me`. The frontend uses that flag to:
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/b5b7972c-0a9f-4371-aee2-892669bf27b7" alt="Facrboard React Project" width="600"/>
-</p>
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/7e2727ff-916f-490a-897a-a180429d1793" alt="Facrboard React Project" width="600"/>
-</p>
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/2afa2d48-f3ba-49ff-b362-bc8ff109c778" alt="Facrboard React Project" width="300"/>
-</p>
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/aef5f098-199d-4662-a181-caf5dec3005c" alt="Facrboard React Project" width="300"/>
-</p>
+- show a `DemoModeBanner` and disable/hide mutation controls (posting, liking, commenting, friend actions, profile edits, uploads)
+- serve stories and gallery images for the seed demo profiles from static assets in `public/demo-assets` instead of hitting the backend
+- surface a toast when the backend still rejects a demo request (`DEMO_READ_ONLY` / `DEMO_ACCESS_DENIED`)
+- skip opening a WebSocket connection entirely for demo sessions
 
----
+These frontend checks are for UX; the backend remains the authoritative security boundary for demo restrictions. See the [backend README](https://github.com/danielgino/Faceboard-backend) for the server-side implementation.
 
-## ⚙️ MySQL Configuration
-
-### Backend (Spring Boot)
-
-`application.yml` example:
-
-```yaml
-server:
-  port: 8080
-
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/faceboard?useSSL=false&serverTimezone=UTC
-    username: root
-    password: your_mysql_password
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-
-spring:
-  mail:
-    host: smtp.yourprovider.com
-    port: 587
-    username: your_smtp_user
-    password: your_smtp_password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-app:
-  frontendBaseUrl: http://localhost:3000
-  jwtSecret: ${JWT_SECRET:localDevSecretKeyThatIsLongEnoughForHMAC256_123456789}
-  cloudinary:
-    cloudName: your_cloud_name
-    apiKey: your_api_key
-    apiSecret: your_api_secret
-  cors:
-    allowedOrigins: "http://localhost:3000,https://faceboard-frontend.vercel.app"
-```
-
-### Maven Dependency
-
-```xml
-<dependency>
-  <groupId>mysql</groupId>
-  <artifactId>mysql-connector-j</artifactId>
-  <scope>runtime</scope>
-</dependency>
-```
-
----
-
-## 🚀 Getting Started (Local)
-
-### Backend
+## Running Locally
 
 ```bash
-cd server
-./mvnw spring-boot:run
-```
-
-API will be available at `http://localhost:8080`.
-
-### Frontend
-
-```bash
-cd client
+git clone https://github.com/danielgino/Faceboard-frontend.git
+cd Faceboard-frontend
 npm install
 npm start
 ```
 
-Runs on `http://localhost:3000`.
+Runs on `http://localhost:3000`. You'll need a running instance of the [backend](https://github.com/danielgino/Faceboard-backend) and the environment variables below.
 
----
+## Environment Variables
 
-## 📂 Project Structure
+Set these in a `.env` or `.env.local` file at the project root:
 
-```
-assets/
-│
-├─ buttons/
-│ ├─ ShareButtom.js
-│ ├─ StyleButton.js
-│ └─ TransparentButton.js
-│
-├─ imagelightbox/
-│ ├─ GlobalImageLightbox.js
-│ └─ ImageLightBox.js
-│
-├─ inputs/
-│ ├─ EditableField.js
-│ ├─ GlobalInput.js
-│ ├─ InputAlerts.js
-│ ├─ PasswordInput.js
-│ └─ SearchInput.js
-│
-├─ loaders/
-│ ├─ AlbumPageLoader.js
-│ ├─ CardSkeletonLoader.js
-│ ├─ CommentLoader.js
-│ ├─ FriendsSkeleton.js
-│ ├─ GeneralLoadingLogo.js
-│ ├─ LikeLoader.js
-│ ├─ NoAlbumYet.js
-│ ├─ NoPostsYet.js
-│ └─ PostLoader.js
-│
-├─ photos/
-│ ├─ github.png
-│ ├─ linkedin.png
-│ ├─ mail.png
-│ ├─ noPhotosYet.png
-│ └─ logo/
-│ ├─ FaceboardLogo.png
-│ ├─ LogoLoading.png
-│ └─ logoPNG.png
-│
-└─ styles/
-├─ ChatOverride.css
-└─ ImageLightboxOverride.css
+| Variable | Purpose |
+|---|---|
+| `REACT_APP_API_URL` | Base URL of the backend REST API |
+| `REACT_APP_WS_URL` | WebSocket (STOMP) broker URL for chat/notifications |
 
-components/
-│
-├─ about/
-│ ├─ AboutCard.js
-│ ├─ AnimatedMenu.js
-│ └─ GalaxyBackground.js
-│
-├─ interaction/
-│ ├─ EmojiLibrary.js
-│ ├─ LikeList.js
-│ ├─ Notification.js
-│ ├─ Search.js
-│ └─ StoryBar.js
-│
-├─ layout/
-│ ├─ Feed.js
-│ ├─ Footer.js
-│ ├─ HeaderBar.js
-│ ├─ MainLayout.js
-│ └─ SideBar.js
-│
-├─ posts/
-│ ├─ AddComment.js
-│ ├─ AddPost.js
-│ ├─ Comment.js
-│ ├─ Like.js
-│ ├─ Post.js
-│ └─ PostImages.js
-│
-└─ profile/
-├─ FriendsCard.js
-├─ FriendshipActionButton.js
-├─ StoryUploadDialog.js
-└─ UserDetails.js
+## Testing
 
-context/
-├─ FriendshipProvider.js
-├─ LightBoxContext.js
-├─ MessageProvider.js
-├─ NotificationProvider.js
-├─ PostProvider.js
-├─ SearchProvider.js
-├─ StoryProvider.js
-├─ useAutoSaveField.js
-├─ useProfilePictureUpload.js
-├─ UserProvider.js
-└─ WebSocketProvider.js
-
-Icons/
-├─ HeaderBarIcons.js
-├─ HeartIcon.js
-├─ RandomIcons.js
-└─ SideBarIcons.js
-
-pages/
-├─ About.js
-├─ Album.js
-├─ ForgotPassword.js
-├─ Friends.js
-├─ Home.js
-├─ Login.js
-├─ MobileNotifications.js
-├─ Page404.js
-├─ Profile.js
-├─ ResetPassword.js
-├─ SearchPage.js
-├─ Settings.js
-├─ SignUp.js
-├─ SinglePostPage.js
-├─ Unauthorized.js
-└─ chat/
-├─ Chat.js
-└─ ConversationsList.js
-
-service/
-└─ WebSocketHandler.js
-
-utils/
-├─ RouteGuard.js
-├─ Utils.js
-└─ enums/
-└─ FriendshipStatus.js
+```bash
+npm test
 ```
 
----
+Tests use Jest and React Testing Library, covering contexts/providers, hooks, `fetchWithAuth` and other utils, and key components/pages (chat, posts, settings, auth forms, demo-mode behavior). There's no end-to-end test suite.
 
-## 📫 Contact
+## Deployment
 
-* **Author:** Daniel Gino
-* **Email:** :Danielgino3@gmail.com
-* **Live demo:** [https://faceboard-frontend.vercel.app](https://faceboard-frontend.vercel.app)
+The frontend is hosted on Vercel. GitHub Actions (`.github/workflows/ci.yml`) runs `npm test` and `npm run build` on pull requests and pushes to `main`; deployment is handled separately by Vercel.
 
----
+## Project Structure
 
+```
+src/
+  pages/
+  components/
+  context/
+  hooks/
+  service/
+  utils/
+```
 
+## Backend
 
+API, auth, WebSocket server, database and infrastructure details live in the backend repo:
 
+https://github.com/danielgino/Faceboard-backend
 
+## Author
+
+Daniel Gino
+
+- GitHub: https://github.com/danielgino
+- LinkedIn: https://www.linkedin.com/in/daniel-gino-2b6350345/
