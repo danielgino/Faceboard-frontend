@@ -1,3 +1,6 @@
+
+<img width="651" height="361" alt="FACEBOARD" src="https://github.com/user-attachments/assets/88b6ffda-9dfb-4f09-a8c6-a517e7aa323c" />
+
 # Faceboard Frontend
 
 React client for Faceboard, a social network with posts, friendships, real-time chat and notifications. It talks to the [Faceboard backend](https://github.com/danielgino/Faceboard-backend) over a REST API and a STOMP/WebSocket connection.
@@ -12,7 +15,24 @@ The Login page has an "Explore as Demo User" button that logs into a shared, rea
 
 ## Screenshots
 
-TODO: add screenshots of the feed, chat and profile pages.
+### Desktop
+
+#### Feed
+<img width="1661" height="893" alt="feed desktop" src="https://github.com/user-attachments/assets/65dabde8-4799-40e7-a9a8-73d069e204d2" />
+
+#### Profile
+<img width="1800" height="913" alt="profile desktop" src="https://github.com/user-attachments/assets/54aa9cee-c2aa-4ef6-a072-f04d1a806653" />
+
+### Mobile
+
+#### Chat
+<img width="441" height="813" alt="chat desktop" src="https://github.com/user-attachments/assets/8599afc5-880c-4d98-b416-914a9d81fd5f" />
+
+#### Feed
+<img width="523" height="837" alt="feed mobile" src="https://github.com/user-attachments/assets/bd894f8f-628a-4085-b7f3-4876a2478915" />
+
+#### Profile
+<img width="436" height="832" alt="profile mobile" src="https://github.com/user-attachments/assets/0586d420-4326-487f-a5fa-cfdbb2b3c71b" />
 
 ## Features
 
